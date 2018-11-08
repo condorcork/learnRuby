@@ -64,6 +64,7 @@ end
 
 
 #----- MAIN ------
+=begin
 prompt= [
   "Chose A B C",
   "   A: fghhhjj",
@@ -75,7 +76,7 @@ p sel
 
 nn = char_selected( "chose A B C\n A : Abc\n B : Bbb\n",'ABC')
 p nn
-exit
+=end
 
 #... New 
 puts 

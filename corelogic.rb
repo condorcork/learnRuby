@@ -25,6 +25,7 @@ require 'date'
 #
 #-----------------
 #
+=begin # mved to Helper
 # [0.. @num_workers + 1(for check)][0..34]
 # [0.. @num_workers][0..34]
 #     ' ' : free
@@ -52,8 +53,14 @@ require 'date'
 #       :daycheck  [0..31+4]
 #       :dayview   [0..31+4]
 #................
+=end
 
 class Yotei
+
+#require './view'
+#include './View'
+#include './ControlHelper'
+  
   
   attr_accessor    :Teiin,
        :yotei,
@@ -89,7 +96,7 @@ class Yotei
         date=Date.today
 
     #[- Honban --]
-    # date=Date.today    
+    # date=Date.today
 #....
     puts "tmp Today : #{date.year} #{date.month} #{date.day}\n\t#{date}"
     #
@@ -107,7 +114,7 @@ puts " Month Specified #{month}"
       end
     end
     #
-    @num_days16= daysofmonth(@month_16)
+    @num_days16= daysOnMonth(@month_16)
     @wday_16 = Date.new(@year_16, @month_16, 16).wday
     
 #    @num_idx_days = @num_days16 + 15
@@ -322,9 +329,10 @@ end
   end
 
 
+=begin  # Moved to  Helper
   ## moved , after ok reset place
     #.............................
-    def daysofmonth(mon, year=nil)
+    def daysOnMonth(mon, year=nil)
     #.............................
       case mon
       when 1,3,5,7,8,10,12
@@ -339,7 +347,8 @@ end
         end
       end
     end
-
+=end
+  
   #.............................
   def checked_str(num_filled)
   #.............................
@@ -399,7 +408,8 @@ end
     puts "# End def examine( #{ex_workers}, #{isview} )"
   end
 
-    #.................................................
+=begin #  moved to Helper
+  #.................................................
     def start_p(yti)
     #.................................................
       if yti[3] == ' ' then    # _|
@@ -440,7 +450,7 @@ end
         end
       end
     end
-
+=end
   ##
   ##
   
@@ -493,6 +503,7 @@ if @debug_ > 10
 end
   end
 
+=begin   # moved to Helper  
   #...........................
   def stat_day(idx_day, chk_members=[0,1,2,3], views=false)
   #...........................
@@ -542,6 +553,7 @@ end
     }
     p pos_OffDays
   end
+=end
 
   def checkCase()
    
@@ -610,17 +622,18 @@ end
     #  add_OffDays(idxWorker, pos_OffDays)
     #-----------
   end
-  
+
+=begin # moved to Helper
   #................................
   def cnt_filled(idx_day, idx_workers=[0, 1, 2])
   #................................
     cnt=0
     idx_workers.each{|w|
-=begin
-      if ! isDayOff(w, idx_day )
-        cnt+=1
-      end
-=end
+##=begin when isDayOff is corrected
+##      if ! isDayOff(w, idx_day )
+##        cnt+=1
+##      end
+##=end
       
      case @wrkdays[w][idx_day]
       when ' ', 'D',  'y', 'Y'
@@ -631,7 +644,8 @@ end
     }
     cnt
   end
-
+=end
+  
   #..............................
   def shift_to(idxWorker, direction=+1)
   #..............................
@@ -673,6 +687,7 @@ end
     @wrkdays[idxWorker] = strDays.split('')
   end
 
+=begin   # moved to Helper  
   #................................
   def isDayOff(idxWorker, day)
   #   return is 'the Day is OffDay'
@@ -687,25 +702,30 @@ end
       true
     end
   end
+=end
 
-
+  #................................
   def adjust(idx_to_change)
+    #................................
+    puts "-------------------"
     puts "#  adjust( #{idx_to_change} )"
     save_Case
+    puts "Case Person #{idx_to_change}"
+    hor_show
     cnt=changed=0 
-    (4..( @num_days16 + 4) ).each {|day|
+    (4...( @num_days16 + 4) ).each {|day|
 ##      puts "# think   day #{day}   '#{@wrkdays[ idxWorker][ day ]}'"
-      case cnt_filled(day)
+      case cnt_filled(day, [0,1,2,3])
       when 1
         if @wrkdays[idx_to_change][day] == ' '
-          @wrkdays[idx_to_change][day] = 'x'
+          @wrkdays[idx_to_change][day] = color_str('x', 'RED')
           cnt+=1
           changed=+1
         else
         end
       when 3
         if @wrkdays[idx_to_change][day] == 'x'
-          @wrkdays[idx_to_change][day] = ' '
+          @wrkdays[idx_to_change][day] = color_str('*', 'RED')
           cnt-=1
           changed=+1
         else
@@ -739,6 +759,7 @@ end
     }
   end
 
+=begin   # mved to view
 #
 #  For Views
 #  
@@ -861,6 +882,7 @@ end
       puts "" + canv
     end
   end
+=end
 
   #-----------------------------
   def save_Case(isInitState=false)
