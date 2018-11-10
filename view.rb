@@ -2,23 +2,57 @@ module View
 #
 #  For Views
   #
+
+  #..........................
+#  def color_str(filled)      
+  def set_AttrStr( filled )    # for line check
+  #...........................
+##    puts "# def set_AttrStr( '#{filled}' )"
+  # 
+    # filled number (nomal 2)
+    case filled
+    when 2
+      color_str = color_str( filled.to_s, "NORMAL" )
+    when 1
+      color_str = color_str( filled.to_s, "RED" )
+    when 3
+      color_str = color_str( filled.to_s, "RED,BLINK" )
+    when 4, 0
+      color_str = color_str( filled.to_s, "RED" )
+    end
+  end
+  
   #..........................
   def color_str(str, color='')
   #...........................
 #    puts "# def color_str(#{str}, #{color})"
-    case color
-    when 'RED'
-      colorstr='31'
-    when 'GREEN'
-      colorstr='32'      
-    when 'YELLOW'
-      colorstr='33'
-    when 'NORMAL'
-      colorstr='0'
-    else
-      colorstr='34'
-    end
-    "\033[" + colorstr + 'm' + str + "\033[0m"
+    attr=""
+#    puts "# color #{color}"
+    color.split(',').each {|c|
+#      puts "## each attr '#{c}'"
+      case c
+      when 'RED'
+        c_str ='31'
+      when 'GREEN'
+        c_str ='32'      
+      when 'YELLOW'
+        c_str ='33'
+      when 'MAGENTA'
+        c_str = '35'
+      when 'NORMAL'
+        c_str='0'
+      when 'BLINK'
+        c_str='5'
+      else
+        c_str='34'
+      end
+      attr += c_str + ';'
+    }
+    attr.chop!     # delet last cahr ;
+  #      print "## attr ='", attr, "'\n"
+    ret  = "\033[" + attr + 'm' + str + "\033[0m"
+   #     print "## attr End ='", ret, "'\n"
+   #  ret
   end
 
   #.............................

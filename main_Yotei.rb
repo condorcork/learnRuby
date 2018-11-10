@@ -15,7 +15,7 @@
 # 2018-10-30(Tue) 18:57:15
 
 #require './corelogic'
-require './coredev' # for development
+require './CoreLogic' # for development
 '
 
 #---- no use
@@ -51,44 +51,10 @@ def char_selected(prompt='chose :', srcs)
   end
 end
 
-def are_you_ok?(prompt='ok ? [y|n]:')
-  while true
-    print prompt
-    res = gets
-    case res
-    when /^[yY]/
-#      puts "you say yes!"
-      return true
-    when /^[nN]/, /^$/
-#      puts "you say no!"
-      return false
-    end
-  end	
-end
-
 
 #----- MAIN ------
-=begin
-prompt= [
-  "Chose A B C",
-  "   A: fghhhjj",
-  "   B: bbbbbb ",
-  "   Q: Quit   " ].join("\n")
-sel=prompt.match(/[^A-Z]([A-Z]):/)
-p prompt
-p sel
-
-nn = char_selected( "chose A B C\n A : Abc\n B : Bbb\n",'ABC')
-p nn
-=end
-
-#... New 
-puts 
-puts "y=Yotei.new(members, 11)"
-puts "  y.prepare(3, 'DDx ')"
 members=4
-y=Yotei.new(members)  # 11, 2)
-
+y=Yotei.new(members, '2018-11-01')  # 11, 2)
 #... Prepare for Prevmonth
   # 'xx  ''xxx'    --> 0(1)
   y.prepare(0, 'xx  ')
@@ -133,20 +99,18 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
   y.hor_show()
   puts "#---- Check ---"
   ###
-  
 
-
-
-
-  if !are_you_ok?()
+  if ! y.are_you_ok?()
     exit 0
   end
 
   [0,1,2].each {|i|
     y.adjust(i)
+    break  if ! y.are_you_ok?
   }
+
   
-  if !are_you_ok?('continue? ')
+  if ! y.are_you_ok?('continue? ')
     exit 0
   end
 
@@ -184,3 +148,27 @@ y.hor_show
 
 puts "==== End of main ===="
 #=== End of Prog File ===
+
+
+
+__END__
+#nn = char_selected( "chose A B C\n A : Abc\n B : Bbb\n",'ABC')
+#p nn
+#=end
+print y.color_str("RED,BLINK", "RED,BLINK"), "\n"
+print y.color_str("GREEN,BLINK", "GREEN,BLINK"), "\n"
+print y.color_str("RED,REMOVE", "RED,REMOVE"), "\n"
+print y.color_str("RE MOVE", "RED,REMOVE"), "\n"
+print y.color_str(" "), "\n"
+exit
+
+##
+puts "======="
+a= y.set_AttrStr( 1 )
+b= y.set_AttrStr( 2 )
+c= y.set_AttrStr( 3 )
+d= y.set_AttrStr( 4 )
+
+print a," ", b, " ",  c, " ",d, "\n"
+puts "======="
+exit 

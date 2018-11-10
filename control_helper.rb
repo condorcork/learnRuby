@@ -28,11 +28,14 @@ module ControlHelper
 #       :daycheck  [0..31+4]
 #       :dayview   [0..31+4]
 #................
-
+  $onDay = 'x'
+  $offDat = ' '
+  $reserved = 'D'
+  
   #
   #----- Date --------
   #.............................
-  def daysOnMonth(mon, year=nil)
+  def daysOfMonth(year, mon)
   #.............................
     case mon
     when 1,3,5,7,8,10,12
@@ -40,7 +43,7 @@ module ControlHelper
     when 4,6,9,11
       30
     else 2
-      if Date.new(@year_16, 2, 1).leap?
+      if Date.new(year, 2, 1).leap?
         29
       else
         28
@@ -48,10 +51,7 @@ module ControlHelper
     end
   end
 
-  @year_16 ||= , 2, 1).leap?
-  
   def nextMonth(month=nil)
-    if 
   end
 
   #----- Initailze -------  
@@ -64,94 +64,47 @@ module ControlHelper
   end
   
   # 
-
-
-
-
-
+  #.................................................
+  def start_p(yti)
     #.................................................
-    def start_p(yti)
-    #.................................................
-      if yti[3] == ' ' then    # _|
-        if yti[2] == ' ' then    #  0 1 2
-          p_template=0              ##  __| X X X
-        else
-          if yti[1] == ' '        # _x_| XXX
-            p_template=0
-          else                    # xx_|
-            if yti[0] == ' '         ## _xx_| _XXX
-              p_template=4
-            else
-              p_template=4           ## xxx_| _XXX
-            end
-          end
-        end
-      else                     # x|
-        if yti[2] == ' '         # _x|
-          if yti[1] == ' '          # __x | XX__
-            p_tmplate=1
-          else                      # x_x |
-            if yti[0] == ' '
-              p_tmplate=2            ## _x_x | X__ or XX_  ... 1
-            else
-              p_tmplate= 3           ## xx_x | __X or _X_  special
-            end
-          end
-        else                     # xx|
-          if yti[1] == ' '          # _xx|
-            if yti[0]==' '
-              p_tmplate= 2            ## __xx | X__ 
-            else
-              p_tmplate= 2            ## x_xx | X__   or _XXX   
-            end
-          else                      #  xxx |
-            p_tmplate=3               ## xxx | __XXX
+    if yti[3] == ' ' then    # _|
+      if yti[2] == ' ' then    #  0 1 2
+        p_template=0              ##  __| X X X
+      else
+        if yti[1] == ' '        # _x_| XXX
+          p_template=0
+        else                    # xx_|
+          if yti[0] == ' '         ## _xx_| _XXX
+            p_template=4
+          else
+            p_template=4           ## xxx_| _XXX
           end
         end
       end
-    end
-
-    #.................................................
-    def start_p(yti)
-    #.................................................
-      if yti[3] == ' ' then    # _|
-        if yti[2] == ' ' then    #  0 1 2
-          p_template=0              ##  __| X X X
-        else
-          if yti[1] == ' '        # _x_| XXX
-            p_template=0
-          else                    # xx_|
-            if yti[0] == ' '         ## _xx_| _XXX
-              p_template=4
-            else
-              p_template=4           ## xxx_| _XXX
-            end
+    else                     # x|
+      if yti[2] == ' '         # _x|
+        if yti[1] == ' '          # __x | XX__
+          p_tmplate=1
+        else                      # x_x |
+          if yti[0] == ' '
+            p_tmplate=2            ## _x_x | X__ or XX_  ... 1
+          else
+            p_tmplate= 3           ## xx_x | __X or _X_  special
           end
         end
-      else                     # x|
-        if yti[2] == ' '         # _x|
-          if yti[1] == ' '          # __x | XX__
-            p_tmplate=1
-          else                      # x_x |
-            if yti[0] == ' '
-              p_tmplate=2            ## _x_x | X__ or XX_  ... 1
-            else
-              p_tmplate= 3           ## xx_x | __X or _X_  special
-            end
+      else                     # xx|
+        if yti[1] == ' '          # _xx|
+          if yti[0]==' '
+            p_tmplate= 2            ## __xx | X__ 
+          else
+            p_tmplate= 2            ## x_xx | X__   or _XXX   
           end
-        else                     # xx|
-          if yti[1] == ' '          # _xx|
-            if yti[0]==' '
-              p_tmplate= 2            ## __xx | X__ 
-            else
-              p_tmplate= 2            ## x_xx | X__   or _XXX   
-            end
-          else                      #  xxx |
-            p_tmplate=3               ## xxx | __XXX
-          end
+        else                      #  xxx |
+          p_tmplate=3               ## xxx | __XXX
         end
       end
     end
+  end
 
   #...........................
   def stat_day(idx_day, chk_members=[0,1,2,3], views=false)
@@ -215,9 +168,10 @@ module ControlHelper
 ##=end
       
      case @wrkdays[w][idx_day]
-      when ' ', 'D',  'y', 'Y'
-        ;
-      else    # 'x' 'X' 'u'
+ #     when ' ', '*'  # 'D',  'y', 'Y'
+ #       ;
+      when 'x','X'
+#      else    # 'x' 'X'
         cnt+=1
       end
     }
@@ -237,6 +191,24 @@ module ControlHelper
     else # ' '
       true
     end
+  end
+
+
+  #--------
+  #  miscellaneous
+  #--------
+
+  def are_you_ok?(prompt='ok ? [y|n]:')
+    while true
+      print prompt
+      res = gets
+      case res
+      when /^[yY]/
+        return true
+      when /^[nN]/, /^$/
+        return false
+      end
+    end	
   end
   
 end

@@ -27,6 +27,186 @@ Teiin = 2
 #-----------------
 #
 =begin # mved to Helper
+#  27 lines skipped
+=end
+
+#  -- set last 4 days of prev month 
+#  def prepare(idx, prevdays=' '*4, nvotAvail={})
+# 
+
+
+class Yotei
+
+#=== 'include './View'' ===#
+#=== including < view.rb > ===
+# 'module View'
+#
+#  For Views
+  #
+
+  #..........................
+#  def color_str(filled)      
+  def set_AttrStr( filled )    # for line check
+  #...........................
+##    puts "# def set_AttrStr( '#{filled}' )"
+  # 
+    # filled number (nomal 2)
+    case filled
+    when 2
+      color_str = color_str( filled.to_s, "NORMAL" )
+    when 1
+      color_str = color_str( filled.to_s, "RED" )
+    when 3
+      color_str = color_str( filled.to_s, "RED,BLINK" )
+    when 4, 0
+      color_str = color_str( filled.to_s, "RED" )
+    end
+  end
+  
+  #..........................
+  def color_str(str, color='')
+  #...........................
+#    puts "# def color_str(#{str}, #{color})"
+    attr=""
+#    puts "# color #{color}"
+    color.split(',').each {|c|
+#      puts "## each attr '#{c}'"
+      case c
+      when 'RED'
+        c_str ='31'
+      when 'GREEN'
+        c_str ='32'      
+      when 'YELLOW'
+        c_str ='33'
+      when 'MAGENTA'
+        c_str = '35'
+      when 'NORMAL'
+        c_str='0'
+      when 'BLINK'
+        c_str='5'
+      else
+        c_str='34'
+      end
+      attr += c_str + ';'
+    }
+    attr.chop!     # delet last cahr ;
+  #      print "## attr ='", attr, "'\n"
+    ret  = "\033[" + attr + 'm' + str + "\033[0m"
+   #     print "## attr End ='", ret, "'\n"
+   #  ret
+  end
+
+  #.............................
+  def hor_show(chk_members=[0,1,2,3], checkview=true)
+  #.............................
+    puts "# def hor_show( #{chk_members}, #{checkview} )"
+    # for Header & Guide
+    if checkview
+#      itemName2= "        |"
+      hdrDay   = "        |"
+      hdrMonth = "  Date  |"
+      hdr=". "*4 + "|16. . . 20. . . . , . . "    # until 28th
+      (28..@num_days16).each {|d|
+        if d == 30
+          if d != @num_days16
+            hdr=hdr + d.to_s
+          else
+            hdr=hdr + '+ '
+          end
+        else
+          hdr=hdr + '. '
+        end
+      }
+      #   puts "16--31  '#{hdr}'"
+      hdr=hdr+ "1 . . . + . . . . 10. . . . 15"
+      guide= (' 1'..' 9').to_a.join + ' + '
+      guide[0]=''
+      guide= ". . . . |" + guide*3 +'.'
+      #  when Smafo
+#      puts guide
+#      puts hdr
+      #  when PC
+      puts ' ' * hdrDay.length + guide
+# ??      puts  "Here  #{(  4 + @num_days16 - 16  - @num_days16.to_s.length )}"
+      strPrevMonth = '+-' *  4 + '|' #
+      strPrevMonth += '+-' * ( @num_days16 - 15 )
+                               #     puts "'#{strPrevMonth}'  #{strPrevMonth.length}   strPrevmaon Len" 
+#      strPrevMonth = strPrevMonth
+#      strMonth = " " + @month_16.to_s + " "
+#      centerPos = ( strPrevMonth.length - strMonth.length ) / 2
+#      t = strMonth.slice(0, centerPos - 1) + strMonth
+#      t = ( strPrevMonth.length - t.length )
+
+      nextMonth = Date.new(@year_16, @month_16, 28) + 28
+#      nextMonth.month
+      puts hdrMonth + strPrevMonth + "<<---  " + nextMonth.month.to_s + " ----"
+      puts hdrDay + hdr
+      #
+    end
+    #
+    filler = '_'
+    chk_members.each do |idx|
+      # 4 days of prevMonth to Ref
+      kinmuM = @wrkdays[idx][0..3].join(filler)
+      # this month
+      dat = @wrkdays[idx][4... 4+@num_days16].join(filler)
+      kinmuM = kinmuM + '_|' + dat + filler
+      #      puts kinmuM                       # Smafo
+      puts "  No. #{idx} |" + kinmuM      # PC
+    end
+    if checkview
+      dat = ' '
+      (0..34).each {|nday|
+        @check_info[:daycheck][nday] = cnt_filled(nday, chk_members)
+        @check_info[:dayview][nday] = checked_str( @check_info[:daycheck][nday] )
+      }
+      dat = @check_info[:dayview][0..3].join(filler) + '_|'
+      dat = dat + @check_info[:dayview][4... 4+@num_days16].join(filler)
+#      puts dat                      # when Smafo
+      puts " check  |#{dat}"    # when PC
+    end
+  end  
+  
+  #.............................
+  def ver_show(chk_members=[0,1,2,3],   checkview=true)
+  #.............................
+    puts "# def ver_show( #{chk_members}, #{checkview} )"
+    chk_members.each do |worker|
+      if ! (0...@num_workers).include?( worker )
+        puts "Unkown worker index #{worker} : expected (0 .. #{@num_workers} )"
+        exit 1
+      end
+    end
+    (0..34).each do |nth_day|
+      if nth_day == 4
+        puts '  ==|=================='
+      end
+      printf " %2d ", nth_day
+      canv =[]
+      chk_members.each { |worker|
+        canv << @wrkdays[worker][nth_day]
+      }
+      canv= '|__' + canv.join("___")
+      + '___'
+      if checkview == true
+        cnt = cnt_filled( nth_day, chk_members ) # - @num_workers)
+        canv = canv + "|  [" + checked_str(cnt) +  "]"
+      end
+      
+      puts "" + canv
+    end
+  end
+  
+#   
+#== END #===
+'end'  ===#
+#[ end  # of module
+#=== << view.rb >> included
+#=== 'include './ControlHelper'' ===#
+#=== including < control_helper.rb > ===
+# 'module ControlHelper'
+
+  #
 # [0.. @num_workers + 1(for check)][0..34]
 # [0.. @num_workers][0..34]
 #     ' ' : free
@@ -54,17 +234,194 @@ Teiin = 2
 #       :daycheck  [0..31+4]
 #       :dayview   [0..31+4]
 #................
-=end
+  $onDay = 'x'
+  $offDat = ' '
+  $reserved = 'D'
+  
+  #
+  #----- Date --------
+  #.............................
+  def daysOfMonth(year, mon)
+  #.............................
+    case mon
+    when 1,3,5,7,8,10,12
+      31
+    when 4,6,9,11
+      30
+    else 2
+      if Date.new(year, 2, 1).leap?
+        29
+      else
+        28
+      end
+    end
+  end
 
-#  -- set last 4 days of prev month 
-#  def prepare(idx, prevdays=' '*4, nvotAvail={})
-# 
+  def nextMonth(month=nil)
+  end
+
+  #----- Initailze -------  
+  def init_InstVars(members, teiin, month=nil)
+    @numWorkersInPlace = teiin
+    @numofWorkersInPlace = members
+#    @month ||=  
+#      @foo ||= "bar"    'or equal'
+      
+  end
+  
+  # 
+  #.................................................
+  def start_p(yti)
+    #.................................................
+    if yti[3] == ' ' then    # _|
+      if yti[2] == ' ' then    #  0 1 2
+        p_template=0              ##  __| X X X
+      else
+        if yti[1] == ' '        # _x_| XXX
+          p_template=0
+        else                    # xx_|
+          if yti[0] == ' '         ## _xx_| _XXX
+            p_template=4
+          else
+            p_template=4           ## xxx_| _XXX
+          end
+        end
+      end
+    else                     # x|
+      if yti[2] == ' '         # _x|
+        if yti[1] == ' '          # __x | XX__
+          p_tmplate=1
+        else                      # x_x |
+          if yti[0] == ' '
+            p_tmplate=2            ## _x_x | X__ or XX_  ... 1
+          else
+            p_tmplate= 3           ## xx_x | __X or _X_  special
+          end
+        end
+      else                     # xx|
+        if yti[1] == ' '          # _xx|
+          if yti[0]==' '
+            p_tmplate= 2            ## __xx | X__ 
+          else
+            p_tmplate= 2            ## x_xx | X__   or _XXX   
+          end
+        else                      #  xxx |
+          p_tmplate=3               ## xxx | __XXX
+        end
+      end
+    end
+  end
+
+  #...........................
+  def stat_day(idx_day, chk_members=[0,1,2,3], views=false)
+  #...........................
+    ret=[]
+    #    (0...@num_workers).each {|x|
+    chk_members.each {|x|
+      ret.push @wrkdays[x][idx_day]
+    } 
+    ret
+  end
+
+  #............................... 
+  def sr_offdays_array(idxWorker)
+  #...............................
+    seqs_pos=[]
+    num_seq=0
+
+    (1...@num_days16+4).each{|nth_day|
+      if @wrkdays[idxWorker][nth_day]==' '
+        num_seq+=1
+      else
+        if num_seq > 1
+          seqs=(0...num_seq).map {|n|
+            nth_day - n - 1
+          }.sort
+#          p "seqs"
+#          p seqs
+          seqs_pos << seqs
+          num_seq=0
+        end
+      end
+    }
+    print "#... Off Seq ";seqs_pos
+    seqs_pos
+  end
+
+  #.............................
+  def add_OffDays(idxWorker, pos_OffDays)
+  #.............................
+    pos_OffDays.each {|offDays|
+      offDays.each_with_index {|day, i|
+        if cnt_filled(day) < 2
+          @wrkdays[idxWorker][day] = 'x'
+          offDays.delete_at(i)
+        end
+      }
+    }
+    p pos_OffDays
+  end
+
+  #................................
+  def cnt_filled(idx_day, idx_workers=[0, 1, 2])
+  #................................
+    cnt=0
+    idx_workers.each{|w|
+##=begin when isDayOff is corrected
+##      if ! isDayOff(w, idx_day )
+##        cnt+=1
+##      end
+##=end
+      
+     case @wrkdays[w][idx_day]
+ #     when ' ', '*'  # 'D',  'y', 'Y'
+ #       ;
+      when 'x','X'
+#      else    # 'x' 'X'
+        cnt+=1
+      end
+    }
+    cnt
+  end
+
+  #................................
+  def isDayOff(idxWorker, day)
+  #   return is 'the Day is OffDay'
+  #................................
+#puts "#    def isDayOff(#{idxWorker}, #{day})"
+    case @wrkdays[idxWorker] [ day ]
+    when'x', 'X'     #  OnDay ,   'D' is   
+      false
+    when 'D'
+      false #[-
+    else # ' '
+      true
+    end
+  end
 
 
-class Yotei
+  #--------
+  #  miscellaneous
+  #--------
 
-include './View'
-include './ControlHelper'
+  def are_you_ok?(prompt='ok ? [y|n]:')
+    while true
+      print prompt
+      res = gets
+      case res
+      when /^[yY]/
+        return true
+      when /^[nN]/, /^$/
+        return false
+      end
+    end	
+  end
+  
+#== END #===
+'end'  ===#
+#[ end  # of module
+
+#=== << control_helper.rb >> included
   
   # date
   #  @month_16
@@ -167,13 +524,7 @@ include './ControlHelper'
 
     p @daySpecifiers
 =begin 
-# 
-    @daySpecifiers[:defined] = []
-    @daySpecifiers[:defined] =  @daySpecifiers.keys.map{ |k|
-      if k != :defined
-          @daySpecifiers[:defined] = @daySpecifiers[k]
-      end
-    }
+#  7 lines skipped
 =end    
 
     @daySpecifiers[:Defined] =  @daySpecifiers.keys.map{ |k|
@@ -233,11 +584,7 @@ p "START include ? "
     print "# _symCanAdd "; p _symCanAdd
 
 =begin
-    print "_symAll        ";  p  _symAll
-    print  "_symOnJob     ";  p  _symOnJob
-    print  "_symOnJobAll  ";  p  _symOnJobAll
-    print  "_symOffJob    ";  p  _symOffJob
-    print  "_symAll      ";  p  _symAll
+#  5 lines skipped
 =end
     xx=' '
 #    if _symAll.include?(xx)
@@ -278,11 +625,7 @@ end
     (startDay..startDay + 30).each {|x|
      yb =( @wday_16 + delta ) % 7
 =begin
-if @debug_ > 1      
-      puts  " Pos Index  i : #{i}"
-      p " start day  #{x}"
-     puts "Yoybi #{yb}  #{%w(Su Mo Tu We Th Fr Sa)[yb]}"
-end
+#  5 lines skipped
 =end
       if psv.include?(yb)
         @wrkdays[id_worker][i] = 'D'
@@ -354,32 +697,7 @@ end
 #    (4..34).each do |day|
     (4...4 + @num_days16 ).each do |day|
 =begin        
-      num_filled=0;
-      ex_workers.each do |idx|
-        case @wrkdays[idx][day]
-        when 'x', 'u', 'X'
-          num_filled+=1
-        when 'D', ' '
-          ;
-        else
-          puts "examine:  unknown '#{@wrkdays[idx][day]}', must be ' ', 'x', 'u', 'X', 'D'"
-          puts "       worker: #{idx}   nthday: '#{day}'"
-          # display
-          exit
-        end
-        @check_info[:daycheck][day] = um_filled
-        case num_filled
-        when 2
-          color='NORNAL'
-        when 1
-          color='YELLOW'
-        when 3
-          color='RED'
-        when 0
-          color='RED'
-        end 
-        @check_info[:dayview][day] = color_str(num_filled.to_s, color)
-      end
+#  26 lines skipped
 =end
       @check_info[:daycheck][day] = cnt_filled( day )
       @check_info[:dayview][day] = set_AttrStr( @check_info[:daycheck][day] )
@@ -582,8 +900,7 @@ end
         else
         end
 =begin        
-      when 0
-      when 4
+#  2 lines skipped
 =end
       else # 2
       end
@@ -613,9 +930,7 @@ end
     (4 .. ( @num_days16 + 4) ).each {|day|
 ##      puts "# think   day #{day}   '#{@wrkdays[ idxWorker][ day ]}'"
 =begin
-      if cnt_filled(day) < 2 
-        puts "# ==> Tar  day #{day}   '#{@wrkdays[ idxWorker][ day ]}'"
-      end
+#  3 lines skipped
 =end      
       if cnt_filled(day) < 2 &&  isDayOff(idxWorker, day)
         puts " # ...> Tar Tar "
@@ -669,18 +984,6 @@ end
 end
 #--- End of Class ---
 __END__
-
-
-  #  123..123..123..123..1
-      #  .123..123..123x..23..
-  #  ...123..123..123..123
-  #     67----567----567----567
-  #  ...2....2.....11...1.  
-
-#  ....567....557
-#  xxx..xxx..xx.xxx..xxx
-#  .xxx...xxx..
-  #  x..xxx..xxx..
- #
-
-#      X..DDDDX..DDDD
+# followng lines omitted
+#  15 lines skipped by __END__
+#__END__
