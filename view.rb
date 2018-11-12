@@ -116,7 +116,7 @@ module View
     if checkview
       dat = ' '
       (0..34).each {|nday|
-        @check_info[:daycheck][nday] = cnt_filled(nday, chk_members)
+        @check_info[:daycheck][nday] = cnt_filled(nday)
         @check_info[:dayview][nday] = checked_str( @check_info[:daycheck][nday] )
       }
       dat = @check_info[:dayview][0..3].join(filler) + '_|'
@@ -148,7 +148,7 @@ module View
       canv= '|__' + canv.join("___")
       + '___'
       if checkview == true
-        cnt = cnt_filled( nth_day, chk_members ) # - @num_workers)
+        cnt = cnt_filled( nth_day ) #  @num_workers)
         canv = canv + "|  [" + checked_str(cnt) +  "]"
       end
       

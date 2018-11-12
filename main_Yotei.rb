@@ -25,18 +25,6 @@ require './CoreLogic' # for development
 # chk_workers=[0,1,2,3]
 # test_cnt_filled(y, days, chk_workers, 1)
 #
-def test_cnt_filled(cls,
-        idxdays=[0,1,2,3],
-        idxworkers=[0,1,2],
-        verbose=nil)
-  if verbose
-    puts '== Test ==: test_cnt_filled'
-  end
-  idxdays.each{|x|
- #   p x
-    puts "#{x}th day  #{cls.cnt_filled(x, idxworkers)}"
-  }
-end
 
 def char_selected(prompt='chose :', srcs)
   print prompt

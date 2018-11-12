@@ -553,7 +553,7 @@ end
 
   #................................
   def adjust(idx_to_change)
-    #................................
+  #..............................
     puts "\n\n-------------------"
     puts "#  adjust( #{idx_to_change} )"
     save_Case
@@ -562,7 +562,7 @@ end
     cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
     (4...( @num_days16 + 4) ).each {|day|
       ##      puts "# think   day #{day}   '#{@wrkdays[ idxWorker][ day ]}'"
-      num = cnt_filled(day, [0,1,2,3])
+      num = cnt_filled(day)
       if num == 2
         cnt_ok0 += 1
       end
@@ -588,7 +588,7 @@ end
       else # 2
       end
       # to  evaluate
-      if cnt_filled(day, [0,1,2,3]) == 2
+      if cnt_filled(day) == 2
          cnt_ok += 1
       end
       case @wrkdays[idx_to_change][day]
@@ -670,17 +670,3 @@ end
 #--- End of Class ---
 __END__
 
-
-  #  123..123..123..123..1
-      #  .123..123..123x..23..
-  #  ...123..123..123..123
-  #     67----567----567----567
-  #  ...2....2.....11...1.  
-
-#  ....567....557
-#  xxx..xxx..xx.xxx..xxx
-#  .xxx...xxx..
-  #  x..xxx..xxx..
- #
-
-#      X..DDDDX..DDDD
