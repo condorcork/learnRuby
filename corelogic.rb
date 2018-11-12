@@ -26,45 +26,16 @@ Teiin = 2
 #
 #-----------------
 #
-=begin # mved to Helper
-# [0.. @num_workers + 1(for check)][0..34]
-# [0.. @num_workers][0..34]
-#     ' ' : free
-#     'x' : kinmu
-#     'D' : Dame (antherplace Kinmu)
-#     'u' : Zantei temp kinmu           # changable
-#     'y','Y' : Yukyu
-#     'X' : Upper case fixed
-# 
-# check value of 
-# not use  [@num_workers (for check)][0..34],
-#     but   ==> @check_info[:daycheck] 
-#     '2' : ok
-#     '3' : Err over 
-#     '0' : Err under
-#     '1' : ''  under
-#     
-#................
-#  Counter of Kuujitu, Kinmu
-#   @check_info{}
-#       :ake    [0...@num_workers]
-#       :kokyu  [0...@num_workers]
-#       :kinmu  [0...@num_workers]
-#       :day    [0...31+4]
-#       :daycheck  [0..31+4]
-#       :dayview   [0..31+4]
-#................
-=end
 
 #  -- set last 4 days of prev month 
 #  def prepare(idx, prevdays=' '*4, nvotAvail={})
 # 
 
-
 class Yotei
 
-include './View'
+include './FakeSystem'
 include './ControlHelper'
+include './View'
   
   # date
   #  @month_16
@@ -79,13 +50,12 @@ include './ControlHelper'
   #  @cnt_hecks
   
   #.................................................
-  def initialize(members=1, fakeDate=nil )
+  def initialize(members=4, fakeDate=nil )
   #.................................................
         # @month_16
     # @num_days16..[28/29/30/31]
 
     @debug_= 2
-#
 #    @debug_ = 3  # 0,1, 2
 
     if fakeDate != nil
@@ -93,166 +63,62 @@ include './ControlHelper'
       d.map!(&:to_i)
       p d
       date=Date.new(d[0], d[1], d[2])
+      puts "tmp Today : #{date.year} #{date.month} #{date.day}\n\t#{date}"
     else
       # Honban
       date=Date.today
+      puts "Today : #{date.year} #{date.month} #{date.day}\n\t#{date}"
     end
     #
-    #.... Set to Supose
-    #    t =Time.now
-    #    date=Date.new(t.year, t.month, t.day) # 2018, 12, 1)
 
-    #[- Honban --]
-    # date=Date.today
-#....
-    puts "tmp Today : #{date.year} #{date.month} #{date.day}\n\t#{date}"
-    #
-    if date.day < 7
-      @month_16= date.month
-      @year_16 = date.year
-    else
-      @month_16=date.next_month.month
-      @year_16 = date.next_month.year
-    end
-    #
-    @num_days16= daysOfMonth(@year_16, @month_16)
-    @wday_16 = Date.new(@year_16, @month_16, 16).wday
+    init_InitVarCon(members, date)
+
+  end
+
+
+  #------------------------
+  #  preparation
+  #................................
+  def presetKoyano(idxWorker, howTo=0) 
+    #..............................
+    #  howTo : how to Add OnDay
+    #         0 : OnDay set to lastday of seq 3 days
+    # not only weekly,
+    # but for General use
+    # suposed already set Dame Days
     
-#    @num_idx_days = @num_days16 + 15
+    puts "#  presetKoyano( #{idxWorker} )"
 
-#    puts "@num_idx_days = @num_days16 + 15"
-#    puts "#{@num_idx_days} = #{@num_days16} + 15"
-#  exit
-#    if @debug_ > 0
-      puts " #{@year_16}-#{@month_16} has #{@num_days16} days."
-      puts "           #{@month_16}-16  #{%w(Su Mo Tu We Th Fr Sa)[@wday_16]}(#{@wday_16}) "
-#    end
-    #     @startday=Time.now # .month
-    @template=('xxx  '*8).split('')
-    @num_workers = members
+#    #... Search consequent ' '
+    pos_OffDays = sr_offdays_array(idxWorker)
     
-#    if @debug_ > 0
-      puts " This has #{@num_workers} members" 
-#    end
-    
-      @wrkdays=Array.new( @num_workers + 1, Array.new(35, ' ') )
-    #[-  no use  
-    @viewsdays=Array.new( @num_workers + 1, Array.new(35, ' ') )
-    @cnt_checks=Array.new( @num_workers - 1, Array.new(2, 0) )
-    # check info & views
-    @check_info=Hash.new()
-    @check_info[:ake]=[0...@num_workers]
-    @check_info[:kokyu]=[0...@num_workers]
-    @check_info[:kinmu]=[0...@num_workers]
-    @check_info[:day]=[0...@num_workers]
-    @check_info[:daycheck]=[0...31+4]
-    @check_info[:dayview]=[0...31+4]
-#
-#    @dayStatus={}
-#    @dayStatus[:dayOn]=['X', 'x']      # On Job
-#    @dayStatus[:dayOff]=[' ', 'y']     # Off Job 
-    #    @dayStatus[:dayDame]=['D', 'Y']    # Not Availfor JOB
-    #
-    _OnDay = 'X'
-    _OffDay = ' '
-    _ReservedDay = 'D'
+    p "po_OffDayss",pos_OffDays
 
-    @daySpecifiers={}
-    @daySpecifiers[:OnDay]    = 'x'
-    @daySpecifiers[:OffDay]   = ' '
-    @daySpecifiers[:ReservedDay] = 'D'
-    @daySpecifiers[:FreeDay]   = ' '
-#    @daySpecifiers[:ERR] = 'D'
-    @daySpecifiers[:FreeDay]   = ' '
-
-    p @daySpecifiers
-=begin 
-# 
-    @daySpecifiers[:defined] = []
-    @daySpecifiers[:defined] =  @daySpecifiers.keys.map{ |k|
-      if k != :defined
-          @daySpecifiers[:defined] = @daySpecifiers[k]
+    cnt_add = 0
+    pos_OffDays.each {|days|
+      print "# seq OffDays "; p days
+      print "#     OffDays.size "; p days.size
+      puts  "#   now stat (Last pos0 = '#{days[-1]}'"
+      if days.size > 2
+        cnt_add += 1
+        # set 3rd day in OffDay-seq
+#        puts  "#  Before Value  ==> '#{wrkdays[idxWorker][days[-1]]}'"
+        @wrkdays[idxWorker][days[-1]] = 'x'
+#        puts  "#  AFTER  Value  ==> '#{wrkdays[idxWorker][days[-1]]}'"
       end
     }
-=end    
+    puts "#==== presetKoyano #{cnt_add} days Added"
 
-    @daySpecifiers[:Defined] =  @daySpecifiers.keys.map{ |k|
-      @daySpecifiers[k]
-    }
-    #
-    @daySpecifiers[:Defined]
-    print "# daySpecifiers[:Defined] "; p @daySpecifiers[:Defined]
 
-    print " Org    "; p @daySpecifiers[:Defined]
-    @daySpecifiers[:Defined].flatten!
-    print " Fatten ";
-    @daySpecifiers[:Defined]
-    print " UNiq   ";
-    @daySpecifiers[:Defined].uniq!
-    p @daySpecifiers[:Defined]
-
-    
-    p @daySpecifiers[:CanAdds]
-    print "# @daySpecifiers[CanAdds] "; p @daySpecifiers[:CanAdds]
-    @daySpecifiers[:CanAdds] = @daySpecifiers[:Defined ]  -[  @daySpecifiers[:OnDay] ] # - @daySpecifiers[:ReservedDay]
-
-p "CanAdds ", @daySpecifiers[:CanAdds]                                                                                             
-        
-p "START include ? "
-    p @daySpecifiers[:Defined].include?('x')
-    p @daySpecifiers[:Defined].include?(' ')
-    p @daySpecifiers[:Defined].include?('D')
-    p @daySpecifiers[:Defined].include?('Y')
-    p " Check :Keys"
-    p @daySpecifiers.keys.include?(:FreeDay)
-    p @daySpecifiers.keys.include?(:OnDay)
-    days=[' ', 'x' ]
-    print " days[1]= '#{days}'"
-
-    days[1] = @daySpecifiers[:OnDay]
-    print " days[1]= '#{days[1]}'"
-    #
-    p @daySpecifiers[:Defined].include?(days[1])
-
-#    p " Check :Keys"
-#    p @daySpecifiers.keys.include?(:FreeDay)
-#    p @daySpecifiers.keys.include?(:OnDay)
-    
-    p "END include ? "
-    _symOnJob=[ 'X', 'x' ]
-    _symOnOther = [ 'D' ]
-    _symOnJobAll = _symOnJob + _symOnOther 
-    #
-    _symOffJob = [ ' ' ]
-#    _symOffJob =  _symOffJob.dup
-#    _symOffJobAll += 'D'
-    _symAll = _symOnJobAll + _symOffJob
-    print "# _symAll "; p _symAll
-    
-    _symCanAdd = _symAll - _symOnJobAll
-    print "# _symCanAdd "; p _symCanAdd
-
-=begin
-    print "_symAll        ";  p  _symAll
-    print  "_symOnJob     ";  p  _symOnJob
-    print  "_symOnJobAll  ";  p  _symOnJobAll
-    print  "_symOffJob    ";  p  _symOffJob
-    print  "_symAll      ";  p  _symAll
-=end
-    xx=' '
-#    if _symAll.include?(xx)
-      print "Corrrect Specifier ? '#{xx}'    :";p _symAll.include?(xx)
-      print "OnJob    :"; p _symOnJob.include?(xx)
-      print "OnJobAll :"; p _symOnJobAll.include?(xx)
-      print "Off Job  :"; p _symOffJob.include?(xx)
-      print "Can Add  :"; p _symCanAdd.include?(xx)
-
-    
-    @serCase=[]
-
-      #    end
-  end   
-
+    examine()
+#    checkCase
+   
+    ## --- start , Add dsy of seqs to under day
+    # 
+    #  add_OffDays(idxWorker, pos_OffDays)
+    #-----------
+  end
+  
   #...............................
   def yoyaku(id_worker=3, preserv)
   #...............................
@@ -295,103 +161,8 @@ end
     }
   end
 
-  #.............................
-  def prepare(idx, prevdays=' '*4, nvotAvail={})
-    #.............................
-    puts "def prepare( #{idx}, #{prevdays}, #{ nvotAvail})"
 
-   # notAvail
-    unless idx < @num_workers
-      puts "prepare: 1nd param : idx '#{idx}' must be less than #{@num_workers.to_s}"
-      return false
-    end
-    if prevdays.length!=4
-      puts "prepare: 2nd param Length Not 4";
-      puts "  '#{prevdays}'"
-      return false
-    end
-    #
-    prv=prevdays.split('')
-  if @debug_ > 10
-    p prv
-  end
-    itm=Array.new
-    (0..34).each do |n|
-      if n < 4 then
-        itm[n]=prv[n]
-      else
-        itm[n]=' '
-      end
-    end
-    @wrkdays[idx]=itm
-    return true
-  end
-  
-  #.............................
-  def checked_str(num_filled)
-  #.............................
-    str_dat= num_filled.to_s
-    case num_filled
-    when 0
-      column = color_str(str_dat, 'NORMAL')
-    when 1
-      column = color_str(str_dat, 'RED')
-    when 3
-      column =color_str(str_dat, 'RED')
-    when  2   
-      column =color_str(str_dat, 'GREEN')
-    else
-      column =color_str(str_dat, 'RED')
-    end
-    column
-  end
-  
-  #..............................
-  def examine(ex_workers=[0,1,2,3], isview=true)
-  #..............................
-    puts "# def examine( #{ex_workers}, #{isview} )"
-    #  filled '2'
-#    (4..34).each do |day|
-    (4...4 + @num_days16 ).each do |day|
-=begin        
-      num_filled=0;
-      ex_workers.each do |idx|
-        case @wrkdays[idx][day]
-        when 'x', 'u', 'X'
-          num_filled+=1
-        when 'D', ' '
-          ;
-        else
-          puts "examine:  unknown '#{@wrkdays[idx][day]}', must be ' ', 'x', 'u', 'X', 'D'"
-          puts "       worker: #{idx}   nthday: '#{day}'"
-          # display
-          exit
-        end
-        @check_info[:daycheck][day] = um_filled
-        case num_filled
-        when 2
-          color='NORNAL'
-        when 1
-          color='YELLOW'
-        when 3
-          color='RED'
-        when 0
-          color='RED'
-        end 
-        @check_info[:dayview][day] = color_str(num_filled.to_s, color)
-      end
-=end
-      @check_info[:daycheck][day] = cnt_filled( day )
-      @check_info[:dayview][day] = set_AttrStr( @check_info[:daycheck][day] )
-    end
-    if isview
-#      ver_show(ex_workers)
-      hor_show(ex_workers)
-    end
-    puts "# End def examine( #{ex_workers}, #{isview} )"
-  end
 
-  
   #............................
 #  def pre_set(pass_idx)
   def pre_set(idxs_workers=[0,1,2])
@@ -441,75 +212,42 @@ if @debug_ > 10
 end
   end
 
+  #.............................
+  def prepare(idx, prevdays=' '*4, nvotAvail={})
+    #.............................
+    puts "def prepare( #{idx}, #{prevdays}, #{ nvotAvail})"
 
-  def checkCase()
-   
-#=begin
-    filled_days=Array.new(5, 0)
-    (4... 4+ @num_days16).each {|d|
-      ninzuDay=@check_info[:daycheck][d]
-      filled_days[ninzuDay]+=1
-    }
-    
-    puts "Hyoka After Koyno (Filled) "
-#=begin
-#         '  0   ==>     '
-    puts "  Members   days "
-    cnt_errDays=0
-    filled_days.each_with_index {|val,idx|
-      if idx != 2
-        #    puts "  " + color_str( idx.to_s, 'RED' ) + "    ==>    " + colo _str(val.to_s, 'RED')
-        puts " " + idx.to_s + "      = " + val.to_s
-        cnt_errDays+=val
+   # notAvail
+    unless idx < @num_workers
+      puts "prepare: 1nd param : idx '#{idx}' must be less than #{@num_workers.to_s}"
+      return false
+    end
+    if prevdays.length!=4
+      puts "prepare: 2nd param Length Not 4";
+      puts "  '#{prevdays}'"
+      return false
+    end
+    #
+    prv=prevdays.split('')
+  if @debug_ > 10
+    p prv
+  end
+    itm=Array.new
+    (0..34).each do |n|
+      if n < 4 then
+        itm[n]=prv[n]
       else
-        puts " " + idx.to_s + " (OK) = " + val.to_s
+        itm[n]=' '
       end
-    }
-
-    puts "# Error (Over or Under )  = #{cnt_errDays} "
+    end
+    @wrkdays[idx]=itm
+    return true
   end
 
-  #................................
-  def presetKoyano(idxWorker, howTo=0) 
-    #..............................
-    #  howTo : how to Add OnDay
-    #         0 : OnDay set to lastday of seq 3 days
-    # not only weekly,
-    # but for General use
-    # suposed already set Dame Days
-    
-    puts "#  presetKoyano( #{idxWorker} )"
 
-    #... Search consequent ' '
-    pos_OffDays =
-      sr_offdays_array(idxWorker)
-    
-    p "po_OffDayss",pos_OffDays
-
-    cnt_add = 0
-    pos_OffDays.each {|days|
-      print "# seq OffDays "; p days
-      print "#     OffDays.size "; p days.size
-      puts  "#   now stat (Last pos0 = '#{days[-1]}'"
-      if days.size > 2
-        cnt_add += 1
-        # set 3rd day in OffDay-seq
-#        puts  "#  Before Value  ==> '#{wrkdays[idxWorker][days[-1]]}'"
-        @wrkdays[idxWorker][days[-1]] = 'x'
-#        puts  "#  AFTER  Value  ==> '#{wrkdays[idxWorker][days[-1]]}'"
-      end
-    }
-    puts "#==== presetKoyano #{cnt_add} days Added"
-
-    examine([0,1,2,3], true)
-    checkCase
-   
-    ## --- start , Add dsy of seqs to under day
-    # 
-    #  add_OffDays(idxWorker, pos_OffDays)
-    #-----------
-  end
-  
+  #
+  #   Real Actual Operation 
+  #
   #..............................
   def shift_to(idxWorker, direction=+1)
   #..............................
@@ -551,11 +289,46 @@ end
     @wrkdays[idxWorker] = strDays.split('')
   end
 
+  
+  #..............................
+  def shift_AI(idxWorker, direction=+1)
+    #..............................
+  # shift right +N, left -N
+    puts "#  def shift_to( #{idxWorker}, #{direction} )"    
+    #
+    shift_to(idx, dir)
+    prev = saveCase
+    #   others = (0...@num_workers).to_a - [ idx ]
+    (4...4+@num_days16).each do |d|
+      n = cnt_filled(d)  #, others)
+      case n
+      when 1, 0
+        if @wrkdays[3][d] == ' '
+          @wrkdays[3][d] = 'x'
+        else
+        end
+      when 3, 4
+        if @wrkdays[3][d] == 'x'
+          @wrkdays[3][d] = ' '
+        else
+        end
+      when 2
+        ;   # ok
+      else
+        ;   #  ??
+      end
+    end  # (4..).each
+    # Hyoka
+    # compareCase
+    # get Better
+  end # shift_AI
+  
+
   #................................
   def adjust(idx_to_change)
   #..............................
-    puts "\n\n-------------------"
-    puts "#  adjust( #{idx_to_change} )"
+      puts "\n\n-------------------"
+      puts "#  adjust( #{idx_to_change} )"
     save_Case
     puts "Case Person #{idx_to_change}"
     hor_show
@@ -603,10 +376,12 @@ end
     puts "##   OffDay is #{cnt_offDays} days"
     hor_show
     load_Case
-  end
+  end  
 
-  #..........................
-  def think(idxWorker)
+
+  #....................
+  #[- ......
+  def think(idxWorker) 
   #..........................
     
     puts "#    def think( #{idxWorker} )"
@@ -617,56 +392,51 @@ end
         puts "# ==> Tar  day #{day}   '#{@wrkdays[ idxWorker][ day ]}'"
       end
 =end      
-      if cnt_filled(day) < 2 &&  isDayOff(idxWorker, day)
+      if cnt_filled(day) < 2 &&  isOffDay( @wrkdays[ idxWorker][ day ] )
         puts " # ...> Tar Tar "
       end
     }
   end
 
-  #-----------------------------
-  def save_Case(isInitState=false)
-    puts "# save_Case  size #{@isInitState}"    
-    #-----------------------------
-    if isInitState
-      @initCase=Marshal.dump( @wrkdays )
-    else
-      @prevCase = Marshal.dump( @wrkdays )
-    end
-#    @serCase << @preCase
-  end
- 
-  #-----------------------------
-#  def load_Case(saveNow=false)
-  def load_Case(isInitState=false)
-    #----------------------------
-    puts "#  load_Case(#{isInitState})"
-    if isInitState
-      if @initCase
-        @wrkdays = Marshal.load(@initCase)
-      end
-    else             
-      if @prevCase
-        @wrkdays = Marshal.load(@prevCase)
-      end
-    end
-    return
-    print  "# load_Case "
-    if ! @serCase.empty?
-      puts " size #{@serCase.size}"
-#=begin      
-#      if saveNow
-#        nowCase=Marshal.dump( @wrkdays )
-#      end
-      @wrkdays = Marshal.load(@serCase.pop)
-      #
-#      if saveNow
-#        @serCase << nowCase
-#      end
-#=end
-    end
-    puts ''
-  end
-end
-#--- End of Class ---
-__END__
 
+  #
+  #   check & Hyouka
+  #
+  
+  #..............................
+  def examine(workers=[0,1,2,3])
+  #..............................
+    puts "# def examine( #{workers} )"
+    #  filled '2'
+    #    (4..34).each do |day|
+    # for days OK?
+
+    (3 ... 4 + @num_days16 ).each { |day|
+      @chk_Place[:numDay][day] = cnt_filled( day )
+      @chk_Place[:isOK][day] = ( cnt_filled( day ) == @num_workers_p_day )
+      @chk_Place[:dayView][day] = str_Attr ( cnt_filled( day ))
+    }
+    @chk_Place[:Done] = @chk_Place[:isOK].count( true )
+
+    
+    workers.each do |w|
+      puts " workers = #{w}"  
+      @chk_workers[:OffDay][w] = 0
+      @chk_workers[:FullOffDay][w] = 0
+      @chk_workers[:OnDay][w] = 0
+      @chk_workers[:OnDayAll][w] = 0
+      (3 ... 4 + @num_days16 ).each do |day|
+        @chk_workers[:OnDay][w]  += 1  if isOnDay( @wrkdays[w][day] )
+        @chk_workers[:OffDay][w] += 1  if isOffDay( @wrkdays[w][day] )
+        @chk_workers[:OnDayAll][w] += 1  if isOnDayAll( @wrkdays[w][day] )
+      end
+      ##[-      @chk_workers[:FullOffDays][w] = []   @wrkdays[w])
+      
+    end
+
+    puts "# End def examine( #{workers} )"
+  end
+
+end
+
+#--- End of Class ---

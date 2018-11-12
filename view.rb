@@ -5,20 +5,21 @@ module View
 
   #..........................
 #  def color_str(filled)      
-  def set_AttrStr( filled )    # for line check
+#  def set_AttrStr( num_filled )    # for line check
+  def str_Attr( num_filled )    # for line check
   #...........................
-##    puts "# def set_AttrStr( '#{filled}' )"
+##    puts "# def set_AttrStr( '#{num_filled}' )"
   # 
-    # filled number (nomal 2)
-    case filled
-    when 2
-      color_str = color_str( filled.to_s, "NORMAL" )
+    # number of filled (nomal 2)
+    case num_filled
+    when 2      # OK
+      color_str = color_str( num_filled.to_s, "NORMAL" )
     when 1
-      color_str = color_str( filled.to_s, "RED" )
+      color_str = color_str( num_filled.to_s, "RED" )
     when 3
-      color_str = color_str( filled.to_s, "RED,BLINK" )
+      color_str = color_str( num_filled.to_s, "RED,BLINK" )
     when 4, 0
-      color_str = color_str( filled.to_s, "RED" )
+      color_str = color_str( num_filled.to_s, "RED" )
     end
   end
   
@@ -111,16 +112,18 @@ module View
       dat = @wrkdays[idx][4... 4+@num_days16].join(filler)
       kinmuM = kinmuM + '_|' + dat + filler
       #      puts kinmuM                       # Smafo
-      puts "  No. #{idx} |" + kinmuM      # PC
+ #     puts "  No. #{idx} |" + kinmuM      # PC
     end
     if checkview
-      dat = ' '
-      (0..34).each {|nday|
-        @check_info[:daycheck][nday] = cnt_filled(nday)
-        @check_info[:dayview][nday] = checked_str( @check_info[:daycheck][nday] )
-      }
-      dat = @check_info[:dayview][0..3].join(filler) + '_|'
-      dat = dat + @check_info[:dayview][4... 4+@num_days16].join(filler)
+      examine()
+#      print " @chk_Place[:dayView] ='", @chk_Place[:dayView], "'\n"
+#      print " @chk_Place[:dayView][0] ='", @chk_Place[:dayView][0], "'\n"
+      
+#              .join(filler) + '_|'
+      dat = @chk_Place[:dayView][0, 3].join(filler) + '_|'
+      
+#      print " @chk_Place[:dayView][4... 4+@num_days16] ='", @chk_Place[:dayView][4... 4+@num_days16] , "' \n"
+      dat = dat + @chk_Place[:dayView][4... 4+@num_days16].join(filler)
 #      puts dat                      # when Smafo
       puts " check  |#{dat}"    # when PC
     end
@@ -149,7 +152,7 @@ module View
       + '___'
       if checkview == true
         cnt = cnt_filled( nth_day ) #  @num_workers)
-        canv = canv + "|  [" + checked_str(cnt) +  "]"
+        canv = canv + "|  [" + str_Attr(cnt) +  "]"
       end
       
       puts "" + canv

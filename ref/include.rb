@@ -10,14 +10,16 @@
 def fakename( fn )
   fn.sub(/([a-z][A-Z])/, "\1_")
   case fn
-   when"control_helper"
+   when "control_helper"
     md = "ControlHelper"
-  when"view"
+  when "view"
     md = 'View'
-  when"ControlHelper"
+  when "ControlHelper"
     md = "control_helper"
-  when"View"
+  when "View"
     md = 'view'
+  when "FakeSystem"
+    md = "fake_system"
   else
     md = fn
   end
@@ -90,11 +92,11 @@ end
 ##ARGF.each do |line|
 #
 
-ARGF.each do |line|
+  ARGF.each do |line|
 #  if line =~ /^include[ \t]+\'\.\/([a-zA-Z_0-9]+)\'/
 # print "# DATA # '" + line.chop + "'\n"
  if is_LineSkip(line) # , @cnt_begin, @cnt__END__)
-   next
+   next 
  end
 =begin
  if line =~/^__END__/
@@ -162,7 +164,7 @@ ARGF.each do |line|
         else
           if  l =~ /^end[\t ]*/
             print "#== END #===\n"
-            print "'#{l.chop!}'  ===#\n"
+            print "#'#{l.chop!}'  ===#\n"
             print "#[ #{l}  # of module\n"
 #            break   #[-
           else
