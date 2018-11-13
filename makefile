@@ -1,5 +1,6 @@
 CoreLogic.rb: corelogic.rb control_helper.rb view.rb fake_system.rb run.rb test_helper.rb ref/include.rb
 	ruby control_helper.rb
+	ruby test_helper.rb
 	ruby view.rb
 	ruby fake_system.rb 
 	ruby test_helper.rb

@@ -454,9 +454,9 @@ end
   #..............................
     def examine(workers=[0,1,2,3])
     #..............................
-=begin    
+#=begin    
     puts "# def examine( #{workers} )"
-=end
+#=end
     #  filled '2'
     #    (4..34).each do |day|
     # for days OK?
@@ -485,7 +485,7 @@ end
 #      exit 1
     end  
     workers.each do |w|
-##      puts " workers = #{w}"  
+      puts " workers = #{w}"  
       @chk_workers[:OffDay][w] = 0
       @chk_workers[:FullOffDay][w] = []
       @chk_workers[:OnDay][w] = 0
