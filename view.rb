@@ -58,75 +58,79 @@ module View
 
   #.............................
   def hor_show(chk_members=[0,1,2,3], checkview=true)
-  #.............................
-    puts "# def hor_show( #{chk_members}, #{checkview} )"
+    #.............................
+    
+   puts "# def hor_show( #{chk_members}, #{checkview} )"
     # for Header & Guide
-    if checkview
+   if checkview
 #      itemName2= "        |"
-      hdrDay   = "        |"
-      hdrMonth = "  Date  |"
-      hdr=". "*4 + "|16. . . 20. . . . , . . "    # until 28th
-      (28..@num_days16).each {|d|
-        if d == 30
-          if d != @num_days16
-            hdr=hdr + d.to_s
-          else
-            hdr=hdr + '+ '
-          end
-        else
-          hdr=hdr + '. '
-        end
-      }
-      #   puts "16--31  '#{hdr}'"
-      hdr=hdr+ "1 . . . + . . . . 10. . . . 15"
-      guide= (' 1'..' 9').to_a.join + ' + '
-      guide[0]=''
-      guide= ". . . . |" + guide*3 +'.'
-      #  when Smafo
-#      puts guide
-#      puts hdr
-      #  when PC
-      puts ' ' * hdrDay.length + guide
-# ??      puts  "Here  #{(  4 + @num_days16 - 16  - @num_days16.to_s.length )}"
-      strPrevMonth = '+-' *  4 + '|' #
-      strPrevMonth += '+-' * ( @num_days16 - 15 )
-                               #     puts "'#{strPrevMonth}'  #{strPrevMonth.length}   strPrevmaon Len" 
-#      strPrevMonth = strPrevMonth
-#      strMonth = " " + @month_16.to_s + " "
-#      centerPos = ( strPrevMonth.length - strMonth.length ) / 2
-#      t = strMonth.slice(0, centerPos - 1) + strMonth
-#      t = ( strPrevMonth.length - t.length )
+     hdrDay   = "        |"
+     hdrMonth = "  Date  |"
+     hdr=". "*4 + "|16. . . 20. . . . , . . "    # until 28th
+     (28..@num_days16).each {|d|
+       if d == 30
+         if d != @num_days16
+           hdr=hdr + d.to_s
+         else
+           hdr=hdr + '+ '
+         end
+       else
+         hdr=hdr + '. '
+       end
+     }
+     #   puts "16--31  '#{hdr}'"
+     hdr=hdr+ "1 . . . + . . . . 10. . . . 15"
+     guide= (' 1'..' 9').to_a.join + ' + '
+     guide[0]=''
+     guide= ". . . . |" + guide*3 +'.'
+     #  when Smafo
+     #      puts guide
+     #      puts hdr
+     #  when PC
+     puts ' ' * hdrDay.length + guide
+     # ??      puts  "Here  #{(  4 + @num_days16 - 16  - @num_days16.to_s.length )}"
+     strPrevMonth = '+-' *  4 + '|' #
+     strPrevMonth += '+-' * ( @num_days16 - 15 )
+     #     puts "'#{strPrevMonth}'  #{strPrevMonth.length}   strPrevmaon Len" 
+     #      strPrevMonth = strPrevMonth
+     #      strMonth = " " + @month_16.to_s + " "
+     #      centerPos = ( strPrevMonth.length - strMonth.length ) / 2
+     #      t = strMonth.slice(0, centerPos - 1) + strMonth
+     #      t = ( strPrevMonth.length - t.length )
 
-      nextMonth = Date.new(@year_16, @month_16, 28) + 28
-#      nextMonth.month
-      puts hdrMonth + strPrevMonth + "<<---  " + nextMonth.month.to_s + " ----"
-      puts hdrDay + hdr
-      #
-    end
+     nextMonth = Date.new(@year_16, @month_16, 28) + 28
+     #      nextMonth.month
+     puts hdrMonth + strPrevMonth + "<<---  " + nextMonth.month.to_s + " ----"
+     puts hdrDay + hdr
+     #
+   end
     #
-    filler = '_'
-    chk_members.each do |idx|
-      # 4 days of prevMonth to Ref
-      kinmuM = @wrkdays[idx][0..3].join(filler)
-      # this month
-      dat = @wrkdays[idx][4... 4+@num_days16].join(filler)
-      kinmuM = kinmuM + '_|' + dat + filler
-      #      puts kinmuM                       # Smafo
- #     puts "  No. #{idx} |" + kinmuM      # PC
-    end
-    if checkview
-      examine()
-#      print " @chk_Place[:dayView] ='", @chk_Place[:dayView], "'\n"
-#      print " @chk_Place[:dayView][0] ='", @chk_Place[:dayView][0], "'\n"
-      
-#              .join(filler) + '_|'
-      dat = @chk_Place[:dayView][0, 3].join(filler) + '_|'
-      
-#      print " @chk_Place[:dayView][4... 4+@num_days16] ='", @chk_Place[:dayView][4... 4+@num_days16] , "' \n"
-      dat = dat + @chk_Place[:dayView][4... 4+@num_days16].join(filler)
-#      puts dat                      # when Smafo
-      puts " check  |#{dat}"    # when PC
-    end
+   filler = '_'
+   chk_members.each do |idx|
+     # 4 days of prevMonth to Ref
+     kinmuM = @wrkdays[idx][0..3].join(filler)
+     # this month
+     dat = @wrkdays[idx][4... 4+@num_days16].join(filler)
+     kinmuM = kinmuM + '_|' + dat + filler
+     #      puts kinmuM                       # Smafo
+     puts "  No. #{idx} |" + kinmuM      # PC
+   end
+   if checkview
+     examine()
+     #      print " @chk_Place[:dayView] ='", @chk_Place[:dayView], "'\n"
+     #      print " @chk_Place[:dayView][0] ='", @chk_Place[:dayView][0], "'\n"
+     #      print " @chk_Place[:dayView][1] ='", @chk_Place[:dayView][1], "'\n"
+     #      print " @chk_Place[:dayView][2] ='", @chk_Place[:dayView][2], "'\n"
+     #      print " @chk_Place[:dayView][3] ='", @chk_Place[:dayView][3], "'\n"
+     
+     #              .join(filler) + '_|'
+     dat = @chk_Place[:dayView][0, 4].join(filler) + '_|'
+     
+     ##      print " @chk_Place[:dayView][4... 4+@num_days16] ='", @chk_Place[:dayView][4... 4+@num_days16] , "' \n"
+     dat = dat + @chk_Place[:dayView][4... 4+@num_days16].join(filler)
+     #      puts dat                      # when Smafo
+     puts " check  |#{dat}"    # when PC
+   end
   end  
   
   #.............................

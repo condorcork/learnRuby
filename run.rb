@@ -70,14 +70,14 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
 #y.ver_show()
 
 #   y.save_Case  
-  p "===============Saved after Koyano"
+  print "\n\n===============Saved after Koyano\n"
   y.hor_show()
   puts "#---- Check ---"
   ###
   (0..4).each {|x|
-    y.hor_show([ x ])
+    y.hor_show()   ## [ x ])
     seq=y.sr_offdays_array( x )
-    print "No.#{x}  '", seq, "'\n"
+    print "\n#Full Off No.#{x}  '", seq, "'\n\n"
   }
 
   

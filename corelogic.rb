@@ -331,7 +331,9 @@ end
       puts "#  adjust( #{idx_to_change} )"
     save_Case
     puts "Case Person #{idx_to_change}"
+
     hor_show
+#    ver_show
     cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
     (4...( @num_days16 + 4) ).each {|day|
       ##      puts "# think   day #{day}   '#{@wrkdays[ idxWorker][ day ]}'"
@@ -369,12 +371,27 @@ end
         cnt_offDays += 1
       end
     }
+
+    examine()
+
+    
     puts "# RESULTadjusted"
     puts "#   #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{idx_to_change}"
     puts "#       OK  Before #{cnt_ok0}  ==> After #{cnt_ok} days  "
     puts "#       Result #{cnt_ok - cnt_ok0}"
     puts "##   OffDay is #{cnt_offDays} days"
+    #term_month = (3 .. @num_days16 + 4 - 1)
+
+    p "## Full Off before"
+    p @chk_workers[:FullOffDay][idx_to_change]
+    @chk_workers[:FullOffDay][idx_to_change].each {|days|
+      days = days[1, 100]
+    }
+    p "## Full Off AFTER"
+    p @chk_workers[:FullOffDay][idx_to_change]
+      
     hor_show
+#    ver_show
     load_Case
   end  
 
@@ -405,13 +422,15 @@ end
   
   #..............................
   def examine(workers=[0,1,2,3])
-  #..............................
+    #..............................
+=begin    
     puts "# def examine( #{workers} )"
+=end
     #  filled '2'
     #    (4..34).each do |day|
     # for days OK?
 
-    (3 ... 4 + @num_days16 ).each { |day|
+    (0 ... 4 + @num_days16 ).each { |day|
       @chk_Place[:numDay][day] = cnt_filled( day )
       @chk_Place[:isOK][day] = ( cnt_filled( day ) == @num_workers_p_day )
       @chk_Place[:dayView][day] = str_Attr ( cnt_filled( day ))
@@ -420,21 +439,24 @@ end
 
     
     workers.each do |w|
-      puts " workers = #{w}"  
+##      puts " workers = #{w}"  
       @chk_workers[:OffDay][w] = 0
-      @chk_workers[:FullOffDay][w] = 0
+      @chk_workers[:FullOffDay][w] = []
       @chk_workers[:OnDay][w] = 0
       @chk_workers[:OnDayAll][w] = 0
       (3 ... 4 + @num_days16 ).each do |day|
-        @chk_workers[:OnDay][w]  += 1  if isOnDay( @wrkdays[w][day] )
+        @chk_workers[:OnDay][w] += 1  if isOnDay( @wrkdays[w][day] )
         @chk_workers[:OffDay][w] += 1  if isOffDay( @wrkdays[w][day] )
         @chk_workers[:OnDayAll][w] += 1  if isOnDayAll( @wrkdays[w][day] )
       end
       ##[-      @chk_workers[:FullOffDays][w] = []   @wrkdays[w])
-      
+      @chk_workers[:FullOffDay][w] = sr_offdays_array( w )
+      print "\n#Full Off No.#{w}  '", @chk_workers[:FullOffDay][w], "'\n\n"      
     end
 
+=begin
     puts "# End def examine( #{workers} )"
+=end
   end
 
 end

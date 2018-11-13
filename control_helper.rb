@@ -10,29 +10,7 @@ module ControlHelper
 #     'A','B' :  OnDay ( Shift ) 
 #     'X' : Upper case fixed
 # 
-# check value of 
-# not use  [@num_workers (for check)][0..34],
-#     but   ==> @check_info[:daycheck] 
-#     '2' : ok
-#     '3' : Err over 
-#     '0' : Err under
-#     '1' : ''  under
-#     
 #................
-#  Counter of Kuujitu, Kinmu
-#   @check_info{}
-#       :ake    [0...@num_workers]
-#       :kokyu  [0...@num_workers]
-#       :kinmu  [0...@num_workers]
-#       :day    [0...31+4]
-#       :daycheck  [0..31+4]
-#       :dayview   [0..31+4]
-#................
-  $onDay = 'x'
-  $offDat = ' '
-  $reserved = 'D'
-
-
   #----- Initailze -------  
   def init_InitVarCon(members, date)
   #-----------------------
@@ -92,21 +70,15 @@ module ControlHelper
     @chk_workers[:OnDay]=Array.new( @num_workers )
     @chk_workers[:OnDayAll]=Array.new( @num_workers )   # including workdays of other places 
     @chk_workers[:OffDay]=Array.new( @num_workers )
+    #   for view
     @chk_workers[:FullOffDay]=Array.new( @num_workers )
-    p @chk_workers
+
     ## status for Each day 
     @chk_Place = {}
-    @chk_Place[:numDay]=Array.new( 31+4 )
-    @chk_Place[:isOK]=Array.new( 31+4 )
-    p @chk_Place
-    # for View ( show )
-    @chk_Place[:dayView]=Array.new( 31+4 )
-#    p @chk_Place
-#    exit 1; 
-
-    
-#    @chk_worke
-    ##
+    @chk_Place[:numDay]=Array.new( 31+4, 0 )
+    @chk_Place[:isOK]=Array.new( 31+4 , false)
+    #    for View ( show )
+    @chk_Place[:dayView]=Array.new( 31+4, ' ' )
     #
 ####    @check_info[:dayview]=[0...31+4]
 #
@@ -155,8 +127,8 @@ module ControlHelper
   #..................................
   def isOffDay(day)   # Yaumi
   #.................................
-#    day =~ /^[ \*]$/        #  
-    day =~ /^[#{@day_OFF}]$/        #
+    day =~ /^[ \*]$/        #  
+#    day =~ /^[#{@day_OFF}]$/        #
   end
 
   #..................................
@@ -168,13 +140,13 @@ module ControlHelper
   #.................................
   def isOnDay(day)
   #.................................
-    day =~ /^#[#{@day_ON}]$/i   # XxAaBb   , Dd
+    day =~ /^[#{@day_ON}]$/i   # XxAaBb   , Dd
   end
 
   #.................................
   def isOnDayAll(day)     # All OnDay including other Place
   #.................................
-    day =~ /^#[#{@day_ON_ALL}]$/i   # xabdABD
+    day =~ /^[#{@day_ON_ALL}]$/i   # xabdABD
   end
 
   def isFullOffDay(idx, day)
@@ -254,13 +226,15 @@ module ControlHelper
           seqs=(0...num_seq).map {|n|
             nth_day - n - 1
           }.sort
-          print "seqs '",  seqs, "'\n"
+#if @debug_           
+#          print "seqs '",  seqs, "'\n"
+#end          
           seqs_pos << seqs
           num_seq=0
         end
       end
     }
-    print "#... Off Seq ";seqs_pos
+##    print "#... Off Seq ";seqs_pos
     seqs_pos
   end
 
