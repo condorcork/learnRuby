@@ -76,8 +76,8 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
   ###
   (0..4).each {|x|
     y.hor_show()   ## [ x ])
-    seq=y.sr_offdays_array( x )
-    print "\n#Full Off No.#{x}  '", seq, "'\n\n"
+#    seq=y.sr_offdays_array( x )
+#    print "\n#Full Off No.#{x}  '", seq, "'\n\n"
   }
 
   

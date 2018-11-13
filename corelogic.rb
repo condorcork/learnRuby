@@ -331,7 +331,7 @@ end
       puts "#  adjust( #{idx_to_change} )"
     save_Case
     puts "Case Person #{idx_to_change}"
-
+    
     hor_show
 #    ver_show
     cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
@@ -378,23 +378,42 @@ end
     puts "# RESULTadjusted"
     puts "#   #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{idx_to_change}"
     puts "#       OK  Before #{cnt_ok0}  ==> After #{cnt_ok} days  "
-    puts "#       Result #{cnt_ok - cnt_ok0}"
+    puts "#       Result + #{cnt_ok - cnt_ok0}"
     puts "##   OffDay is #{cnt_offDays} days"
     #term_month = (3 .. @num_days16 + 4 - 1)
 
     p "## Full Off before"
+=begin    
     p @chk_workers[:FullOffDay][idx_to_change]
     @chk_workers[:FullOffDay][idx_to_change].each {|days|
       days = days[1, 100]
     }
     p "## Full Off AFTER"
     p @chk_workers[:FullOffDay][idx_to_change]
-      
+=end      
     hor_show
 #    ver_show
     load_Case
   end  
 
+  def get_FullOffDays()
+    #  p @chk_workers[:FullOffDay][idx_to_change]
+    # delete First OffDay 
+    @chk_workers[:FullOffDay][idx_to_change].each {|days|
+      days = days[1, 100]
+    }
+    p "## Full Off AFTER"
+    p  @chk_workers[:FullOffDay][idx_to_change]
+    @chk_workers[:FullOffDay][idx_to_change].flatten!
+    p @chk_workers[:FullOffDay][idx_to_change]
+    @chk_workers[:FullOffDay][idx_to_change].reject {|day|
+      if ! (4 ... 4+@num_days16).member(day)
+        day
+      end
+    }
+    
+  end
+  
 
   #....................
   #[- ......
@@ -421,7 +440,7 @@ end
   #
   
   #..............................
-  def examine(workers=[0,1,2,3])
+    def examine(workers=[0,1,2,3])
     #..............................
 =begin    
     puts "# def examine( #{workers} )"
@@ -435,9 +454,24 @@ end
       @chk_Place[:isOK][day] = ( cnt_filled( day ) == @num_workers_p_day )
       @chk_Place[:dayView][day] = str_Attr ( cnt_filled( day ))
     }
-    @chk_Place[:Done] = @chk_Place[:isOK].count( true )
 
-    
+    # between n.16th --> n_1.15th  
+#    (4 ... 4+ @num_days16 ).each { |day|
+    @chk_Place[:OK] = @chk_Place[:numDay][4, @num_days16].count( 2 )
+      #
+    @chk_Place[:Under] = @chk_Place[:numDay][4, @num_days16].count( 1 )
+    @chk_Place[:Under] += @chk_Place[:numDay][4, @num_days16].count( 0 )
+    #
+    @chk_Place[:Over] = @chk_Place[:numDay][4, @num_days16].count( 3 )
+    @chk_Place[:Over] += @chk_Place[:numDay][4, @num_days16].count( 4 )
+    if @chk_Place[:OK] + @chk_Place[:Under] + @chk_Place[:Over] != @num_days16
+      puts "############# <<def examine(workers=[0,1,2,3]) >>====="
+      puts "# Prog Error "
+      puts "##  @chk_Place[:OK] + @chk_Place[:Under] + @chk_Place[:Over] != @num_days16"
+      puts "##  #{@chk_Place[:OK]} + #{@chk_Place[:Under]} + #{@chk_Place[:Over]} != #{@num_days16}"
+      puts "############# << def examine(workers=[0,1,2,3]) >> ====="
+#      exit 1
+    end  
     workers.each do |w|
 ##      puts " workers = #{w}"  
       @chk_workers[:OffDay][w] = 0

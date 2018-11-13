@@ -217,7 +217,7 @@ module ControlHelper
     seqs_pos=[]
     num_seq=0
 
-    (1...@num_days16+4).each{|nth_day|
+    (0..@num_days16+4).each{|nth_day|
 #      if @wrkdays[idxWorker][nth_day]==' '
       if isOffDay( @wrkdays[idxWorker][nth_day] )
         num_seq+=1
