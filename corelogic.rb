@@ -89,8 +89,8 @@ include './View'
     
     puts "#  presetKoyano( #{idxWorker} )"
 
-#    #... Search consequent ' '
-    pos_OffDays = sr_offdays_array(idxWorker)
+#[-    #... Search consequent ' '
+    pos_OffDays = sr_offdays_array( idxWorker )
     
     p "po_OffDayss",pos_OffDays
 
@@ -383,35 +383,46 @@ end
     #term_month = (3 .. @num_days16 + 4 - 1)
 
     p "## Full Off before"
-=begin    
-    p @chk_workers[:FullOffDay][idx_to_change]
-    @chk_workers[:FullOffDay][idx_to_change].each {|days|
-      days = days[1, 100]
+    (0..3).each {|w|
+      p  @chk_workers[:FullOffDay][w]
+      get_FullOffDays(w)
     }
     p "## Full Off AFTER"
-    p @chk_workers[:FullOffDay][idx_to_change]
-=end      
+    (0..3).each {|w|
+      p  @chk_workers[:FullOffDay][w]
+    }
     hor_show
+    print "===Ok==== "
+    gets
+
 #    ver_show
     load_Case
   end  
 
-  def get_FullOffDays()
-    #  p @chk_workers[:FullOffDay][idx_to_change]
+  def get_FullOffDays(idx_w)
+  puts "# def get_FullOffDays( #{idx_w} )"
     # delete First OffDay 
-    @chk_workers[:FullOffDay][idx_to_change].each {|days|
+    p "##  @chk_workers[:FullOffDay]   ",       @chk_workers[:FullOffDay]
+    p "##  @chk_workers[:FullOffDay].length   ",       @chk_workers[:FullOffDay].length
+    p "### @chk_workers[:FullOffDay][idx_w]  ", @chk_workers[:FullOffDay][idx_w]
+
+    @chk_workers[:FullOffDay][idx_w].each {|days|
       days = days[1, 100]
     }
     p "## Full Off AFTER"
-    p  @chk_workers[:FullOffDay][idx_to_change]
-    @chk_workers[:FullOffDay][idx_to_change].flatten!
-    p @chk_workers[:FullOffDay][idx_to_change]
-    @chk_workers[:FullOffDay][idx_to_change].reject {|day|
-      if ! (4 ... 4+@num_days16).member(day)
+    p  @chk_workers[:FullOffDay][idx_w]
+    @chk_workers[:FullOffDay][idx_w].flatten!
+    p @chk_workers[:FullOffDay][idx_w]
+    tmp= @chk_workers[:FullOffDay][idx_w].reject {|day|
+      if ! (4 ... 4+@num_days16).member?(day)
         day
       end
     }
+
+    @chk_workers[:FullOffDay][idx_w] = tmp
     
+    print  "##  ===> @chk_workers[:FullOffDay][idx_w]  #{idx_w} =  ",   @chk_workers[:FullOffDay][idx_w]
+    print  "##  ===> @chk_workers[:FullOffDay][idx_w]  #{idx_w} =  ",   tmp
   end
   
 
