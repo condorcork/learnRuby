@@ -40,7 +40,11 @@ y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
   # ' DDx '' DDD'  special
   y.prepare(3, 'DDx ')
  #######################
-
+  ##
+  y.test_data
+  y.hor_show()
+exit
+  ##
 #
   y.examine()
   y.hor_show()

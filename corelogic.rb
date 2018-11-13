@@ -33,6 +33,7 @@ Teiin = 2
 
 class Yotei
 
+include './TestHelper'
 include './FakeSystem'
 include './ControlHelper'
 include './View'

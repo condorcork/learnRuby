@@ -3,14 +3,15 @@
 
 #fake include module
 
-
 @cnt_begin = 0
 @cnt__END__ = 0
 
 def fakename( fn )
   fn.sub(/([a-z][A-Z])/, "\1_")
   case fn
-   when "control_helper"
+  when "TestHelper"
+    md = "test_helper"
+  when "control_helper"
     md = "ControlHelper"
   when "view"
     md = 'View'
