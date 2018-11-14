@@ -94,7 +94,7 @@ include './View'
     daysWithOffday = get_OffDays( @wrkdays[idxWorker])   #   #  sr_offdays_array( w )
     @chk_workers[:FullOffDay][idxWorker] = get_FullOffDays( daysWithOffday )
 
-    pos_OffDays = dayWithOffday
+    pos_OffDays = daysWithOffday
     
     p "po_OffDayss",pos_OffDays
 
