@@ -59,7 +59,6 @@ module View
   #.............................
   def hor_show(chk_members=[0,1,2,3], checkview=true)
     #.............................
-    
    puts "# def hor_show( #{chk_members}, #{checkview} )"
     # for Header & Guide
    if checkview

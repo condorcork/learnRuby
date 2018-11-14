@@ -31,7 +31,8 @@ module ControlHelper
     # 
     @num_days16= daysOfMonth(@year_16, @month_16)
     @wday_16 = Date.new(@year_16, @month_16, 16).wday
-
+    @theMonthRange = (4 ... 4 + @num_days16)       # idxs  of Range of the MONTH (True dat)
+    
     puts " This has #{@num_workers} members"
     puts " Taiin = #{@num_workers_p_day}"
     puts " #{@year_16}-#{@month_16} has #{@num_days16} days."
@@ -210,34 +211,103 @@ module ControlHelper
     ret
   end
 =end
-  
-  #............................... 
-  def sr_offdays_array(idxWorker)
-  #...............................
-    seqs_pos=[]
-    num_seq=0
 
+  ###
+  #-----------------------
+  def get_OffDays( wkDays )   # dummy)
+  #-----------------------  
+    #---- start Here -----    
+    seqs_pos=[]    # Array of array days 
+    days = []
+    num_days = 0
+    #  Check form Last 4 days of Prev Month
+    #  ' ':LastDayogPrevMonth | ' ': FirstDay  ===> FullOffDay 
     (0..@num_days16+4).each{|nth_day|
-#      if @wrkdays[idxWorker][nth_day]==' '
-      if isOffDay( @wrkdays[idxWorker][nth_day] )
-        num_seq+=1
+      if  isOffDay( wkDays[nth_day] )
+        days << nth_day
+        #        num_seq+=1
+        num_days+=1
       else
-        if num_seq > 1
-          seqs=(0...num_seq).map {|n|
-            nth_day - n - 1
-          }.sort
-#if @debug_           
-#          print "seqs '",  seqs, "'\n"
-#end          
-          seqs_pos << seqs
-          num_seq=0
+        if num_days > 1
+          seqs_pos << days
         end
+        days = []
+        num_days=0
       end
     }
-##    print "#... Off Seq ";seqs_pos
+    if num_days > 1
+      seqs_pos << days
+    end
     seqs_pos
   end
+  ###
 
+  def get_FullOffDays(seqs)
+    #  puts "# def get_FullOffDays( #{seqs} )"
+    # ---- In Range of the Month
+    daysWithFullOff =[]    # array of COnseq 
+    seqs.each do|days|
+      #    puts "Check element daary #{days}"
+      days_ =[]
+      #    puts "# Range #{@theMonthRange}' "
+      days.each {|day|
+        if @theMonthRange.member?(day)
+          days_ << day
+        end
+      }
+      #    puts "## days in seq days_ ==> '#{days_}'"
+      #    puts "## days length ==> '#{days_.length}'"
+      case days_.length
+      when 1
+        if days_[0] == 4
+          daysWithFullOff << [ days_.shift ]
+          #else
+          #  month over  
+        end
+      when 2, 3, 4
+        daysWithFullOff << days_  # array of Kokyu
+      when 0
+        ;
+      else    #  3,4,5.....
+        daysWithFullOff << days_  # array of Kokyu
+      end
+      #    puts "## days after removed out of range _ ==> '#{days_}'"
+      #    puts "## daysWithFullOff '#{daysWithFullOff}'"
+    end
+    #  puts "## daysWithFullOff '#{daysWithFullOff}'"
+    #  p #{daysWithFullOff}
+    daysWithFullOff
+  end 
+
+#=begin  
+#  #...............................
+#  def sr_offdays_array(idxWorker)
+#  #...............................
+#    seqs_pos=[]
+#    num_seq=0
+#
+#    (0..@num_days16+4).each{|nth_day|
+##      if @wrkdays[idxWorker][nth_day]==' '
+#      if isOffDay( @wrkdays[idxWorker][nth_day] )
+#        num_seq+=1
+#      else
+#        if num_seq > 1
+#          seqs=(0...num_seq).map {|n|
+#            nth_day - n - 1
+#          }.sort
+###if @debug_           
+##          print "seqs '",  seqs, "'\n"
+##end          
+#          seqs_pos << seqs
+#          num_seq=0
+#        end
+#      end
+#    }
+###    print "#... Off Seq ";seqs_pos
+#    seqs_pos
+#  end
+#=end
+  
 =begin  
   #.............................
 # yet  def add_OffDays(idxWorker, pos_OffDays)
