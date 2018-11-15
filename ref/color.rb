@@ -16,9 +16,10 @@
 # 1	Bold on
 # 4	Underscore (on monochrome display adapter only)
 # 5	Blink on
-# 7	Reverse video on
+# 7	Reverse video on  ===
 # 8	Concealed on
-# 
+# 9    == = centerline for remove chars
+
 ###Foreground colors
 # 30	Black
 # 31	Red

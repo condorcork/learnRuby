@@ -32,7 +32,11 @@ module ControlHelper
     @num_days16= daysOfMonth(@year_16, @month_16)
     @wday_16 = Date.new(@year_16, @month_16, 16).wday
     @theMonthRange = (4 ... 4 + @num_days16)       # idxs  of Range of the MONTH (True dat)
-    
+    if @theMonthRange.size != @num_days16
+      puts "#=* Range Error"
+      exit 1
+    end
+    @num_wokers_p_day = 2
     puts " This has #{@num_workers} members"
     puts " Taiin = #{@num_workers_p_day}"
     puts " #{@year_16}-#{@month_16} has #{@num_days16} days."
@@ -51,20 +55,6 @@ module ControlHelper
     
     # === Data ====
     # check info & views
-=begin    
-#    @check_info=Hash.new()
-#    #  Worker Check
-    
-#    @check_info[:OnDay]=[0...@num_workers]
-#    @check_info[:OnDayAll]=[0...@num_workers]
-#    @check_info[:OffDay]=[0...@num_workers]
-#    @check_info[:FullOffDay]=[0...@num_workers]
-
-#    #  Place check  
-#    @check_info[:day]=[0...@num_workers]
-#    @check_info[:daycheck]=[0...31+4]
-#    @check_info[:isOK]=[0...31+4]
-=end
  
     ## status  for each worker
     @chk_workers={}
@@ -81,8 +71,6 @@ module ControlHelper
     #    for View ( show )
     @chk_Place[:dayView]=Array.new( 31+4, ' ' )
     #
-####    @check_info[:dayview]=[0...31+4]
-#
 #    @serCase=[]
     
   end
@@ -125,17 +113,17 @@ module ControlHelper
     @day_ON_ALL = "#{@day_ON}D"
   end
   #
-  #..................................
+  #...............................
   def isOffDay(day)   # Yaumi
-  #.................................
+  #...............................
     day =~ /^[ \*]$/        #  
 #    day =~ /^[#{@day_OFF}]$/        #
   end
 
-  #..................................
-  def isFullOffDay(day)  # Koukyu #[-
-  #..................................
-#
+  #...............................
+  def isFullOffDay(day) # Koukyu #[-
+  #..............................
+#[-
   end
   
   #.................................
@@ -147,18 +135,13 @@ module ControlHelper
   #.................................
   def isOnDayAll(day)     # All OnDay including other Place
   #.................................
-    day =~ /^[#{@day_ON_ALL}]$/i   # xabdABD
+    day =~ /^[#{@day_ON_ALL}]$/i   # xabXABD  ,d 
   end
 
-  def isFullOffDay(idx, day)
-#[-    
-  end
-
-  
   # 
-  #.................................................
+  #..............................
   def start_p( fourDays )
-    #.................................................
+  #.............................
     if isOffDay( fourDays[3] )    # _|
       if isOffDay( fourDays[2] )    #  0 1 2
         p_template=0              ##  __| X X X
@@ -198,29 +181,15 @@ module ControlHelper
     end
   end
 
-=begin  
-# Not Used ; 
-  #...........................
-  def stat_day(idx_day, chk_members=[0,1,2,3], views=false)
-  #...........................
-    ret=[]
-    #    (0...@num_workers).each {|x|
-    chk_members.each {|x|
-      ret.push @wrkdays[x][idx_day]
-    } 
-    ret
-  end
-=end
 
   ###
   #-----------------------
   def get_OffDays( wkDays )   # dummy)
   #-----------------------  
     #---- start Here -----    
-    seqs_pos=[]    # Array of array days 
+    seqs_pos=[]    # Array of array days Po9q1
     days = []
-    num_days = 0
-    #  Check form Last 4 days of Prev Month
+    num_days = 0  #  Check form Last 4 days of Prev Month
     #  ' ':LastDayogPrevMonth | ' ': FirstDay  ===> FullOffDay 
     (0..@num_days16+4).each{|nth_day|
       if  isOffDay( wkDays[nth_day] )
@@ -242,7 +211,7 @@ module ControlHelper
   end
   ###
 
-  def get_FullOffDays(seqs)
+  def get_WithFullOffDays(seqs)
     #  puts "# def get_FullOffDays( #{seqs} )"
     # ---- In Range of the Month
     daysWithFullOff =[]    # array of COnseq 
@@ -279,56 +248,102 @@ module ControlHelper
     daysWithFullOff
   end 
 
-#=begin  
-#  #...............................
-#  def sr_offdays_array(idxWorker)
-#  #...............................
-#    seqs_pos=[]
-#    num_seq=0
-#
-#    (0..@num_days16+4).each{|nth_day|
-##      if @wrkdays[idxWorker][nth_day]==' '
-#      if isOffDay( @wrkdays[idxWorker][nth_day] )
-#        num_seq+=1
-#      else
-#        if num_seq > 1
-#          seqs=(0...num_seq).map {|n|
-#            nth_day - n - 1
-#          }.sort
-###if @debug_           
-##          print "seqs '",  seqs, "'\n"
-##end          
-#          seqs_pos << seqs
-#          num_seq=0
-#        end
-#      end
-#    }
-###    print "#... Off Seq ";seqs_pos
-#    seqs_pos
-#  end
-#=end
+  #
+  #   check & Hyouka
+  #
   
-=begin  
-  #.............................
-# yet  def add_OffDays(idxWorker, pos_OffDays)
-  #.............................
-    pos_OffDays.each {|offDays|
-      offDays.each_with_index {|day, i|
-        if cnt_filled(day) < 2
-          @wrkdays[idxWorker][day] = 'x'
-          offDays.delete_at(i)
-        end
-      }
+  #..............................
+  def examine(workers=[0,1,2,3])
+    #..............................
+      puts "# def examine( #{workers} )"
+    #
+    #  set PLACE Check to @chk_Place
+    # -------
+    (0...4+@num_days16 ).each{ |day|
+      @chk_Place[:numDay][day] = cnt_filled( day )
+      @chk_Place[:isOK][day] = ( cnt_filled( day ) == @num_workers_p_day )
+      @chk_Place[:dayView][day] = str_Attr ( cnt_filled( day ))
     }
-    p pos_OffDays
+
+    # between n.16th --> n_1.15th  
+#    (4 ... 4+ @num_days16 ).each { |day|
+    @chk_Place[:OK] = @chk_Place[:numDay][4, @num_days16].count( 2 )
+      #
+    @chk_Place[:Under] = @chk_Place[:numDay][4, @num_days16].count( 1 )
+    @chk_Place[:Under] += @chk_Place[:numDay][4, @num_days16].count( 0 )
+    #
+    @chk_Place[:Over] = @chk_Place[:numDay][4, @num_days16].count( 3 )
+    @chk_Place[:Over] += @chk_Place[:numDay][4, @num_days16].count( 4 )
+    if @chk_Place[:OK] + @chk_Place[:Under] + @chk_Place[:Over] != @num_days16
+      puts "############# <<def examine(workers=[0,1,2,3]) >>====="
+      puts "# Prog Error "
+      puts "##  @chk_Place[:OK] + @chk_Place[:Under] + @chk_Place[:Over] != @num_days16"
+      puts "##  #{@chk_Place[:OK]} + #{@chk_Place[:Under]} + #{@chk_Place[:Over]} != #{@num_days16}"
+      puts "############# << def examine(workers=[0,1,2,3]) >> ====="
+#      exit 1
+    end
+    # ------
+    # set WORKER Check
+    #  to @chk_Place
+    # -------    
+    workers.each do |w|
+#      puts " workers = #{w}"  
+      @chk_workers[:OffDay][w] = 0
+      @chk_workers[:FullOffDay][w] = []
+      @chk_workers[:OnDay][w] = 0
+      @chk_workers[:OnDayAll][w] = 0
+      @@num_wokers_p_day.each do |day|
+        @chk_workers[:OnDay][w] += 1  if isOnDay( @wrkdays[w][day] )
+        @chk_workers[:OffDay][w] += 1  if isOffDay( @wrkdays[w][day] )
+        @chk_workers[:OnDayAll][w] += 1  if isOnDayAll( @wrkdays[w][day] )
+      end
+      ##[-      @chk_work0ers[:FullOffDays][w] = []   @wrkdays[w])
+      @chk_workers[:FullOffDay][w] = get_FullOffDays( get_SeqOffDays( \
+@wrkdays[w])
+        
+#      print "\n#Full Off No.#{w}  '", @chk_workers[:FullOffDay][w], "'\n\n"      
+    end
+  end   # of exsmine    
+
+
+  def get_FullOffDays()
+    
+    ary_seqdays = @chk_workers[:FullOffDay][worker]|
+   arypdays.each{|seqs|
+      case seqs.size
+      when 1
+        if seqs[0]==4
+          
+      when 2,3,4,5
+        
+        > 1
+        
+      
+    }
+    
+  
   end
-=end
+  
+  def status_Worker(workor)
+    #  show status of worker
+    #  by chk_worker 
+   #{@chk_workers[:OffDay][worker])
+   #{@chk_workers[:FullOffDay][worker]}
+   #{@chk_workers[:OnDay][worker]}
+   #{@chk_workers[:OnDayAll][worker]}
+  end
+  
+  def status_Place()
+    
+]
+  end
   
   #................................
   def cnt_filled(idx_day, idx_workers=[0, 1, 2, 3])
-  #................................
+  #..............................
     # number of current worker Now
-    #    must be adjusted to @num_wokers_p_day
+    #  must be adjusted to
+    #  @num_wokers_p_day
     cnt=0
     idx_workers.each{|w|
       cnt += 1 if isOnDay( @wrkdays[w][idx_day] )
@@ -375,5 +390,4 @@ module ControlHelper
     end	
   end
 
-end
-
+end  # End of Module
