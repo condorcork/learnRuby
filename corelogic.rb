@@ -330,7 +330,7 @@ end
 =begin
 #[-    
     cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
-    @theMonthRange..each {|day|
+    @theMonthRange.each {|day|
       ##      puts "# think   day #{day}   '#{@wrkdays[ idxWorker][ day ]}'"
       num = cnt_filled(day)
       if num == 2
@@ -349,7 +349,7 @@ end
     #
     #
     cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
-    @theMonthRange..each {|day|
+    @theMonthRange.each {|day|
       ##      puts "# think   day #{day}   '#{@wrkdays[ idxWorker][ day ]}'"
       num = cnt_filled(day)
       case num
@@ -392,19 +392,23 @@ end
 
     #term_month = (3 .. @num_days16 + 4 - 1)
 
+
+    
     #[- begin
     examine()
 
     
     p "## Full Off before"
-    (0..3).each {|w|
-      p  @chk_workers[:FullOffDay][w]
-      @chk_workers[:FullOffDay][w] = get_WithFullOffDays( get_SeqOffDays ))
-    }
-    p "## Full Off AFTER"
-    (0..3).each {|w|
-      p  @chk_workers[:FullOffDay][w]
-    }
+    @chk_workers[:FullOffDay][idx_to_change] = get_WithFullOffDays(
+      get_SeqOffDays(
+        @chk_workers[:FullOffDay ][idx_to_change]
+      )
+    )
+    
+    puts strStatus_Worker(idx_to_change)
+    
+    puts strStatus_Place()
+
     #[- end
     hor_show
     print "===Ok==== "

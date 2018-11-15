@@ -44,6 +44,8 @@ module View
         c_str='0'
       when 'BLINK'
         c_str='5'
+      when 'REVERSE'
+        c_str='7'
       else
         c_str='34'
       end

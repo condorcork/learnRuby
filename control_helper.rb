@@ -1,3 +1,4 @@
+# coding: utf-8
 module ControlHelper
 
   #
@@ -184,7 +185,7 @@ module ControlHelper
 
   ###
   #-----------------------
-  def get_OffDays( wkDays )   # dummy)
+  def get_SeqOffDays( wkDays )
   #-----------------------  
     #---- start Here -----    
     seqs_pos=[]    # Array of array days Po9q1
@@ -194,7 +195,6 @@ module ControlHelper
     (0..@num_days16+4).each{|nth_day|
       if  isOffDay( wkDays[nth_day] )
         days << nth_day
-        #        num_seq+=1
         num_days+=1
       else
         if num_days > 1
@@ -211,10 +211,10 @@ module ControlHelper
   end
   ###
 
-  def get_WithFullOffDays(seqs)
+  def get_WithFullOffDays( seqs )
     #  puts "# def get_FullOffDays( #{seqs} )"
     # ---- In Range of the Month
-    daysWithFullOff =[]    # array of COnseq 
+    daysWithFullOff =[]    # array of seq of OffDays 
     seqs.each do|days|
       #    puts "Check element daary #{days}"
       days_ =[]
@@ -251,7 +251,6 @@ module ControlHelper
   #
   #   check & Hyouka
   #
-  
   #..............................
   def examine(workers=[0,1,2,3])
     #..............................
@@ -292,50 +291,51 @@ module ControlHelper
       @chk_workers[:FullOffDay][w] = []
       @chk_workers[:OnDay][w] = 0
       @chk_workers[:OnDayAll][w] = 0
-      @@num_wokers_p_day.each do |day|
+      @theMonthRange.each do |day|
         @chk_workers[:OnDay][w] += 1  if isOnDay( @wrkdays[w][day] )
         @chk_workers[:OffDay][w] += 1  if isOffDay( @wrkdays[w][day] )
         @chk_workers[:OnDayAll][w] += 1  if isOnDayAll( @wrkdays[w][day] )
       end
-      ##[-      @chk_work0ers[:FullOffDays][w] = []   @wrkdays[w])
-      @chk_workers[:FullOffDay][w] = get_FullOffDays( get_SeqOffDays( \
-@wrkdays[w])
-        
-#      print "\n#Full Off No.#{w}  '", @chk_workers[:FullOffDay][w], "'\n\n"      
+      #      @chk_work0ers[:FullOffDays][w] = []   @wrkdays[w])
+      @chk_workers[:FullOffDay][w] = get_WithFullOffDays( get_SeqOffDays( @wrkdays[w] ) )
+##      print "\n#Full Off No.#{w}  '", @chk_workers[:FullOffDay][w], "'\n\n"      
     end
-  end   # of exsmine    
+  end   # of exsmine
 
 
-  def get_FullOffDays()
+  #----------------------------
+  def get_FullOffDays(worker)
+  #----------------------------
+    #  return Array of Full Off Days
+    ary_seqdays = @chk_workers[:FullOffDay][worker].dup
+    ret=[]
     
-    ary_seqdays = @chk_workers[:FullOffDay][worker]|
-   arypdays.each{|seqs|
-      case seqs.size
-      when 1
-        if seqs[0]==4
-          
-      when 2,3,4,5
-        
-        > 1
-        
+    if arypdays[0].size == 1 && arypdays[0][0] == 4
+      ret <<  arypdays[0][0]
+      arydays.shift
+    end
       
+    arypdays.each {|seqs|
+      seqs.shift
+      ret << seqs
     }
-    
-  
+    ret
   end
   
-  def status_Worker(workor)
+  #----------------------------
+  def strStatus_Worker(worker)
+  #----------------------------
     #  show status of worker
     #  by chk_worker 
-   #{@chk_workers[:OffDay][worker])
-   #{@chk_workers[:FullOffDay][worker]}
-   #{@chk_workers[:OnDay][worker]}
-   #{@chk_workers[:OnDayAll][worker]}
+    @statusStr_Worker =  "# No.#{worker}     #{@num_days16}\n"
+    @statusStr_Worker += " Off: #{@chk_workers[:OffDay][worker]}  FullOff(公休): #{@chk_workers[:FullOffDay][worker]}\n"
+    @statusStr_Worker += " On: #{@chk_workers[:OnDay][worker]} [ 'On' with Other Place ]: #{@chk_workers[:OnDayAll][worker]}"
   end
   
-  def status_Place()
-    
-]
+  #-----------------------
+  def strStatus_Place()
+  #-----------------------
+    @statusStr_Place = "#{@num_days16}  = OK: #{@chk_Place[:OK]} +  Under: #{@chk_Place[:Under]} + Over: #{@chk_Place[:Over]}"
   end
   
   #................................
