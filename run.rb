@@ -1,32 +1,26 @@
 #!/usr/bin/env ruby
 # coding: utf-8
 #
-# temp main_Yotei.rb
-#  made from main-core.rb
-#
-# 2018-11-08 adapted module
-#......
-# 2018-11-02(Fri) 17:35:00
-#
-# 2018-10-28(Sun) 15:45:38
-
-# 10-29(Mon) 15:43
-# 10-30(Thu) 12:49
-# 2018-10-30(Tue) 18:57:15
 
 #require './corelogic'
-require './CoreLogic' # for development
-'
+require './CoreLogic' 
 
-#---- no use
-# puts '#... Ready state of each day'
-#.... Test methods
-# days=[0, 1, 2, 3, 4, 5]
-# chk_workers=[0,1,2,3]
-# test_cnt_filled(y, days, chk_workers, 1)
-#
+def test_Reverse()
+  dat='_ _*_x_X_'
+  dat2=dat
+  dat2=dat.gsub(/[X\*]/){|s|
+    y.color_str(s,'REVERSE, GREEN')
+  }
+  dat3 = dat2.gsub(/\*/,' ')
+    
+  puts "  '#{dat2}'  <-- '#{dat}'"
+  puts
+  puts "  '#{dat3}'  <-- '#{dat2}'"
+end
+
 
 #----- MAIN ------
+  $fulldayDebug = false
 members=4
 y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
 #... Prepare for Prevmonth
@@ -46,30 +40,39 @@ y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
 #  y.testMain
 #
   ##
+#  test_Reverse
 #
   y.examine()
-  y.hor_show()
+  y.hor_show(3)
+
 #  
-  y.ver_show([0,1,2,3], false) # false)
-  y.hor_show([0,1,2,3], true)
+  y.ver_show() # false)
+  y.hor_show(1)
   #
   puts '##Yotaku idx 3 古谷野 san'
   y.yoyaku(3, '6012')
-  y.hor_show([3])
-  
-  y.hor_show()
+  y.hor_show(2)
+#  
+  $fulldayDebug = true
+  y.examine
+  if ! y.are_you_ok?( "## KOKYU")
+    exit 0
+  end
+
+  y.hor_show(3)
   #
   # Start to Think
   #
   y.save_Case(true)
   puts '# ======== Saved end of Yotaku idx 3 古谷野 san'
 #
-#... PreSet  Fill days by Patern ....
+  #... PreSet  Fill days by Patern ....
+
 puts "#---- PRESET by Pattern---"
 y.pre_set([0,1,2])
 y.ver_show()
 
-#  def presetMultiWorker(idx,d, x)
+#  def presetMultiWorker(idx,d, x)p
 
 y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
 #y.ver_show()
@@ -80,25 +83,26 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
   puts "#---- Check ---"
   ###
   (0..4).each {|x|
-    y.hor_show()   ## [ x ])
+    y.hor_show(x)   ## [ x ])
 #    seq=y.sr_offdays_array( x )
-#    print "\n#Full Off No.#{x}  '", seq, "'\n\n"
+#x    print "\n#Full Off No.#{x}  '", seq, "'\n\n"
   }
 
   
-  if ! y.are_you_ok?()
+  if ! y.are_you_ok?( "---FOR ADJUST #-----")
     exit 0
   end
 
-  [0,1,2].each {|i|
+  (0..2).each {|i|
+    puts "\n\n#ADJUST #{i}"
     y.adjust(i)
-    break  if ! y.are_you_ok?
+ #   break  if ! y.are_you_ok?
   }
 
   
-  if ! y.are_you_ok?('continue? ')
+ # if ! y.are_you_ok?('continue? ')
     exit 0
-  end
+ # end
 
   #---------
 y.examine()

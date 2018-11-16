@@ -324,33 +324,10 @@ end
     save_Case
     puts "Case Person #{idx_to_change}"
     
-    hor_show
-    #    ver_show
-    #
-=begin
-#[-    
-    cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
-    @theMonthRange.each {|day|
-      ##      puts "# think   day #{day}   '#{@wrkdays[ idxWorker][ day ]}'"
-      num = cnt_filled(day)
-      if num == 2
-        cnt_ok0 += 1
-      end
-      case num
-      when 1, 0
-        if isOffDay( @wrkdays[idx_to_change][day] )
-          @wrkdays[idx_to_change][day] = 'X'
-          cnt_add += 1
-          changed += 1
-        else
-        end
-      when 3, 4
-=end    
-    #
+    hor_show(idx_to_change)
     #
     cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
     @theMonthRange.each {|day|
-      ##      puts "# think   day #{day}   '#{@wrkdays[ idxWorker][ day ]}'"
       num = cnt_filled(day)
       case num
       when 2
@@ -410,7 +387,7 @@ end
     puts strStatus_Place()
 
     #[- end
-    hor_show
+    hor_show( idx_to_change )
     print "===Ok==== "
     gets
 

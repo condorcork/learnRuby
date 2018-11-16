@@ -51,72 +51,70 @@ module View
       end
       attr += c_str + ';'
     }
-    attr.chop!     # delet last cahr ;
-  #      print "## attr ='", attr, "'\n"
+    if attr[-1] == ';'
+      attr.chop!
+    end
+
     ret  = "\033[" + attr + 'm' + str + "\033[0m"
-   #     print "## attr End ='", ret, "'\n"
-   #  ret
+    ret
   end
 
   #.............................
-  def hor_show(chk_members=[0,1,2,3], checkview=true)
+  def hor_show(chk_Worker=nil) #= nil, chk_members=[0,1,2,3])
     #.............................
-   puts "# def hor_show( #{chk_members}, #{checkview} )"
+   puts "# def hor_show( #{chk_Worker} )"
     # for Header & Guide
-   if checkview
 #      itemName2= "        |"
-     hdrDay   = "        |"
-     hdrMonth = "  Date  |"
-     hdr=". "*4 + "|16. . . 20. . . . , . . "    # until 28th
-     (28..@num_days16).each {|d|
-       if d == 30
-         if d != @num_days16
-           hdr=hdr + d.to_s
-         else
-           hdr=hdr + '+ '
-         end
+   hdrDay   = "        |"
+   hdrMonth = "  Date  |"
+   hdr=". "*4 + "|16. . . 20. . . . , . . "    # until 28th
+   (28..@num_days16).each {|d|
+     if d == 30
+       if d != @num_days16
+         hdr=hdr + d.to_s
        else
-         hdr=hdr + '. '
+         hdr=hdr + '+ '
        end
-     }
-     #   puts "16--31  '#{hdr}'"
-     hdr=hdr+ "1 . . . + . . . . 10. . . . 15"
-     guide= (' 1'..' 9').to_a.join + ' + '
-     guide[0]=''
-     guide= ". . . . |" + guide*3 +'.'
-     #  when Smafo
-     #      puts guide
-     #      puts hdr
-     #  when PC
-     puts ' ' * hdrDay.length + guide
-     # ??      puts  "Here  #{(  4 + @num_days16 - 16  - @num_days16.to_s.length )}"
-     strPrevMonth = '+-' *  4 + '|' #
-     strPrevMonth += '+-' * ( @num_days16 - 15 )
-     #     puts "'#{strPrevMonth}'  #{strPrevMonth.length}   strPrevmaon Len" 
-     #      strPrevMonth = strPrevMonth
-     #      strMonth = " " + @month_16.to_s + " "
-     #      centerPos = ( strPrevMonth.length - strMonth.length ) / 2
-     #      t = strMonth.slice(0, centerPos - 1) + strMonth
-     #      t = ( strPrevMonth.length - t.length )
+     else
+       hdr=hdr + '. '
+     end
+   }
+   #   puts "16--31  '#{hdr}'"
+   hdr=hdr+ "1 . . . + . . . . 10. . . . 15"
+   guide= (' 1'..' 9').to_a.join + ' + '
+   guide[0]=''
+   guide= ". . . . |" + guide*3 +'.'
+   puts ' ' * hdrDay.length + guide
+   # ??      puts  "Here  #{(  4 + @num_days16 - 16  - @num_days16.to_s.length )}"
+   strPrevMonth = '+-' *  4 + '|' #
+   strPrevMonth += '+-' * ( @num_days16 - 15 )
 
-     nextMonth = Date.new(@year_16, @month_16, 28) + 28
-     #      nextMonth.month
-     puts hdrMonth + strPrevMonth + "<<---  " + nextMonth.month.to_s + " ----"
-     puts hdrDay + hdr
-     #
-   end
-    #
+   date_nextMonth = nextMonth()
+   #      nextMonth.month
+   puts hdrMonth + strPrevMonth + "<<---  " + date_nextMonth.month.to_s + " ----"
+   puts hdrDay + hdr
+   #
    filler = '_'
-   chk_members.each do |idx|
+   (0...@num_workers).each do |idx|
      # 4 days of prevMonth to Ref
      kinmuM = @wrkdays[idx][0..3].join(filler)
      # this month
      dat = @wrkdays[idx][4... 4+@num_days16].join(filler)
+     
+     #     if idx == chk_Worker
+     if dat =~ /[X\*]/
+       puts '#?? REVERSE Before'
+       p dat
+       dat.gsub(/[X\*]/) {|s|
+         color_str(s,'REVERSE')
+       }
+       puts '#?? REVERSE After'
+       p dat
+     end
      kinmuM = kinmuM + '_|' + dat + filler
-     #      puts kinmuM                       # Smafo
-     puts "  No. #{idx} |" + kinmuM      # PC
+     puts kinmuM
    end
-   if checkview
+ #  if checkview
      examine()
      #      print " @chk_Place[:dayView] ='", @chk_Place[:dayView], "'\n"
      #      print " @chk_Place[:dayView][0] ='", @chk_Place[:dayView][0], "'\n"
@@ -131,7 +129,7 @@ module View
      dat = dat + @chk_Place[:dayView][4... 4+@num_days16].join(filler)
      #      puts dat                      # when Smafo
      puts " check  |#{dat}"    # when PC
-   end
+#   end
   end  
   
   #.............................

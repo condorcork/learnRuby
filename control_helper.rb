@@ -96,6 +96,8 @@ module ControlHelper
   end
 
   def nextMonth(month=nil)
+    Date.new(@year_16, @month_16, 28) + 28
+    
   end
 
 
@@ -243,7 +245,7 @@ module ControlHelper
       #    puts "## days after removed out of range _ ==> '#{days_}'"
       #    puts "## daysWithFullOff '#{daysWithFullOff}'"
     end
-    #  puts "## daysWithFullOff '#{daysWithFullOff}'"
+      puts "## daysWithFullOff '#{daysWithFullOff}'"
     #  p #{daysWithFullOff}
     daysWithFullOff
   end 
@@ -300,9 +302,17 @@ module ControlHelper
       @chk_workers[:FullOffDay][w] = get_WithFullOffDays( get_SeqOffDays( @wrkdays[w] ) )
 ##      print "\n#Full Off No.#{w}  '", @chk_workers[:FullOffDay][w], "'\n\n"      
     end
-  end   # of exsmine
 
-
+    if $fulldayDebug
+      (0..3).each {|w|
+        puts "# exam Worker # #{w}"
+        dat = get_FullOffDays(w)
+        puts "#{dat}"
+      }
+      puts "# exam Place"
+      puts strStatus_Place()
+    end
+  end   # of examine
   #----------------------------
   def get_FullOffDays(worker)
   #----------------------------
@@ -310,15 +320,17 @@ module ControlHelper
     ary_seqdays = @chk_workers[:FullOffDay][worker].dup
     ret=[]
     
-    if arypdays[0].size == 1 && arypdays[0][0] == 4
-      ret <<  arypdays[0][0]
-      arydays.shift
+    if ary_seqdays[0].size == 1 && ary_seqdays[0][0] == 4
+      ret <<  ary_seqdays[0]
+      ary_seqdays.shift
     end
       
-    arypdays.each {|seqs|
+    ary_seqdays.each {|seqs|
       seqs.shift
       ret << seqs
     }
+    puts "__ get_FullOffDays( #{worker} ) "
+    p ret
     ret
   end
   
@@ -326,16 +338,24 @@ module ControlHelper
   def strStatus_Worker(worker)
   #----------------------------
     #  show status of worker
-    #  by chk_worker 
+    #  by chk_worker
+    
     @statusStr_Worker =  "# No.#{worker}     #{@num_days16}\n"
     @statusStr_Worker += " Off: #{@chk_workers[:OffDay][worker]}  FullOff(公休): #{@chk_workers[:FullOffDay][worker]}\n"
     @statusStr_Worker += " On: #{@chk_workers[:OnDay][worker]} [ 'On' with Other Place ]: #{@chk_workers[:OnDayAll][worker]}"
+    if $fulldayDebug
+      puts @statusStr_Worker
+    end
   end
   
   #-----------------------
   def strStatus_Place()
   #-----------------------
     @statusStr_Place = "#{@num_days16}  = OK: #{@chk_Place[:OK]} +  Under: #{@chk_Place[:Under]} + Over: #{@chk_Place[:Over]}"
+    
+    if $fulldayDebug
+      puts @statusStr_Place
+    end
   end
   
   #................................
