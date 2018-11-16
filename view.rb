@@ -61,75 +61,70 @@ module View
 
   #.............................
   def hor_show(chk_Worker=nil) #= nil, chk_members=[0,1,2,3])
-    #.............................
-   puts "# def hor_show( #{chk_Worker} )"
+  #.............................
+    puts "# def hor_show( #{chk_Worker} )"
+   #   
     # for Header & Guide
-#      itemName2= "        |"
-   hdrDay   = "        |"
-   hdrMonth = "  Date  |"
-   hdr=". "*4 + "|16. . . 20. . . . , . . "    # until 28th
-   (28..@num_days16).each {|d|
-     if d == 30
-       if d != @num_days16
-         hdr=hdr + d.to_s
-       else
-         hdr=hdr + '+ '
-       end
-     else
-       hdr=hdr + '. '
-     end
-   }
-   #   puts "16--31  '#{hdr}'"
-   hdr=hdr+ "1 . . . + . . . . 10. . . . 15"
-   guide= (' 1'..' 9').to_a.join + ' + '
-   guide[0]=''
-   guide= ". . . . |" + guide*3 +'.'
-   puts ' ' * hdrDay.length + guide
-   # ??      puts  "Here  #{(  4 + @num_days16 - 16  - @num_days16.to_s.length )}"
-   strPrevMonth = '+-' *  4 + '|' #
-   strPrevMonth += '+-' * ( @num_days16 - 15 )
+    #
+    hdrDay   = "      |"
+    hdrMonth = " Date |"
+    
+    hdr=". "*4 + "|16. . . 20. . . . , . . "    # until 28th
+    (28..@num_days16).each {|d|
+      if d == 30
+        if d != @num_days16
+          hdr=hdr + d.to_s
+        else
+          hdr=hdr + '+ '
+        end
+      else
+        hdr=hdr + '. '
+      end
+    }
+    #   puts "16--31  '#{hdr}'"
+    hdr=hdr+ "1 . . . + . . . . 10. . . . 15"
+    ##
+    guide= (' 1'..' 9').to_a.join + ' + '
+    guide[0]=''
+    guide= ". . . . |" + guide*3 +'.'
+    puts ' ' * hdrDay.length + guide
+    # ??      puts  "Here  #{(  4 + @num_days16 - 16  - @num_days16.to_s.length )}"
+    strPrevMonth = '+-' *  4 + '|' #
+    strPrevMonth += '+-' * ( @num_days16 - 15 )
 
-   date_nextMonth = nextMonth()
-   #      nextMonth.month
-   puts hdrMonth + strPrevMonth + "<<---  " + date_nextMonth.month.to_s + " ----"
-   puts hdrDay + hdr
-   #
-   filler = '_'
-   (0...@num_workers).each do |idx|
-     # 4 days of prevMonth to Ref
-     kinmuM = @wrkdays[idx][0..3].join(filler)
-     # this month
-     dat = @wrkdays[idx][4... 4+@num_days16].join(filler)
-     
-     #     if idx == chk_Worker
-     if dat =~ /[X\*]/
-       puts '#?? REVERSE Before'
-       p dat
-       dat.gsub(/[X\*]/) {|s|
-         color_str(s,'REVERSE')
-       }
-       puts '#?? REVERSE After'
-       p dat
-     end
-     kinmuM = kinmuM + '_|' + dat + filler
-     puts kinmuM
-   end
- #  if checkview
+    date_nextMonth = nextMonth()
+    #      nextMonth.month
+    puts hdrMonth + strPrevMonth + "<<---  " + date_nextMonth.month.to_s + " ----"
+    puts hdrDay + hdr
+    #
+    # Real Data
+    #
+    filler = '_'
+    (0...@num_workers).each do |idx|
+      # 4 days of prevMonth to Ref
+      kinmuM = @wrkdays[idx][0..3].join(filler)
+      # this month
+      dat = @wrkdays[idx][4... 4+@num_days16].join(filler)
+      
+      #     if idx == chk_Worker
+      if dat =~ /[X\*]/
+        dat.gsub!(/[X\*]/) {|s|
+          color_str(s,'REVERSE,GREEN')
+        }
+        dat.gsub!('*',' ')
+      end
+      kinmuM = kinmuM + '_|' + dat + filler
+      puts " No.#{idx} |" + kinmuM
+    end
+
      examine()
-     #      print " @chk_Place[:dayView] ='", @chk_Place[:dayView], "'\n"
-     #      print " @chk_Place[:dayView][0] ='", @chk_Place[:dayView][0], "'\n"
-     #      print " @chk_Place[:dayView][1] ='", @chk_Place[:dayView][1], "'\n"
-     #      print " @chk_Place[:dayView][2] ='", @chk_Place[:dayView][2], "'\n"
-     #      print " @chk_Place[:dayView][3] ='", @chk_Place[:dayView][3], "'\n"
-     
      #              .join(filler) + '_|'
      dat = @chk_Place[:dayView][0, 4].join(filler) + '_|'
-     
-     ##      print " @chk_Place[:dayView][4... 4+@num_days16] ='", @chk_Place[:dayView][4... 4+@num_days16] , "' \n"
+
      dat = dat + @chk_Place[:dayView][4... 4+@num_days16].join(filler)
      #      puts dat                      # when Smafo
      puts " check  |#{dat}"    # when PC
-#   end
+
   end  
   
   #.............................

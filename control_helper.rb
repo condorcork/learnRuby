@@ -245,8 +245,9 @@ module ControlHelper
       #    puts "## days after removed out of range _ ==> '#{days_}'"
       #    puts "## daysWithFullOff '#{daysWithFullOff}'"
     end
-      puts "## daysWithFullOff '#{daysWithFullOff}'"
-    #  p #{daysWithFullOff}
+    #
+    #  puts "## daysWithFullOff '#{daysWithFullOff}'"
+    #
     daysWithFullOff
   end 
 
@@ -281,8 +282,10 @@ module ControlHelper
       puts "##  @chk_Place[:OK] + @chk_Place[:Under] + @chk_Place[:Over] != @num_days16"
       puts "##  #{@chk_Place[:OK]} + #{@chk_Place[:Under]} + #{@chk_Place[:Over]} != #{@num_days16}"
       puts "############# << def examine(workers=[0,1,2,3]) >> ====="
+      puts "\a"      # BELLx
 #      exit 1
     end
+
     # ------
     # set WORKER Check
     #  to @chk_Place
@@ -303,23 +306,33 @@ module ControlHelper
 ##      print "\n#Full Off No.#{w}  '", @chk_workers[:FullOffDay][w], "'\n\n"      
     end
 
-    if $fulldayDebug
-      (0..3).each {|w|
-        puts "# exam Worker # #{w}"
-        dat = get_FullOffDays(w)
-        puts "#{dat}"
-      }
-      puts "# exam Place"
-      puts strStatus_Place()
-    end
+    puts "#-------------- exam Place ----------------"
+    puts strStatus_Place()
+
+    
+    (0..3).each {|w|
+      puts "#------ exam Worker -----------# #{w}"
+      dat = get_FullOffDays(w)
+      dat.flatten!
+      puts  " Off Days = #{dat.size} days:    #{dat}"
+    }
   end   # of examine
+
   #----------------------------
   def get_FullOffDays(worker)
   #----------------------------
+  puts "#--- def get_FullOffDays( #{worker} ) ----" 
     #  return Array of Full Off Days
+#    print "@chk_workers[:FullOffDay][worker] ;", @chk_workers[:FullOffDay][worker], ";\n"
     ary_seqdays = @chk_workers[:FullOffDay][worker].dup
-    ret=[]
+#    print "Array of array seqs (dupped) '", ary_seqdays, "'\n"
+    if ary_seqdays.empty?
+#      puts "#--- End of def get_FullOffDays( #{worker} ) ----"
+#      print " ret (ary_seqdays) ='", ary_seqdays, "'\n"
+      return ary_seqdays
+    end
     
+    ret=[]
     if ary_seqdays[0].size == 1 && ary_seqdays[0][0] == 4
       ret <<  ary_seqdays[0]
       ary_seqdays.shift
@@ -329,8 +342,7 @@ module ControlHelper
       seqs.shift
       ret << seqs
     }
-    puts "__ get_FullOffDays( #{worker} ) "
-    p ret
+    
     ret
   end
   
@@ -339,13 +351,23 @@ module ControlHelper
   #----------------------------
     #  show status of worker
     #  by chk_worker
-    
+
+    dat = get_FullOffDays(worker)
+    print "# def  strStaus_Worker( #Pworker} )\n"
+    print "# strStaus_Worker( #Pworker} )\n"
     @statusStr_Worker =  "# No.#{worker}     #{@num_days16}\n"
-    @statusStr_Worker += " Off: #{@chk_workers[:OffDay][worker]}  FullOff(公休): #{@chk_workers[:FullOffDay][worker]}\n"
+
+=begin    
+    @statusStr_Worker += " Off: #{@chk_workers[:OffDay][worker]}  FullOff(公休): #{dat.length} [ #{dat} ] \n"
     @statusStr_Worker += " On: #{@chk_workers[:OnDay][worker]} [ 'On' with Other Place ]: #{@chk_workers[:OnDayAll][worker]}"
+=end
+    @statusStr_Worker = @statusStr_Worker + " Off: #{@chk_workers[:OffDay][worker]}  FullOff(公休): #{dat.length} [ #{dat} ] \n"
+    @statusStr_Worker = @statusStr_Worker + " On: #{@chk_workers[:OnDay][worker]} [ 'On' with Other Place ]: #{@chk_workers[:OnDayAll][worker]}"
+
     if $fulldayDebug
       puts @statusStr_Worker
     end
+    @statusStr_Worker    
   end
   
   #-----------------------
@@ -353,9 +375,7 @@ module ControlHelper
   #-----------------------
     @statusStr_Place = "#{@num_days16}  = OK: #{@chk_Place[:OK]} +  Under: #{@chk_Place[:Under]} + Over: #{@chk_Place[:Over]}"
     
-    if $fulldayDebug
-      puts @statusStr_Place
-    end
+    @statusStr_Place
   end
   
   #................................
@@ -370,7 +390,6 @@ module ControlHelper
     }
     cnt
   end
-
   
   #--------
   #  miscellaneous

@@ -20,9 +20,11 @@ end
 
 
 #----- MAIN ------
-  $fulldayDebug = false
+$fulldayDebug = false
 members=4
 y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
+
+
 #... Prepare for Prevmonth
   # 'xx  ''xxx'    --> 0(1)
   y.prepare(0, 'xx  ')
@@ -33,6 +35,10 @@ y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
   y.prepare(2, ' xxx')
   # ' DDx '' DDD'  special
   y.prepare(3, 'DDx ')
+  #
+  y.hor_show(1)
+  
+  #
  #######################
   ##
 #  y.test_data
@@ -42,9 +48,8 @@ y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
   ##
 #  test_Reverse
 #
-  y.examine()
-  y.hor_show(3)
-
+#  y.examine()
+  y.hor_show()
 #  
   y.ver_show() # false)
   y.hor_show(1)
@@ -55,7 +60,7 @@ y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
 #  
   $fulldayDebug = true
   y.examine
-  if ! y.are_you_ok?( "## KOKYU")
+  if ! y.are_you_ok?( "## Continue Y/N:")
     exit 0
   end
 

@@ -360,6 +360,17 @@ end
       end
     }
 
+    #term_month = (3 .. @num_days16 + 4 - 1)
+    
+    #[- begin
+    examine()
+
+    
+
+    #[- end
+    hor_show( idx_to_change )
+    print "===Ok==== "
+    gets
 
     puts "# RESULTadjusted"
     puts "#   #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{idx_to_change}"
@@ -367,14 +378,6 @@ end
     puts "#       Result + #{cnt_ok - cnt_ok0}"
     puts "##   OffDay is #{cnt_offDays} days"
 
-    #term_month = (3 .. @num_days16 + 4 - 1)
-
-
-    
-    #[- begin
-    examine()
-
-    
     p "## Full Off before"
     @chk_workers[:FullOffDay][idx_to_change] = get_WithFullOffDays(
       get_SeqOffDays(
@@ -386,11 +389,7 @@ end
     
     puts strStatus_Place()
 
-    #[- end
-    hor_show( idx_to_change )
-    print "===Ok==== "
-    gets
-
+    
 #    ver_show
     load_Case
   end  
