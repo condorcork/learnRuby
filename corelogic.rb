@@ -324,7 +324,7 @@ end
     save_Case
     puts "Case Person #{idx_to_change}"
     
-    hor_show(idx_to_change)
+#    hor_show(idx_to_change)
     #
     cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
     @theMonthRange.each {|day|
@@ -363,12 +363,13 @@ end
     #term_month = (3 .. @num_days16 + 4 - 1)
     
     #[- begin
-    examine()
+#[-    examine()
 
     
 
     #[- end
     hor_show( idx_to_change )
+    return  #[-
     print "===Ok==== "
     gets
 

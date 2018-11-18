@@ -49,10 +49,10 @@ y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
 #  test_Reverse
 #
 #  y.examine()
-  y.hor_show()
+#  y.hor_show()
 #  
-  y.ver_show() # false)
-  y.hor_show(1)
+ #  y.ver_show() # false)
+ # y.hor_show(1)
   #
   puts '##Yotaku idx 3 古谷野 san'
   y.yoyaku(3, '6012')
@@ -60,7 +60,7 @@ y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
 #  
   $fulldayDebug = true
   y.examine
-  if ! y.are_you_ok?( "## Continue Y/N:")
+  if ! y.ok_YN?( "## Continue Y/N:")
     exit 0
   end
 
@@ -94,18 +94,18 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
   }
 
   
-  if ! y.are_you_ok?( "---FOR ADJUST #-----")
+  if ! y.ok_YN?( "---FOR ADJUST #-----")
     exit 0
   end
 
   (0..2).each {|i|
     puts "\n\n#ADJUST #{i}"
     y.adjust(i)
- #   break  if ! y.are_you_ok?
+ #   break  if ! y.ok_YN?
   }
 
   
- # if ! y.are_you_ok?('continue? ')
+ # if ! y.ok_YN?('continue? ')
     exit 0
  # end
 

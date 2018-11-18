@@ -63,7 +63,9 @@ module View
   def hor_show(chk_Worker=nil) #= nil, chk_members=[0,1,2,3])
   #.............................
     puts "# def hor_show( #{chk_Worker} )"
-   #   
+    #  Prepare Check Line
+    examine()
+#
     # for Header & Guide
     #
     hdrDay   = "      |"
@@ -97,34 +99,38 @@ module View
     puts hdrMonth + strPrevMonth + "<<---  " + date_nextMonth.month.to_s + " ----"
     puts hdrDay + hdr
     #
-    # Real Data
+    # Each Worker On/Off days
     #
+    #   
+    
     filler = '_'
     (0...@num_workers).each do |idx|
       # 4 days of prevMonth to Ref
       kinmuM = @wrkdays[idx][0..3].join(filler)
       # this month
-      dat = @wrkdays[idx][4... 4+@num_days16].join(filler)
+#[-      dat = @wrkdays[idx][4... 4+@num_days16].join(filler)
+      dat_=@wrkdays[idx][4... 4+@num_days16].dup
+      dat = dat_.join(filler)
       
-      #     if idx == chk_Worker
-      if dat =~ /[X\*]/
+      if idx == chk_Worker
+#      if dat =~ /[X\*]/
         dat.gsub!(/[X\*]/) {|s|
           color_str(s,'REVERSE,GREEN')
         }
         dat.gsub!('*',' ')
       end
       kinmuM = kinmuM + '_|' + dat + filler
-      puts " No.#{idx} |" + kinmuM
+      hdr = " No.#{idx} |"
+      puts hdr + kinmuM
     end
+    
+    #  check  Row,  Last Line
 
-     examine()
-     #              .join(filler) + '_|'
      dat = @chk_Place[:dayView][0, 4].join(filler) + '_|'
-
+2
      dat = dat + @chk_Place[:dayView][4... 4+@num_days16].join(filler)
-     #      puts dat                      # when Smafo
-     puts " check  |#{dat}"    # when PC
 
+     puts " <=> |#{dat}"    # when PC
   end  
   
   #.............................

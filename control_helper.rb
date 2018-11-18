@@ -415,7 +415,7 @@ module ControlHelper
   end
 
   #.............................
-  def are_you_ok?(prompt='ok ? [y|n]:')
+  def ok_YN?(prompt='ok ? [y|n]:')
   #.............................
     while true
       print prompt
