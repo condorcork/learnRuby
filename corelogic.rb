@@ -86,8 +86,6 @@ include './View'
     puts "\n\n#==  presetKoyano( #{idxWorker} )"
 
     pos_OffDays = get_SeqOffDays( @wrkdays[idxWorker])   
-#[-    @chk_workers[:WithFullOffDay][idxWorker] = get_WithFullOffDays( daysWithOffday )
-
     p "po_OffDayss",pos_OffDays
 
     cnt_add = 0

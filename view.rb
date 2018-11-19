@@ -128,7 +128,7 @@ module View
 2
      dat = dat + @chk_Place[:dayView][4... 4+@num_days16].join(filler)
 
-     puts " <=> |#{dat}"    # when PC
+     puts " <=>  |#{dat}"    # when PC
   end  
   
   #.............................

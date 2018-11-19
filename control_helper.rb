@@ -189,12 +189,14 @@ module ControlHelper
   #-----------------------
   def get_SeqOffDays( wkDays )
   #-----------------------  
+  print "#-- def get_SeqOffDays( ", wkDays," ) ---\n"
     #---- start Here -----    
     seqs_pos=[]    # Array of array days Po9q1
     days = []
     num_days = 0  #  Check form Last 4 days of Prev Month
-    #  ' ':LastDayogPrevMonth | ' ': FirstDay  ===> FullOffDay 
-    (0..@num_days16+4).each{|nth_day|
+    #  ' ':LastDayOfPrevMonth | ' ': FirstDay  ===> FullOffDay 
+#    (0..@num_days16+4).each{|nth_day|
+    (0...@num_days16+4).each{|nth_day|
       if  isOffDay( wkDays[nth_day] )
         days << nth_day
         num_days+=1
@@ -209,11 +211,14 @@ module ControlHelper
     if num_days > 1
       seqs_pos << days
     end
+    print "#-- seq data '", seqs_pos, "'  at set_SeqOffDays\n"
     seqs_pos
   end
   ###
 
+  #----------------------------
   def get_WithFullOffDays( seqs )
+  #----------------------------
     #  puts "# def get_FullOffDays( #{seqs} )"
     # ---- In Range of the Month
     daysWithFullOff =[]    # array of seq of OffDays 
@@ -246,11 +251,48 @@ module ControlHelper
       #    puts "## daysWithFullOff '#{daysWithFullOff}'"
     end
     #
-    #  puts "## daysWithFullOff '#{daysWithFullOff}'"
+      puts "## daysWithFullOff '#{daysWithFullOff}' at get_WithFullOffDays"
     #
     daysWithFullOff
   end 
 
+  #----------------------------
+  def get_FullOffDays(worker)
+  #----------------------------
+  puts "##-- def get_FullOffDays( #{worker} ) ----" 
+    print "##  @chk_workers[:WithFullOffDay][worker] '", @chk_workers[:WithFullOffDay][worker], "'\n"
+
+    ary_seqdays = Marshal.load(Marshal.dump( @chk_workers[:WithFullOffDay][worker] ) )
+#    ary_seqdays = @chk_workers[:WithFullOffDay][worker].clone
+    print "dup  ='",  ary_seqdays.object_id, "'\n"
+    print "orig ='", @chk_workers[:WithFullOffDay][worker].object_id, "'\n"
+    print "##  Array of array seqs (dupped) '", ary_seqdays, "'\n"
+    if ary_seqdays.empty?
+      return ary_seqdays
+    end
+    
+    ret=[]
+    
+#    if ary_seqdays[0].size == 1          #  && ary_seqdays[0][0] == 4
+#      ret <<  ary_seqdays[0]
+#      ary_seqdays.shift
+#    end
+      
+    ary_seqdays.each {|seqs|
+      if seqs.size == 1          #  && ary_seqdays[0][0] == 4
+        ret <<  seqs
+        ary_seqdays.shift
+      else
+        seqs.shift
+        ret << seqs
+      end
+    }
+    print "## @chk_workers[:WithFullOffDay][worker] '", @chk_workers[:WithFullOffDay][worker], "'\n"
+    print "##-- get_FullOffDays --'", ret, "'\n"
+    ret
+  end
+
+  
   #
   #   check & Hyouka
   #
@@ -313,34 +355,10 @@ module ControlHelper
       puts "#----- exam Worker -- #{w}"
       dat = get_FullOffDays(w)
       dat.flatten!
-      puts  " Off Days = #{dat.size} days:    #{dat}"
+      puts  " Full Off Days = #{dat.size} days:    #{dat}"
     }
   end   # of examine
 
-  #----------------------------
-  def get_FullOffDays(worker)
-  #----------------------------
-  puts "##-- def get_FullOffDays( #{worker} ) ----" 
-    print "##  @chk_workers[:WithFullOffDay][worker] '", @chk_workers[:WithFullOffDay][worker], "'\n"
-    ary_seqdays = @chk_workers[:WithFullOffDay][worker].dup
-    print "##  Array of array seqs (dupped) '", ary_seqdays, "'\n"
-    if ary_seqdays.empty?
-      return ary_seqdays
-    end
-    
-    ret=[]
-    if ary_seqdays[0].size == 1 && ary_seqdays[0][0] == 4
-      ret <<  ary_seqdays[0]
-      ary_seqdays.shift
-    end
-      
-    ary_seqdays.each {|seqs|
-      seqs.shift
-      ret << seqs
-    }
-    
-    ret
-  end
   
   #----------------------------
   def strStatus_Worker(worker)
