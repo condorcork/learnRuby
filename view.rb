@@ -101,8 +101,6 @@ module View
     #
     # Each Worker On/Off days
     #
-    #   
-    
     filler = '_'
     (0...@num_workers).each do |idx|
       # 4 days of prevMonth to Ref

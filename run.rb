@@ -87,13 +87,14 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
   y.hor_show()
   puts "#---- Check ---"
   ###
+=begin  
   (0..4).each {|x|
     y.hor_show(x)   ## [ x ])
 #    seq=y.sr_offdays_array( x )
 #x    print "\n#Full Off No.#{x}  '", seq, "'\n\n"
   }
 
-  
+=end  
   if ! y.ok_YN?( "---FOR ADJUST #-----")
     exit 0
   end
@@ -101,7 +102,7 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
   (0..2).each {|i|
     puts "\n\n#ADJUST #{i}"
     y.adjust(i)
- #   break  if ! y.ok_YN?
+    break  if ! y.ok_YN?
   }
 
   

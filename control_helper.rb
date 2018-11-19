@@ -63,7 +63,7 @@ module ControlHelper
     @chk_workers[:OnDayAll]=Array.new( @num_workers )   # including workdays of other places 
     @chk_workers[:OffDay]=Array.new( @num_workers )
     #   for view
-    @chk_workers[:FullOffDay]=Array.new( @num_workers )
+    @chk_workers[:WithFullOffDay]=Array.new( @num_workers )
 
     ## status for Each day 
     @chk_Place = {}
@@ -283,7 +283,7 @@ module ControlHelper
       puts "##  #{@chk_Place[:OK]} + #{@chk_Place[:Under]} + #{@chk_Place[:Over]} != #{@num_days16}"
       puts "############# << def examine(workers=[0,1,2,3]) >> ====="
       puts "\a"      # BELLx
-#      exit 1
+      exit 1
     end
 
     # ------
@@ -293,7 +293,7 @@ module ControlHelper
     workers.each do |w|
 #      puts " workers = #{w}"  
       @chk_workers[:OffDay][w] = 0
-      @chk_workers[:FullOffDay][w] = []
+      @chk_workers[:WithFullOffDay][w] = []
       @chk_workers[:OnDay][w] = 0
       @chk_workers[:OnDayAll][w] = 0
       @theMonthRange.each do |day|
@@ -301,17 +301,16 @@ module ControlHelper
         @chk_workers[:OffDay][w] += 1  if isOffDay( @wrkdays[w][day] )
         @chk_workers[:OnDayAll][w] += 1  if isOnDayAll( @wrkdays[w][day] )
       end
-      #      @chk_work0ers[:FullOffDays][w] = []   @wrkdays[w])
-      @chk_workers[:FullOffDay][w] = get_WithFullOffDays( get_SeqOffDays( @wrkdays[w] ) )
-##      print "\n#Full Off No.#{w}  '", @chk_workers[:FullOffDay][w], "'\n\n"      
+      #      @chk_work0ers[:WithFullOffDays][w] = []   @wrkdays[w])
+      @chk_workers[:WithFullOffDay][w] = get_WithFullOffDays( get_SeqOffDays( @wrkdays[w] ) )
+      print "\n# in exam. No.#{w} '", @chk_workers[:WithFullOffDay][w], "'\n\n"      
     end
 
-    puts "#-------------- exam Place ----------------"
+    puts "#---- exam Place ------"
     puts strStatus_Place()
-
     
     (0..3).each {|w|
-      puts "#------ exam Worker -----------# #{w}"
+      puts "#----- exam Worker -- #{w}"
       dat = get_FullOffDays(w)
       dat.flatten!
       puts  " Off Days = #{dat.size} days:    #{dat}"
@@ -321,14 +320,11 @@ module ControlHelper
   #----------------------------
   def get_FullOffDays(worker)
   #----------------------------
-  puts "#--- def get_FullOffDays( #{worker} ) ----" 
-    #  return Array of Full Off Days
-#    print "@chk_workers[:FullOffDay][worker] ;", @chk_workers[:FullOffDay][worker], ";\n"
-    ary_seqdays = @chk_workers[:FullOffDay][worker].dup
-#    print "Array of array seqs (dupped) '", ary_seqdays, "'\n"
+  puts "##-- def get_FullOffDays( #{worker} ) ----" 
+    print "##  @chk_workers[:WithFullOffDay][worker] '", @chk_workers[:WithFullOffDay][worker], "'\n"
+    ary_seqdays = @chk_workers[:WithFullOffDay][worker].dup
+    print "##  Array of array seqs (dupped) '", ary_seqdays, "'\n"
     if ary_seqdays.empty?
-#      puts "#--- End of def get_FullOffDays( #{worker} ) ----"
-#      print " ret (ary_seqdays) ='", ary_seqdays, "'\n"
       return ary_seqdays
     end
     
@@ -352,21 +348,26 @@ module ControlHelper
     #  show status of worker
     #  by chk_worker
 
-    dat = get_FullOffDays(worker)
-    print "# def  strStaus_Worker( #Pworker} )\n"
-    print "# strStaus_Worker( #Pworker} )\n"
+    print "# def  strStaus_Worker( #{worker} )\n"
+
     @statusStr_Worker =  "# No.#{worker}     #{@num_days16}\n"
 
 =begin    
     @statusStr_Worker += " Off: #{@chk_workers[:OffDay][worker]}  FullOff(公休): #{dat.length} [ #{dat} ] \n"
     @statusStr_Worker += " On: #{@chk_workers[:OnDay][worker]} [ 'On' with Other Place ]: #{@chk_workers[:OnDayAll][worker]}"
 =end
+    
+    dat = get_FullOffDays(worker)
+    puts "----- FullOff #{dat}"
     @statusStr_Worker = @statusStr_Worker + " Off: #{@chk_workers[:OffDay][worker]}  FullOff(公休): #{dat.length} [ #{dat} ] \n"
     @statusStr_Worker = @statusStr_Worker + " On: #{@chk_workers[:OnDay][worker]} [ 'On' with Other Place ]: #{@chk_workers[:OnDayAll][worker]}"
 
-    if $fulldayDebug
-      puts @statusStr_Worker
-    end
+
+#    if $fulldayDebug
+    puts "-- @statusStr_Worker --"
+    print "   '",@statusStr_Worker, "'\n"
+    puts "-- @statusStr_Worker --"
+#    end
     @statusStr_Worker    
   end
   

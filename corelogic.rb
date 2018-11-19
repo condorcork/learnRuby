@@ -83,14 +83,11 @@ include './View'
     # but for General use
     # suposed already set Dame Days
     
-    puts "#  presetKoyano( #{idxWorker} )"
+    puts "\n\n#==  presetKoyano( #{idxWorker} )"
 
-    #[-    #... Search consequent ' '
-    daysWithOffday = get_SeqOffDays( @wrkdays[idxWorker])   
-#[-    @chk_workers[:FullOffDay][idxWorker] = get_WithFullOffDays( daysWithOffday )
+    pos_OffDays = get_SeqOffDays( @wrkdays[idxWorker])   
+#[-    @chk_workers[:WithFullOffDay][idxWorker] = get_WithFullOffDays( daysWithOffday )
 
-    pos_OffDays = daysWithOffday
-    
     p "po_OffDayss",pos_OffDays
 
     cnt_add = 0
@@ -100,10 +97,15 @@ include './View'
       puts  "#   now stat (Last pos0 = '#{days[-1]}'"
       if days.size > 2
         cnt_add += 1
-        # set 3rd day in OffDay-seq
-#        puts  "#  Before Value  ==> '#{wrkdays[idxWorker][days[-1]]}'"
+        # set Last day in OffDay-seq
+        if isOnDayAll( @wrkdays[idxWorker][days[-1]] )
+          puts "#===== presetKoyano"
+          puts "#===LOGICAL ERROR=="
+          puts "  #{@wrkdays[idxWorker][days[-1]]}   day #{days[-1]} in #{days}"
+          exit
+        end
+          
         @wrkdays[idxWorker][days[-1]] = 'x'
-#        puts  "#  AFTER  Value  ==> '#{wrkdays[idxWorker][days[-1]]}'"
       end
     }
     puts "#==== presetKoyano #{cnt_add} days Added"
@@ -174,35 +176,13 @@ puts "# def pre_set_one( #{idx} )"
 
       dat_work=@wrkdays[idx]
       startp=start_p(dat_work)
-if @debug_ > 10
-puts "-----  ---------------------"
-      puts "Pre_set_one #{idx}th worker '#{@wrkdays[idx]}'"
-      puts "startp  #{startp}"
-puts "--------------------------"
-
-end
       i=4;
 
       for k in startp..34
         dat_work[i]=@template[k]
-if @debug_ > 10
-        p  k, i  
-        puts ".... @template[k] #{k} ==> '#{@template[k]}'"
-        puts "...... dat_work[i] #{i}            '#{dat_work[i]}'"
-        p dat_work
-end        
         i=i+1
       end
       @wrkdays[idx]= dat_work
-if @debug_ > 10
-  puts "--------------------------"
-  puts "Dat_Work '#{dat_work}'"
-  puts "--------------------------"
-  ver_show(idx)
-  puts "--------------------------"
-#  puts "PreSet @wrkdays[idx]:  #{idx}=>'#{@wrkdays[idx]}'"
-  puts "---END of PreSet_one -----------------------"
-end
   end
 
   #.............................
@@ -245,16 +225,10 @@ end
   def shift_to(idxWorker, direction=+1)
   #..............................
     # shift right +N, left -N
-    puts "#  def shift_to( #{idxWorker}, #{direction} )"    
+    puts "\n\n#==  def shift_to( #{idxWorker}, #{direction} )"    
     strDays = @wrkdays[idxWorker].join('')
     strDays = strDays.slice(4, @num_days16)
     puts " Orignal 4, @num_days16  strDays  '#{strDays.length}'"
-#----- Bug ( debuged ) ------------------------
-# syntax error, unexpected keyword_end, expecting tSTRING_DEND (SyntaxError)
-#  end
-#  ^~~
-    #    puts "'#{strDay' }"               # !! Carefully !!
-#--------------------------    
     puts "'#{strDays}'"
     puts "....+....0"*4
 
@@ -265,9 +239,6 @@ end
     puts "'....+....0"*4
     puts "'#{filler}'"
     if direction > 0
-#      puts "#--- strDays.slice(distance, 100)    "
-#      puts "#----'" + "....+....0"*4
-#      puts "#--- '#{strDays}'   len=#{strDays.length}"
       strDays = filler + strDays
 #      puts "#--- strDays = filler + strDays"
 #      puts "#--- '#{strDays}'   len=#{strDays.length}"
@@ -317,14 +288,14 @@ end
   
 
   #................................
-  def adjust(idx_to_change)
+  def adjust(worker)
   #..............................
-    puts "\n\n-------------------"
-      puts "#  adjust( #{idx_to_change} )"
+    puts "\n-------------------"
+      puts "#  adjust( #{worker} )"
     save_Case
-    puts "Case Person #{idx_to_change}"
+    puts "Case Person #{worker}"
     
-#    hor_show(idx_to_change)
+#    hor_show(worker)
     #
     cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
     @theMonthRange.each {|day|
@@ -333,14 +304,14 @@ end
       when 2
         cnt_ok0 += 1        
       when 1, 0
-        if isOffDay( @wrkdays[idx_to_change][day] )
-          @wrkdays[idx_to_change][day] = 'X'
+        if isOffDay( @wrkdays[worker][day] )
+          @wrkdays[worker][day] = 'X'
           cnt_add += 1
           changed += 1
         end
       when 3, 4
-        if isOnDay( @wrkdays[idx_to_change][day] ) 
-          @wrkdays[idx_to_change][day] = '*'
+        if isOnDay( @wrkdays[worker][day] ) 
+          @wrkdays[worker][day] = '*'
           cnt_del += 1
           changed += 1
         end
@@ -355,43 +326,31 @@ end
       if cnt_filled(day) == 2
          cnt_ok += 1
       end
-      if isOffDay(@wrkdays[idx_to_change][day] )
+      if isOffDay(@wrkdays[worker][day] )
         cnt_offDays += 1
       end
     }
 
-    #term_month = (3 .. @num_days16 + 4 - 1)
-    
-    #[- begin
-#[-    examine()
-
-    
-
-    #[- end
-    hor_show( idx_to_change )
-    return  #[-
-    print "===Ok==== "
-    gets
+    hor_show(worker)  # include exa.
 
     puts "# RESULTadjusted"
-    puts "#   #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{idx_to_change}"
+    puts "#   #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{worker}"
     puts "#       OK  Before #{cnt_ok0}  ==> After #{cnt_ok} days  "
     puts "#       Result + #{cnt_ok - cnt_ok0}"
     puts "##   OffDay is #{cnt_offDays} days"
 
-    p "## Full Off before"
-    @chk_workers[:FullOffDay][idx_to_change] = get_WithFullOffDays(
+    p "## Full Off Days"
+=begin    
+    @chk_workers[:WithFullOffDay][worker] = get_WithFullOffDays(
       get_SeqOffDays(
-        @chk_workers[:FullOffDay ][idx_to_change]
+        @chk_workers[:WithFullOffDay ][worker]
       )
     )
-    
-    puts strStatus_Worker(idx_to_change)
+=end    
+    puts strStatus_Worker(worker)
     
     puts strStatus_Place()
-
-    
-#    ver_show
+   
     load_Case
   end  
 
