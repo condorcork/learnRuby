@@ -238,12 +238,7 @@ puts "# def pre_set_one( #{idx} )"
     puts "'#{filler}'"
     if direction > 0
       strDays = filler + strDays
-#      puts "#--- strDays = filler + strDays"
-#      puts "#--- '#{strDays}'   len=#{strDays.length}"
       strDays = strDays.slice(0, @num_days16)
-#      puts "#=== strDays = strDays.slice(0, @num_days16)"
-#      puts "#----'" + "....+....0"*4
-#      puts "#--- '#{strDays}'   len=#{strDays.length}"
     else
       strDays = strDays.slice(distance, 33)  + filler
     end
@@ -285,16 +280,13 @@ puts "# def pre_set_one( #{idx} )"
   end # shift_AI
   
 
-  #................................
-  def adjust(worker)
-  #..............................
-    puts "\n-------------------"
-      puts "#  adjust( #{worker} )"
+  #...........................
+  def adjust(worker, reset=true)
+  #............................
+    puts "\n\n"
+    puts "#  adjust( #{worker} )"
     save_Case
-    puts "Case Person #{worker}"
     
-#    hor_show(worker)
-    #
     cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
     @theMonthRange.each {|day|
       num = cnt_filled(day)
@@ -331,14 +323,15 @@ puts "# def pre_set_one( #{idx} )"
 
     hor_show(worker)  # include exa.
 
-    puts "# RESULTadjusted"
-    puts "#   #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{worker}"
-    puts "#       OK  Before #{cnt_ok0}  ==> After #{cnt_ok} days  "
-    puts "#       Result + #{cnt_ok - cnt_ok0}"
-    puts "##   OffDay is #{cnt_offDays} days"
+    puts "# RESULT Adjusted"
+    puts "# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{worker}"
+    puts "    OK  Before #{cnt_ok0}  ==> After #{cnt_ok} days  "
+    puts "#   Result + #{cnt_ok - cnt_ok0}"
+    puts "##  OffDay is #{cnt_offDays} days"
 
+=begin
+# 恐ろしいことを    
     p "## Full Off Days"
-=begin    
     @chk_workers[:WithFullOffDay][worker] = get_WithFullOffDays(
       get_SeqOffDays(
         @chk_workers[:WithFullOffDay ][worker]
@@ -348,13 +341,16 @@ puts "# def pre_set_one( #{idx} )"
     puts strStatus_Worker(worker)
     
     puts strStatus_Place()
-   
-    load_Case
+    point = get_Score
+
+    if reset
+      load_Case
+    end
+    point
   end  
 
 
   #....................
-  #[- ......
   def think(idxWorker) 
   #..........................
     

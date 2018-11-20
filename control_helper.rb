@@ -46,11 +46,7 @@ module ControlHelper
     define_OnOff_Day()    # define  the Day to work / not   # yOn, Off
     
     #
-    #  view and control # separate?!
-    #   @viewsdays=Array.new( @num_workers + 1, Array.new(35, ' ') )
-    #   @cnt_checks=Array.new( @num_workers - 1, Array.new(2, 0) )
-
-
+ 
     # === Working Data ===    
     @wrkdays=Array.new( @num_workers + 1, Array.new(35, ' ') )
     
@@ -64,6 +60,7 @@ module ControlHelper
     @chk_workers[:OffDay]=Array.new( @num_workers )
     #   for view
     @chk_workers[:WithFullOffDay]=Array.new( @num_workers )
+    @chk_workers[:FullOffDays] = Array.new( @num_workers )
 
     ## status for Each day 
     @chk_Place = {}
@@ -113,6 +110,7 @@ module ControlHelper
     # ' ','*'                   
     @day_OFF = ' *'
     # 'X', 'A', 'B', and 'D'
+
     @day_ON_ALL = "#{@day_ON}D"
   end
   #
@@ -189,7 +187,7 @@ module ControlHelper
   #-----------------------
   def get_SeqOffDays( wkDays )
   #-----------------------  
-  print "#-- def get_SeqOffDays( ", wkDays," ) ---\n"
+#  print "#-- def get_SeqOffDays( ", wkDays," ) ---\n"
     #---- start Here -----    
     seqs_pos=[]    # Array of array days Po9q1
     days = []
@@ -211,7 +209,7 @@ module ControlHelper
     if num_days > 1
       seqs_pos << days
     end
-    print "#-- seq data '", seqs_pos, "'  at set_SeqOffDays\n"
+#    print "#-- seq data '", seqs_pos, "'  at set_SeqOffDays\n"
     seqs_pos
   end
   ###
@@ -259,15 +257,16 @@ module ControlHelper
   #----------------------------
   def get_FullOffDays(worker)
   #----------------------------
-  puts "##-- def get_FullOffDays( #{worker} ) ----" 
-    print "##  @chk_workers[:WithFullOffDay][worker] '", @chk_workers[:WithFullOffDay][worker], "'\n"
+#  puts "##-- def get_FullOffDays( #{worker} ) ----" 
+ #   print "##  @chk_workers[:WithFullOffDay][worker] '", @chk_workers[:WithFullOffDay][worker], "'\n"
 
     ary_seqdays = Marshal.load(Marshal.dump( @chk_workers[:WithFullOffDay][worker] ) )
 #    ary_seqdays = @chk_workers[:WithFullOffDay][worker].clone
-    print "dup  ='",  ary_seqdays.object_id, "'\n"
-    print "orig ='", @chk_workers[:WithFullOffDay][worker].object_id, "'\n"
-    print "##  Array of array seqs (dupped) '", ary_seqdays, "'\n"
+ #   print "dup  ='",  ary_seqdays.object_id, "'\n"
+#    print "orig ='", @chk_workers[:WithFullOffDay][worker].object_id, "'\n"
+ #   print "##  Array of array seqs (dupped) '", ary_seqdays, "'\n"
     if ary_seqdays.empty?
+      @chk_workers[:FullOffDays][worker] = []
       return ary_seqdays
     end
     
@@ -281,24 +280,46 @@ module ControlHelper
     ary_seqdays.each {|seqs|
       if seqs.size == 1          #  && ary_seqdays[0][0] == 4
         ret <<  seqs
-        ary_seqdays.shift
+#        ary_seqdays.shift
       else
         seqs.shift
         ret << seqs
       end
     }
-    print "## @chk_workers[:WithFullOffDay][worker] '", @chk_workers[:WithFullOffDay][worker], "'\n"
-    print "##-- get_FullOffDays --'", ret, "'\n"
+    ret.flatten!
+#    print "## @chk_workers[:WithFullOffDay][worker] '", @chk_workwers[:WithFullOffDay][worker], "'\n"
+    #    print "##-- get_FullOffDays --'", ret, "'\n"
+    @chk_workers[:FullOffDays][worker] = ret
     ret
   end
 
+  #----------
+  def get_Score()
+  #----------
+    scr= sprintf( "%02d ", @chk_Place[:OK]*2)
+    p @chk_Place[:OK]
+    p  scr
+    w_scr=0
+   # scr=@chk_Place[:OK].to_s.
+    (0...@num_workers).each {|w|
+      p @chk_workers[:FullOffDays] 
+      w_scr += ( 9 - @chk_workers[:FullOffDays][w].size * 2).abs / 2
+      
+    }
+    puts "score"
+    p scr
+    p w_scr
+    p @chk_Place[:OK]*2 - w_scr
+    @chk_Place[:OK]*2 - w_scr
+    
+  end
   
   #
   #   check & Hyouka
   #
   #..............................
   def examine(workers=[0,1,2,3])
-    #..............................
+  #...........................
       puts "# def examine( #{workers} )"
     #
     #  set PLACE Check to @chk_Place
@@ -345,17 +366,18 @@ module ControlHelper
       end
       #      @chk_work0ers[:WithFullOffDays][w] = []   @wrkdays[w])
       @chk_workers[:WithFullOffDay][w] = get_WithFullOffDays( get_SeqOffDays( @wrkdays[w] ) )
-      print "\n# in exam. No.#{w} '", @chk_workers[:WithFullOffDay][w], "'\n\n"      
+      #     print "\n# in exam. No.#{w} '", @chk_workers[:WithFullOffDay][w], "'\n\n"
+      
     end
 
-    puts "#---- exam Place ------"
+#    puts "#---- exam Place ------"
     puts strStatus_Place()
     
     (0..3).each {|w|
-      puts "#----- exam Worker -- #{w}"
+#      puts "#----- exam Worker -- #{w}"
       dat = get_FullOffDays(w)
       dat.flatten!
-      puts  " Full Off Days = #{dat.size} days:    #{dat}"
+ #     puts  " Full Off Days = #{dat.size} days:    #{dat}"
     }
   end   # of examine
 
@@ -366,7 +388,7 @@ module ControlHelper
     #  show status of worker
     #  by chk_worker
 
-    print "# def  strStaus_Worker( #{worker} )\n"
+#    print "# def  strStaus_Worker( #{worker} )\n"
 
     @statusStr_Worker =  "# No.#{worker}     #{@num_days16}\n"
 
@@ -376,17 +398,12 @@ module ControlHelper
 =end
     
     dat = get_FullOffDays(worker)
-    puts "----- FullOff #{dat}"
-    @statusStr_Worker = @statusStr_Worker + " Off: #{@chk_workers[:OffDay][worker]}  FullOff(公休): #{dat.length} [ #{dat} ] \n"
-    @statusStr_Worker = @statusStr_Worker + " On: #{@chk_workers[:OnDay][worker]} [ 'On' with Other Place ]: #{@chk_workers[:OnDayAll][worker]}"
 
+    @statusStr_Worker = @statusStr_Worker + " Off: #{@chk_workers[:OffDay][worker]}  FullOff(休): #{dat.length}  #{dat}\n"
+    @statusStr_Worker = @statusStr_Worker + " On: #{@chk_workers[:OnDay][worker]} ['On' with Other Place ]: #{@chk_workers[:OnDayAll][worker]}"
 
-#    if $fulldayDebug
-    puts "-- @statusStr_Worker --"
-    print "   '",@statusStr_Worker, "'\n"
-    puts "-- @statusStr_Worker --"
-#    end
     @statusStr_Worker    
+
   end
   
   #-----------------------
@@ -434,7 +451,7 @@ module ControlHelper
   end
 
   #.............................
-  def ok_YN?(prompt='ok ? [y|n]:')
+  def ok_YN?(prompt='continue ? [y|n]:')
   #.............................
     while true
       print prompt
@@ -448,4 +465,64 @@ module ControlHelper
     end	
   end
 
+  #-----------------------
+  def act_ToggleOneWorker(worker, idx_day)
+  #-----------------------
+    done = false
+    if isOnDay( @wrkdays[ worker ][idx_day] )
+      @wrkdays[ worker ][idx_day] = '*'
+      done = true
+    else
+      if isOffDay( @wrkdays[ worker ][idx_day] )
+        @wrkdays[ worker ][idx_day] = 'X'
+        done = true
+      else
+        puts "# !! act_ToggleOneWorker unchangable"
+        puts "# !!  code = '#{@wrkdays[worker][idx_day]}'"
+      end
+    end
+    done
+  end  # def act_ToggleOneWorker
+
+  
+  #.........................
+  def sel_ToggleOneWorker(msg=nil)
+  #.........................
+    puts msg if msg != nil
+    prompt="Enter 'workmanNo.(0~) date(4~)[]' (index)\n To Toggle On/Off\n eg. '1 10' :"
+    print prompt
+    ret=[]
+    while true
+      l=gets
+      if l=~/(\d)[ \t]+(\d+)/
+        ret[0]=$1.to_i
+        ret[1]=$2.to_i
+        return ret
+      end
+    end 
+  end # def select_Tog..OneWorker
+
+=begin
+  def change_IO(prompt=nil)
+    if prompt == nil
+      prompt="Enter 'workmanNo.(0~) date(4~)[]' (index)\n To Toggle On/Off\n eg. '1 10' :"
+      a="Select MENU\n"
+      b=" 1:  Toggle On/Off a day "
+      c="Exchange On/Off day"
+      d=" 2: one Day with Another Day in ONE WORKER"
+      e=" 3: one On/Off Day with Off/On Day between 2  WORKERs"
+      prompt0=a+"\n"+b+"\n"+c+"\n"+d+"\n"+e
+    end
+    print prompt0    ret=[]
+    while true
+      l=gets
+      if l=~/(\d)[ \t]+(\d+)/
+        ret[0]=$1.to_i
+        ret[1]=$2.to_i
+        return ret
+      end
+    end 
+  end #def change_IO
+=end
+  
 end  # End of Module

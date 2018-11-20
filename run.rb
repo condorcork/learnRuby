@@ -23,7 +23,11 @@ end
 $fulldayDebug = false
 members=4
 y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
-
+=begin
+a, b = y.change_IO()
+p a
+p b
+=end
 
 #... Prepare for Prevmonth
   # 'xx  ''xxx'    --> 0(1)
@@ -99,17 +103,46 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
     exit 0
   end
 
-  (0..2).each {|i|
-    puts "\n\n#ADJUST #{i}"
-    y.adjust(i)
-    break  if ! y.ok_YN?
-  }
-
+  maxPoint={}
+  maxPoint[:point]=0
+  maxPoint[:Case]=[]
   
- # if ! y.ok_YN?('continue? ')
-    exit 0
- # end
+  (0..3).each {|i|
+    puts "\n\n#ADJUST #{i}\n"
+    point = y.adjust(i)
+    p point
+    p maxPoint[:point]
+    if point > maxPoint[:point]
+      maxPoint[:point] = point
+      maxPoint[:Case] = [ i ]
+    elsif point == maxPoint[:point]
+      maxPoint[:Case] <<  i 
+    end
+ #   break  if ! y.ok_YN?
+  }
+  puts "# BEST SCORE is #{maxPoint[:point]}"
+  puts "  # Case #{maxPoint[:Case]}"
+  
+ #if ! y.ok_YN?('continue? ')
+ #  exit 0
+ #end
 
+ maxPoint[:Case].each{|i|
+   puts "\n\n#ADJUST #{i}\n"
+   point = y.adjust(i, false)
+   wrker, day = y.sel_ToggleOneWorker()
+   print "worker '", wrker,"'  day '", day,"'\n"
+   
+   if y.act_ToggleOneWorker(wrker, day)
+     y.hor_show(wrker)
+   else
+     puts "!!NOT AVAILABLE INPUT"
+     if ! y.ok_YN?('continue? ')
+       break
+     end
+   end
+ }
+ exit
   #---------
 y.examine()
 #y.ver_show()
