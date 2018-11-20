@@ -246,40 +246,37 @@ puts "# def pre_set_one( #{idx} )"
     @wrkdays[idxWorker] = strDays.split('')
   end
 
+=begin 
+# yet perhaps Not So good  
   #..............................
-  def shift_AI(idxWorker, direction=+1)
+  def shift_Part(idxWorker, direction=+1, idx_Start)
     #..............................
   # shift right +N, left -N
-    puts "#  def shift_to( #{idxWorker}, #{direction} )"    
+    puts "#  def shift_Part( #{idxWorker}, #{direction} )"    
     #
-    shift_to(idx, dir)
-    prev = saveCase
-    #   others = (0...@num_workers).to_a - [ idx ]
-    (4...4+@num_days16).each do |d|
-      n = cnt_filled(d)  #, others)
-      case n
-      when 1, 0
-        if @wrkdays[3][d] == ' '
-          @wrkdays[3][d] = 'x'
-        else
-        end
-      when 3, 4
-        if @wrkdays[3][d] == 'x'
-          @wrkdays[3][d] = ' '
-        else
-        end
-      when 2
-        ;   # ok
-      else
-        ;   #  ??
-      end
-    end  # (4..).each
-    # Hyoka
-    # compareCase
-    # get Better
-  end # shift_AI
-  
+    strDays = @wrkdays[idxWorker].join('')
+    strDays = strDays.slice(idx_Start, @num_days16)
+    puts " Orignal 4, @num_days16  strDays  '#{strDays.length}'"
+    puts "'#{strDays}'"
+    puts "....+....0"*4
 
+    distance = ( direction < 0 ? direction * -1 : direction )
+    puts "#--- distance  '#{distance}'"
+    filler = ' ' * distance    
+    puts "#--- filler "
+    puts "'....+....0"*4
+    puts "'#{filler}'"
+    if direction > 0
+      strDays = filler + strDays
+      strDays = strDays.slice(0, @num_days16)
+    else
+      strDays = strDays.slice(distance, 33)  + filler
+    end
+    strDays = @wrkdays[idxWorker].join('').slice(0,4) + strDays
+    @wrkdays[idxWorker] = strDays.split('')
+  end # shift_Part
+=end
+  
   #...........................
   def adjust(worker, reset=true)
   #............................
@@ -349,6 +346,93 @@ puts "# def pre_set_one( #{idx} )"
     point
   end  
 
+  #...........................
+  def adjust_Block(workers=[0,1,2,3], days_Unit=10, reset=true)
+  #............................
+    puts "\n\n"
+    puts "#  adjust( #{workers} )"
+    save_Case
+
+    p "workers", workers
+    cnt_add = cnt_del = changed = cnt_ok = cnt_ok0 = cnt_offDays =  0
+    cnt_days=0
+#    wrker = workers[0]
+    wrker = workers.shift
+    day_start = 4
+    @theMonthRange.each do |day|
+      puts "----------Check #{day}   worker #{wrker}"
+      num = cnt_filled(day)
+      case num
+      when 2
+        cnt_ok0 += 1        
+      when 1, 0
+        p "Day ",day
+        p "wrker ",  wrker
+        p "@wrkdays[ wrker][day] ", @wrkdays[ wrker][day] 
+        if isOffDay( @wrkdays[wrker][day] ) #####
+          @wrkdays[wrker][day] = 'X'
+          cnt_add += 1
+          changed += 1
+        end
+      when 3, 4
+        if isOnDay( @wrkdays[wrker][day] ) 
+          @wrkdays[wrker][day] = '*'
+          cnt_del += 1
+          changed += 1
+        end
+=begin        
+      when 0
+      when 4
+=end
+#      else
+#       
+      end
+=begin      
+      # to  evaluate
+      if cnt_filled(day) == 2
+         cnt_ok += 1
+      end
+      if isOffDay(@wrkdays[wrker][day] )
+        cnt_offDays += 1
+      end
+=end
+      cnt_days += 1
+      if cnt_days > days_Unit
+        wrker = workers.shift
+        cnt_days=0
+#        puts "# RESULT Adjusted  Worker #{wrker}"
+#        puts "#  from #{day_start} to #{day}"
+#        puts "# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{wrker}"
+#        puts "    OK  Before #{cnt_ok0}  ==> After #{cnt_ok} days  "
+#        puts "#   Result + #{cnt_ok - cnt_ok0}"
+#        puts "##  OffDay is #{cnt_offDays} days"
+#      else
+#        day_start = day + 1
+#        cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
+#        wrker += 1
+      end
+    end
+    #
+    puts "# RESULT Adjusted  Worker #{wrker}"
+    puts "# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{wrker}"
+    puts "    OK  Before #{cnt_ok0}  ==> After #{cnt_ok} days  "
+    puts "#   Result + #{cnt_ok - cnt_ok0}"
+    puts "##  OffDay is #{cnt_offDays} days"
+    hor_show() # wrker)  # include exa.
+#    puts strStatus_Worker(wrker)
+    
+#    puts strStatus_Place()
+    point = get_Score
+
+    if reset
+      load_Case
+    end
+    point
+    
+  end
+
+
+  
 
   #....................
   def think(idxWorker) 

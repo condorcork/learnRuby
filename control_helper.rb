@@ -121,11 +121,6 @@ module ControlHelper
 #    day =~ /^[#{@day_OFF}]$/        #
   end
 
-  #...............................
-  def isFullOffDay(day) # Koukyu #[-
-  #..............................
-#[-
-  end
   
   #.................................
   def isOnDay(day)
@@ -138,6 +133,16 @@ module ControlHelper
   #.................................
     day =~ /^[#{@day_ON_ALL}]$/i   # xabXABD  ,d 
   end
+
+  #...............................
+  def isFullOffDay(worker, day) # Koukyu #[-
+  #..............................
+#[- yet
+    @chk_worker[:FullOffDays][worker].include?(day)
+    isOffDay(@wrkdays[worker][day] ) && isOffDay(@wrkdays[worker][day -1] )
+  end
+
+
 
   # 
   #..............................

@@ -60,7 +60,7 @@ module View
   end
 
   #.............................
-  def hor_show(chk_Worker=nil) #= nil, chk_members=[0,1,2,3])
+  def hor_show(chk_Worker=[0,1,2,3] ) ###   nil) #= nil, chk_members=[0,1,2,3])
   #.............................
     puts "# def hor_show( #{chk_Worker} )"
     #  Prepare Check Line

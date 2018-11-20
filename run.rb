@@ -88,7 +88,7 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
 
 #   y.save_Case  
   print "\n\n===============Saved after Koyano\n"
-  y.hor_show()
+  y.hor_show([0,1,2])
   puts "#---- Check ---"
   ###
 =begin  
@@ -99,17 +99,33 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
   }
 
 =end  
-  if ! y.ok_YN?( "---FOR ADJUST #-----")
+  if ! y.ok_YN?( "---FOR ADJUT #-----")
     exit 0
   end
 
   maxPoint={}
   maxPoint[:point]=0
   maxPoint[:Case]=[]
+
+  puts "\n\n#ADJUST \n"
+  point =  y.adjust_Block( [0,1,2,0,1,2], 8, reset=true)
+  
+  
+  p point
+  #p maxPoint[:point]
+  #p maxPoint[:Case]
+  exit 
+  
+
+  maxPoint={}
+  maxPoint[:point]=0
+  maxPoint[:Case]=[]
+
+
   
   (0..3).each {|i|
     puts "\n\n#ADJUST #{i}\n"
-    point = y.adjust(i)
+    point = y.adjust()
     p point
     p maxPoint[:point]
     if point > maxPoint[:point]
