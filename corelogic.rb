@@ -347,15 +347,29 @@ puts "# def pre_set_one( #{idx} )"
   end  
 
   #...........................
-  def adjust_Block(workers=[0,1,2,3], days_Unit=10, reset=true)
-  #............................
+  def adjust_Round(workers=[0,1,2,3], reset=true)
+#  def adjust_Round(workers=[0,1,2,3], days_Unit=10, reset=true)    
+    #............................
+ #
+ #	adjust day by day
+ #	proper worker to fill not available day
+    #
+    
     puts "\n\n"
-    puts "#  adjust( #{workers} )"
+    puts "#  adjust_Round( #{workers} )"
+    if workers.empty?
+      puts "#!! "
+    else
+    end
+      
+      
     save_Case
 
     p "workers", workers
+    workers=workers*3
     cnt_add = cnt_del = changed = cnt_ok = cnt_ok0 = cnt_offDays =  0
     cnt_days=0
+    cnt_change_p_worker=Array.new(@num_workers, 0)
 #    wrker = workers[0]
     wrker = workers.shift
     day_start = 4
@@ -373,19 +387,27 @@ puts "# def pre_set_one( #{idx} )"
           @wrkdays[wrker][day] = 'X'
           cnt_add += 1
           changed += 1
+          cnt_change_p_worker[wrker] += 1
+          wrker = workers.shift
+        else
+          avail = can_ToggleWorkers(wrker, day)
+          
         end
       when 3, 4
         if isOnDay( @wrkdays[wrker][day] ) 
           @wrkdays[wrker][day] = '*'
           cnt_del += 1
           changed += 1
+          cnt_change_p_worker[wrker] += 1
+          
+          wrker = workers.shift
+        else
+          avail = can_ToggleWorkers(wrker, day)
+          
         end
-=begin        
-      when 0
-      when 4
-=end
+#      when 0
+#      when 4
 #      else
-#       
       end
 =begin      
       # to  evaluate
@@ -395,7 +417,7 @@ puts "# def pre_set_one( #{idx} )"
       if isOffDay(@wrkdays[wrker][day] )
         cnt_offDays += 1
       end
-=end
+
       cnt_days += 1
       if cnt_days > days_Unit
         wrker = workers.shift
@@ -411,6 +433,7 @@ puts "# def pre_set_one( #{idx} )"
 #        cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
 #        wrker += 1
       end
+=end
     end
     #
     puts "# RESULT Adjusted  Worker #{wrker}"
@@ -451,8 +474,6 @@ puts "# def pre_set_one( #{idx} )"
       end
     }
   end
-
-
 
 end  # class
 #--- End of Class ---

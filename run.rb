@@ -108,7 +108,7 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
   maxPoint[:Case]=[]
 
   puts "\n\n#ADJUST \n"
-  point =  y.adjust_Block( [0,1,2,0,1,2], 8, reset=true)
+  point =  y.adjust_Round( [0,1,2,3], reset=true)
   
   
   p point

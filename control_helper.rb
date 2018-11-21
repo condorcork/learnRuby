@@ -295,9 +295,42 @@ module ControlHelper
 #    print "## @chk_workers[:WithFullOffDay][worker] '", @chk_workwers[:WithFullOffDay][worker], "'\n"
     #    print "##-- get_FullOffDays --'", ret, "'\n"
     @chk_workers[:FullOffDays][worker] = ret
-    ret
+p    ret
   end
 
+  #..............
+  def can_ToggleWorkers(wrker, day)
+  #..............
+    workers_CAN=[]
+    (0...@num_workers).each {|w|
+      if isOnDay(@wrkdays[wrker][day])
+        if isOffDay(@wrkdays[w][day])
+          workers_CAN << w
+        end
+      else
+        if isOffDay(@wrkdays[wrker][day])
+          if isOnDay(@wrkdays[w][day])
+            workers_CAN << w
+          end
+      end
+    }
+    # cnt_change_p_worker[wrker] += 1
+
+    workers_CAN
+  end # def can_ToggleWorkers
+
+  #............
+  def get_CAN(candiWorkers, changed)
+  #............
+    if candiWorkers.include?(@num_workers)
+      @num_workers
+    else
+      changed.min
+      
+    end
+    
+  end # def get_CAN()
+  
   #----------
   def get_Score()
   #----------
