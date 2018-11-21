@@ -17,7 +17,6 @@ Teiin = 2
 # Bug: bug, to DO
 #-----------------
 #  bug
-#    presetMultiWorker(me
 #
 #-----------------
 #
@@ -281,7 +280,7 @@ puts "# def pre_set_one( #{idx} )"
   def adjust(worker, reset=true)
   #............................
     puts "\n\n"
-    puts "#  adjust( #{worker} )"
+    puts "#def adjust( #{worker} )"
     save_Case
     
     cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
@@ -343,29 +342,27 @@ puts "# def pre_set_one( #{idx} )"
     if reset
       load_Case
     end
+    puts point    
     point
-  end  
+  end #def adjust(worker, reset=true)
 
   #...........................
   def adjust_Round(workers=[0,1,2,3], reset=true)
-#  def adjust_Round(workers=[0,1,2,3], days_Unit=10, reset=true)    
-    #............................
- #
- #	adjust day by day
- #	proper worker to fill not available day
-    #
+  #............................
+    #	adjust day by day
+    #	proper worker to fill not available day
     
     puts "\n\n"
     puts "#  adjust_Round( #{workers} )"
-    if workers.empty?
-      puts "#!! "
-    else
-    end
-      
+#    if workers.empty?
+#      puts "#!! "
+#    else
+#    end
+#      
       
     save_Case
 
-    p "workers", workers
+    p "## workers", workers
     workers=workers*3
     cnt_add = cnt_del = changed = cnt_ok = cnt_ok0 = cnt_offDays =  0
     cnt_days=0
@@ -374,85 +371,76 @@ puts "# def pre_set_one( #{idx} )"
     wrker = workers.shift
     day_start = 4
     @theMonthRange.each do |day|
-      puts "----------Check #{day}   worker #{wrker}"
+      puts "##----------Check #{day}   worker #{wrker}"
       num = cnt_filled(day)
       case num
       when 2
         cnt_ok0 += 1        
-      when 1, 0
-        p "Day ",day
-        p "wrker ",  wrker
-        p "@wrkdays[ wrker][day] ", @wrkdays[ wrker][day] 
+      when 1   # 0
+        p "## Day ",day
+        p "## wrker ",  wrker
+        p "## @wrkdays[ wrker][day] ", @wrkdays[ wrker][day] 
         if isOffDay( @wrkdays[wrker][day] ) #####
+          puts "##   wrker #{wrker}    ' ' -->X "
           @wrkdays[wrker][day] = 'X'
           cnt_add += 1
           changed += 1
           cnt_change_p_worker[wrker] += 1
           wrker = workers.shift
         else
+          puts "##   else wrker #{wrker}   "
           avail = can_ToggleWorkers(wrker, day)
-          
+          if avail.include?(@num_workers-1)  # Koyano
+            puts "##  Koyano "
+            @wrkdays[@num_workers-1][day] = 'X'
+            cnt_add += 1
+            changed += 1
+            cnt_change_p_worker[@num_workers-1] += 1
+          end
         end
-      when 3, 4
+      when 3
         if isOnDay( @wrkdays[wrker][day] ) 
           @wrkdays[wrker][day] = '*'
           cnt_del += 1
           changed += 1
           cnt_change_p_worker[wrker] += 1
-          
           wrker = workers.shift
         else
           avail = can_ToggleWorkers(wrker, day)
-          
+          print "## when 3 to off '",  avail, "'\n"
+          if avail.include?(@num_workers-1)
+            @wrkdays[@num_workers-1][day] = '*'
+            cnt_del += 1
+            changed += 1
+            cnt_change_p_worker[@num_workers-1] += 1
+          end
         end
-#      when 0
-#      when 4
-#      else
+      when 0, 4
+        puts "##  when 0, 4 --> redo"
+        redo
       end
-=begin      
-      # to  evaluate
-      if cnt_filled(day) == 2
-         cnt_ok += 1
-      end
-      if isOffDay(@wrkdays[wrker][day] )
-        cnt_offDays += 1
-      end
-
-      cnt_days += 1
-      if cnt_days > days_Unit
-        wrker = workers.shift
-        cnt_days=0
-#        puts "# RESULT Adjusted  Worker #{wrker}"
-#        puts "#  from #{day_start} to #{day}"
-#        puts "# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{wrker}"
-#        puts "    OK  Before #{cnt_ok0}  ==> After #{cnt_ok} days  "
-#        puts "#   Result + #{cnt_ok - cnt_ok0}"
-#        puts "##  OffDay is #{cnt_offDays} days"
-#      else
-#        day_start = day + 1
-#        cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
-#        wrker += 1
-      end
-=end
     end
     #
-    puts "# RESULT Adjusted  Worker #{wrker}"
-    puts "# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{wrker}"
-    puts "    OK  Before #{cnt_ok0}  ==> After #{cnt_ok} days  "
+    puts "# RESULT Adjust_Round done"
+#    puts "# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{wrker}"
+    puts "# OK days  Before #{cnt_ok0}  ==> After #{cnt_ok} "
     puts "#   Result + #{cnt_ok - cnt_ok0}"
     puts "##  OffDay is #{cnt_offDays} days"
+#    
     hor_show() # wrker)  # include exa.
-#    puts strStatus_Worker(wrker)
+    (0...@num_workers).each {|w|
+      puts strStatus_Worker(w)
+     }
     
-#    puts strStatus_Place()
+    puts strStatus_Place()
     point = get_Score
 
     if reset
       load_Case
     end
+    puts "# point #{point}"
     point
-    
-  end
+  end #def adjust_Round(workers=[0,1,2,3], reset=true)
 
 
   

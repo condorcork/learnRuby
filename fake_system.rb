@@ -4,45 +4,31 @@ module FakeSystem
   #-----------------------------
   def save_Case(isInitState=false)
     #-----------------------------
-    puts "# save_Case  size #{@isInitState}"    
-    if isInitState
-      @initCase=Marshal.dump( @wrkdays )
-    else
-      @prevCase = Marshal.dump( @wrkdays )
-    end
-    #    @serCase << @preCase
+    puts "#def save_Case  size #{@isInitState}"    
+    @prevCase = Marshal.dump( @wrkdays )
   end
   
   #-----------------------------
-  #  def load_Case(saveNow=false)
-  def load_Case(isInitState=false)
-    #----------------------------
-    puts "#  load_Case(#{isInitState})"
-    if isInitState
-      if @initCase
-        @wrkdays = Marshal.load(@initCase)
+  def load_Case(case_Marshal=nil)   # case (Marshal.dump)
+  #----------------------------
+    puts "#def  load_Case( case_Marshal )"
+    if case_Marshal == nil
+      if @prevCase == nil
+        puts "#!! load_Case DO Nothing!!  'case_Marshal==nil' )"
+        nil
+      else
+        Marshal.load( @prevCase )
       end
-    else             
-      if @prevCase
-        @wrkdays = Marshal.load(@prevCase)
-      end
+    else
+      Marshal.load( case_Marshal )
     end
-    return
-    print  "# load_Case "
-    if ! @serCase.empty?
-      puts " size #{@serCase.size}"
-      #=begin      
-      #      if saveNow
-      #        nowCase=Marshal.dump( @wrkdays )
-      #      end
-      @wrkdays = Marshal.load(@serCase.pop)
-      #
-      #      if saveNow
-      #        @serCase << nowCase
-      #      end
-      #=end
-    end
-    puts ''
-  end
+  end # def load_Case(case_Marshal)   # case (Marshal.dump)
 
+  #----------------------------
+  def copy_Data( src, target)
+  #----------------------------
+    puts "# def copy_Data( src, target)"
+    target = marshal.load( marshal.dump( src ) )
+  end # def copy_Data( src, target)
+  
 end

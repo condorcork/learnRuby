@@ -69,6 +69,8 @@ module ControlHelper
     #    for View ( show )
     @chk_Place[:dayView]=Array.new( 31+4, ' ' )
     #
+    @prevCase=nil     # marshal.dump Default
+
 #    @serCase=[]
     
   end
@@ -295,38 +297,49 @@ module ControlHelper
 #    print "## @chk_workers[:WithFullOffDay][worker] '", @chk_workwers[:WithFullOffDay][worker], "'\n"
     #    print "##-- get_FullOffDays --'", ret, "'\n"
     @chk_workers[:FullOffDays][worker] = ret
-p    ret
+    ret
   end
 
   #..............
   def can_ToggleWorkers(wrker, day)
   #..............
+    puts "def can_ToggleWorkers( #{wrker}, #{day} )"
+    print "wrker #{wrker} '#{ @wrkdays[wrker][day] }'   isOnDay? #{ isOnDay(@wrkdays[wrker][day]) }\n"
     workers_CAN=[]
     (0...@num_workers).each {|w|
-      if isOnDay(@wrkdays[wrker][day])
-        if isOffDay(@wrkdays[w][day])
-          workers_CAN << w
-        end
-      else
-        if isOffDay(@wrkdays[wrker][day])
-          if isOnDay(@wrkdays[w][day])
+      print "  w (0.. #{@num_worker} #{w} "
+      if w != wrker 
+        print "    dayis='#{ @wrkdays[w][day] }'   isOnDay? #{ isOnDay(@wrkdays[wrker][day]) }\n"
+        print "    isOff(@..[w][day]) =#{isOffDay(@wrkdays[w][day])}   isOn(@..[w][day]) =#{isOnDay(@wrkdays[w][day])}"
+
+        if isOnDay(@wrkdays[wrker][day])
+          if isOffDay(@wrkdays[w][day])
             workers_CAN << w
+            puts "=== To toggle to On  #{w}"
           end
+        else
+          if isOffDay(@wrkdays[wrker][day])
+            if isOnDay(@wrkdays[w][day])
+              puts "=== To toggle for Off  #{w}"
+              workers_CAN << w
+            end
+          end
+        end
       end
     }
-    # cnt_change_p_worker[wrker] += 1
-
+    puts "#==== can_ToggleWorkers return #{workers_CAN}"
     workers_CAN
   end # def can_ToggleWorkers
 
   #............
   def get_CAN(candiWorkers, changed)
   #............
-    if candiWorkers.include?(@num_workers)
-      @num_workers
-    else
-      changed.min
-      
+#    candiWorkers.
+    if candiWorkers.include?( @num_workers -1 )    # KOYANO SPECIAL
+      @num_workers - 1
+#    else
+#      changed.min
+#      
     end
     
   end # def get_CAN()
@@ -334,23 +347,21 @@ p    ret
   #----------
   def get_Score()
   #----------
+  puts "# def get_Score()"
     scr= sprintf( "%02d ", @chk_Place[:OK]*2)
-    p @chk_Place[:OK]
-    p  scr
+    puts "## scr : Num of OK in the Month  #{scr} x 2"
     w_scr=0
    # scr=@chk_Place[:OK].to_s.
     (0...@num_workers).each {|w|
-      p @chk_workers[:FullOffDays] 
+      puts "#.#{w} KOKYU = #{ @chk_workers[:FullOffDays][w] }"
       w_scr += ( 9 - @chk_workers[:FullOffDays][w].size * 2).abs / 2
-      
     }
-    puts "score"
-    p scr
-    p w_scr
-    p @chk_Place[:OK]*2 - w_scr
+    puts "score (OK x 2) :#{scr}"
+    puts " w_scr ( 9 - kokyu x 2) / 2 ) = #{w_scr}"
+    puts " Total Score  ( score - wscr ) :#{ @chk_Place[:OK]*2 - w_scr}\n"
     @chk_Place[:OK]*2 - w_scr
-    
-  end
+
+  end #def get_Score()
   
   #
   #   check & Hyouka
@@ -561,6 +572,31 @@ p    ret
       end
     end 
   end #def change_IO
+=end
+
+  @bestScore = {}
+  @bestScore[:scre] = 0
+  @bestScore[:check] = ' '
+  @bestScore[:data] = 'NIL'
+  
+=begin
+  def BestScore( score, 
+    if score > @bestScore[:score]
+      @bestScore[:score] = score
+      @bestScore[:check] = status_Str_Place #+ 
+      @bestScore[:data] = marshal.sump( @wrkdays )
+    elsif
+      if @bestScore[:check].to_a?(STring)
+        @bestScore[:check] = [ @bestScore[:check] ]
+        @bestScore[:check] << 
+         @bestScore[:data] = marshal.sump( @wrkdays )
+      se
+      
+  @bestScore[:data] = ' '
+
+          @bestScore[:scre] = 
+  @bestScore[:check] = ' '
+  @bestScore[:data] = ' '
 =end
   
 end  # End of Module

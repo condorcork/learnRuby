@@ -67,7 +67,10 @@ module View
     #
     hdrDay   = "      |"
     hdrMonth = " Date |"
-    
+
+    footer='0 1 2 3 |'
+    ff = '4 + 6 7 8 9<1>1 2 3 4 + 6 7 8 9<2>1 2 3 4 + 6 7 8 9<3>1 2 3 4'.slice(0,  @num_days16*2)
+    footer += ff
     hdr=". "*4 + "|16. . . 20. . . . , . . "    # until 28th
     (28..@num_days16).each {|d|
       if d == 30
@@ -119,95 +122,16 @@ module View
       hdr = " No.#{idx} |"
       puts hdr + kinmuM
     end
-    
     #  check  Row,  Last Line
 
      dat = @chk_Place[:dayView][0, 4].join(filler) + '_|'
-2
+
      dat = dat + @chk_Place[:dayView][4... 4+@num_days16].join(filler)
 
      puts " <=>  |#{dat}"    # when PC
+     puts ' IDX  |' + footer
   end  
 
-=begin
-  #.............................
-  #.............................
-  def hor_show(chk_Workers=[]) 
-  #.............................
-    puts "# def hor_show( #{chk_Workers} )"
-    #  Prepare for Check Line
-    examine()
-#
-    # for Header & Guide
-    #
-    hdrDay   = "      |"
-    hdrMonth = " Date |"
-    
-    hdr=". "*4 + "|16. . . 20. . . . , . . "    # until 28th
-    (28..@num_days16).each {|d|
-      if d == 30
-        if d != @num_days16
-          hdr=hdr + d.to_s
-        else
-          hdr=hdr + '+ '
-        end
-      else
-        hdr=hdr + '. '
-      end
-    }
-    #   puts "16--31  '#{hdr}'"
-    hdr=hdr+ "1 . . . + . . . . 10. . . . 15"
-    ##
-    guide= (' 1'..' 9').to_a.join + ' + '
-    guide[0]=''
-    guide= ". . . . |" + guide*3 +'.'
-    puts ' ' * hdrDay.length + guide
-    # ??      puts  "Here  #{(  4 + @num_days16 - 16  - @num_days16.to_s.length )}"
-    strPrevMonth = '+-' *  4 + '|' #
-    strPrevMonth += '+-' * ( @num_days16 - 15 )
-
-    date_nextMonth = nextMonth()
-    #      nextMonth.month
-    puts hdrMonth + strPrevMonth + "<<---  " + date_nextMonth.month.to_s + " ----"
-    puts hdrDay + hdr
-    #
-    # Each Worker On/Off days
-    #
-    filler = '_'
-    (0...@num_workers).each do |idx|
-      # 4 days of prevMonth to Ref
-      kinmuM = @wrkdays[idx][0..3].join(filler)
-      # this month
-#[-      dat = @wrkdays[idx][4... 4+@num_days16].join(filler)
-      dat_=@wrkdays[idx][4... 4+@num_days16].dup
-      dat = dat_.join(filler)
-      
-      if chk_Workers.include?(idx)
-#      if dat =~ /[X\*]/
-        dat.gsub!(/[X\*]/) {|s|
-          color_str(s,'REVERSE,GREEN')
-        }
-        dat.gsub!('*',' ')
-#?d at.gsub('X','x')
-      end
-      kinmuM = kinmuM + '_|' + dat + filler
-      hdr = " No.#{idx} |"
-      puts hdr + kinmuM
-    end
-    
-    #  check  Row,  Last Line
-
-     dat = @chk_Place[:dayView][0, 4].join(filler) + '_|'
-2
-     dat = dat + @chk_Place[:dayView][4... 4+@num_days16].join(filler)
-
-     puts " <=>  |#{dat}"    # when PC
-  end  
-  
-  #.............................
-  def ver_show(chk_members=[0,1,2,3],   checkview=true)
-
-=end
   #.............................
   def ver_show(chk_members=[0,1,2,3],   checkview=true)
   #.............................
