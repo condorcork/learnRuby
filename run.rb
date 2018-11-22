@@ -18,17 +18,7 @@ def test_Reverse()
   puts "  '#{dat3}'  <-- '#{dat2}'"
 end
 
-
-#----- MAIN ------
-$fulldayDebug = false
-members=4
-y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
-=begin
-a, b = y.change_IO()
-p a
-p b
-=end
-
+def preparePrevMonth(y)
 #... Prepare for Prevmonth
   # 'xx  ''xxx'    --> 0(1)
   y.prepare(0, 'xx  ')
@@ -38,55 +28,52 @@ p b
   # ' xxx''__xx'   --> 3(4)
   y.prepare(2, ' xxx')
   # ' DDx '' DDD'  special
-  y.prepare(3, 'DDx ')
+  y.prepare( 3, 'DDx ')    # y.@Koyano
   #
   y.hor_show(1)
+end
+
+#----- MAIN ------
+  $fulldayDebug = false
+  members=4 
+  y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
+=begin
+a, b = y.change_IO()
+p a
+p b
+=end
+
+ preparePrevMonth(y)
+  #
+  y.hor_show()
   
   #
- #######################
-  ##
-#  y.test_data
-#  y.hor_show()
-#  y.testMain
-#
-  ##
-#  test_Reverse
-#
-#  y.examine()
-#  y.hor_show()
-#  
- #  y.ver_show() # false)
- # y.hor_show(1)
-  #
   puts '##Yotaku idx 3 古谷野 san'
-  y.yoyaku(3, '6012')
-  y.hor_show(2)
+  y.yoyaku( 3, '6012')   # y.@Koyano, '6012')
+  y.hor_show( 3 )  #   y.@Koyano)
 #  
   $fulldayDebug = true
   y.examine
   if ! y.ok_YN?( "## Continue Y/N:")
     exit 0
   end
-
-  y.hor_show(3)
-  #
+  
+  #-----------------------
   # Start to Think
-  #
-  y.save_Case(true)
+  #-----------------------
+y.save_Case("Initail")                # initail stat
   puts '# ======== Saved end of Yotaku idx 3 古谷野 san'
 #
   #... PreSet  Fill days by Patern ....
+  puts "#---- PRESET by Pattern---"
+  y.pre_set([0,1,2])
+  y.save_Case()     
+  y.ver_show()
 
-puts "#---- PRESET by Pattern---"
-y.pre_set([0,1,2])
-y.ver_show()
-
-#  def presetMultiWorker(idx,d, x)p
-
-y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
-#y.ver_show()
-
-#   y.save_Case  
+#####
+  y.presetKoyano( 3 )   # y.@Koyano )  #, [0,1,2,6], [3,5])
+y.save_Case("Koyano")     
+  y.ver_show()
   print "\n\n===============Saved after Koyano\n"
   y.hor_show([0,1,2])
   puts "#---- Check ---"
@@ -98,11 +85,13 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
 #x    print "\n#Full Off No.#{x}  '", seq, "'\n\n"
   }
 
-=end  
+=end
+  
   if ! y.ok_YN?( "---FOR ADJUT #-----")
     exit 0
   end
-
+puts "=========================="
+y.load_Case()  
   maxPoint={}
   maxPoint[:point]=0
   maxPoint[:Case]=[]
@@ -114,7 +103,7 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
   p point
   #p maxPoint[:point]
   #p maxPoint[:Case]
-  exit 
+exit 
   
 
   maxPoint={}
@@ -123,7 +112,7 @@ y.presetKoyano(members - 1)  #, [0,1,2,6], [3,5])
 
 
   
-  (0..3).each {|i|
+  (0...@num_workers).each {|i|
     puts "\n\n#ADJUST #{i}\n"
     point = y.adjust()
     p point
@@ -172,7 +161,7 @@ y.hor_show()
 # y.shift_to(2,-2)
 # y.hor_show()
 #
-y.think(3)
+y.think( 3 )  #   y.@Koyano)
 y.hor_show()
 puts "#---- End Check ---"
 y.think(2)
@@ -211,7 +200,7 @@ exit
 puts "======="
 a= y.str_Attr( 1 )
 b= y.str_Attr( 2 )
-c= y.str_Attr( 3 )
+c= y.str_Attr( 3)
 d= y.str_Attr( 4 )
 
 print a," ", b, " ",  c, " ",d, "\n"

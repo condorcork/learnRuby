@@ -20,6 +20,12 @@ module ControlHelper
     @num_workers_p_day = 2            # Teiin
     #
     @template=('xxx  '*8).split('')
+#    @template=('xxxx  '*7).split('')
+#    @template=('xxx  xx '*5).split('')
+#    @template=('xxxxx  '*6).split('')
+    ### !!! TO DO : changable  'xxxx  ', 'xxx  xx '
+    @Koyano = @num_workers - 1
+
     #--- Date ---- 
     if date.day < 7
       @month_16= date.month
@@ -48,7 +54,8 @@ module ControlHelper
     #
  
     # === Working Data ===    
-    @wrkdays=Array.new( @num_workers + 1, Array.new(35, ' ') )
+#    @wrkdays=Array.new( @num_workers + 1, Array.new(35, ' ') )
+    @wrkdays=Array.new( @num_workers, Array.new(35, ' ') )    # NO check Area 
     
     # === Data ====
     # check info & views
@@ -308,24 +315,24 @@ module ControlHelper
     workers_CAN=[]
     (0...@num_workers).each {|w|
       print "  w (0.. #{@num_worker} #{w} "
-      if w != wrker 
-        print "    dayis='#{ @wrkdays[w][day] }'   isOnDay? #{ isOnDay(@wrkdays[wrker][day]) }\n"
-        print "    isOff(@..[w][day]) =#{isOffDay(@wrkdays[w][day])}   isOn(@..[w][day]) =#{isOnDay(@wrkdays[w][day])}"
+#      if w != wrker 
+      print "    dayis='#{ @wrkdays[w][day] }'   isOnDay? #{ isOnDay(@wrkdays[wrker][day]) }\n"
+      print "    isOff(@..[w][day]) =#{isOffDay(@wrkdays[w][day])}   isOn(@..[w][day]) =#{isOnDay(@wrkdays[w][day])}"
 
-        if isOnDay(@wrkdays[wrker][day])
-          if isOffDay(@wrkdays[w][day])
+      if isOnDay(@wrkdays[wrker][day])
+        if isOffDay(@wrkdays[w][day])
+          workers_CAN << w
+          puts "=== To toggle to On  #{w}"
+        end
+      else
+        if isOffDay(@wrkdays[wrker][day])
+          if isOnDay(@wrkdays[w][day])
+            puts "=== To toggle for Off  #{w}"
             workers_CAN << w
-            puts "=== To toggle to On  #{w}"
-          end
-        else
-          if isOffDay(@wrkdays[wrker][day])
-            if isOnDay(@wrkdays[w][day])
-              puts "=== To toggle for Off  #{w}"
-              workers_CAN << w
-            end
           end
         end
       end
+#      end
     }
     puts "#==== can_ToggleWorkers return #{workers_CAN}"
     workers_CAN
@@ -335,11 +342,16 @@ module ControlHelper
   def get_CAN(candiWorkers, changed)
   #............
 #    candiWorkers.
-    if candiWorkers.include?( @num_workers -1 )    # KOYANO SPECIAL
-      @num_workers - 1
+    if candiWorkers.include?( @Koyano )    # KOYANO SPECIAL
+      @Koyano
 #    else
 #      changed.min
-#      
+      #
+    else
+      puts "#!! get_CAN(candiWorkers, changed)"
+      puts "#!! get_CAN( #{candiWorkers}, #{changed} )"
+      puts "#!! YET NOT MADE !! "
+      exit 1
     end
     
   end # def get_CAN()
@@ -550,6 +562,23 @@ module ControlHelper
       end
     end 
   end # def select_Tog..OneWorker
+
+  #.............................................
+  def set_WorkersSeq( seq_workers,  doneWorker )
+  #.............................................
+    puts "# def set_WorkersSeq( seq_workers,  doneWorker )"
+    newData=[]
+    seq_workers.each_with_index { |wrk, i|
+      if doneWorker == wrk
+        newData  += seq_workers[i+1,99]
+        break
+      else
+        newData << wrk
+      end
+    }
+    newData
+  end  #def set_WorkersSeq( seq_workers,  doneWorker )
+
 
 =begin
   def change_IO(prompt=nil)
