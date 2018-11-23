@@ -78,6 +78,8 @@ y.save_Case("Koyano")
   y.hor_show([0,1,2])
   puts "#---- Check ---"
   ###
+##
+  
 =begin  
   (0..4).each {|x|
     y.hor_show(x)   ## [ x ])
@@ -97,14 +99,27 @@ y.load_Case()
   maxPoint[:Case]=[]
 
   puts "\n\n#ADJUST \n"
-  point =  y.adjust_Round( [0,1,2,3], reset=true)
+point =  y.adjust_Round( [0,1,2,3], reset=true)
   
-  
-  p point
+p point
   #p maxPoint[:point]
   #p maxPoint[:Case]
+
+   w,d = y.sel_ToggleOneWorker("Toggle On/Off" )
+   if ! y.do_ToggleDay(w, d)
+     puts "#!!! Not Done do_ToggleDay(#{w}, #{d})"
+   else  
+     y.hor_show
+     (0..3).each{|w|
+       puts y.strStatus_Worker(w)
+     }
+     puts y.strStatus_Place
+     print "Point ", y.get_Score, "\n"
+#     y.examine
+   end
+
 exit 
-  
+
 
   maxPoint={}
   maxPoint[:point]=0
@@ -127,7 +142,8 @@ exit
   }
   puts "# BEST SCORE is #{maxPoint[:point]}"
   puts "  # Case #{maxPoint[:Case]}"
-  
+
+
  #if ! y.ok_YN?('continue? ')
  #  exit 0
  #end
@@ -206,3 +222,19 @@ d= y.str_Attr( 4 )
 print a," ", b, " ",  c, " ",d, "\n"
 puts "======="
 exit 
+##
+#  Test do_ToggleDay 
+(4 .. 30).each do |d|
+  (3..3).each {|w|
+    if ! y.do_ToggleDay(w, d)
+      puts "#!==== Error do_ToggleDay( #{w}, "#{d} )"
+    end
+  }
+end  
+y.hor_show()
+(1...4).each {|w|
+  puts y.strStatus_Worker(w)
+}
+puts y.strStatus_Place
+puts "Score =", y.get_Score
+exit 0

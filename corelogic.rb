@@ -341,7 +341,7 @@ puts "# def pre_set_one( #{idx} )"
   end #def adjust(worker, reset=true)
 
   #...........................
-  def adjust_Round(workers=[0,1,2,3], reset=true)
+  def adjust_RoundXX(workers=[0,1,2,3], reset=true)
   #............................
     #	adjust day by day
     #	proper worker to fill not available day
@@ -432,6 +432,7 @@ puts "# def pre_set_one( #{idx} )"
             cnt_del += 1
             changed += 1
             cnt_change_p_worker[worKer] += 1
+            
             # Next JUN  !?
             # wrker = workers.shift
             #
@@ -511,7 +512,139 @@ puts "# def pre_set_one( #{idx} )"
   end #def adjust_Round(workers=[0,1,2,3], reset=true)
 
 
+  #.....................
+  def do_Toggle_ETC( wrkr, day, changed, cnt_add, cnt_del, cnt_change_p_worker, seq_workers)
+  #.....................
+    puts "#!! do_Tog..Etc  ( #{wrkr} , #{day} )"
+    puts "#!!    Now '#{@wrkdays[wrkr][day]}'"
+    puts "#!! seq_workers  '#{seq_workers}'"
+    
+    wasDayOff =  isOffDay( @wrkdays[wrkr][day] )
+    if do_ToggleDay(wrkr , day)
+      puts "#!!  done  '#{@wrkdays[wrkr][day]}'"
+      changed += 1
+      if wasDayOff
+        cnt_add += 1
+      else
+        cnt_del += 1
+      end
+      seq_workers = set_WorkersSeq( seq_workers, wrkr )
+      puts "#!! seq_workers  '#{seq_workers}'"
+      cnt_change_p_worker[wrkr] += 1
+      if cnt_change_p_worker[wrkr] > 3
+        puts "#!! #{wrkr} changed 3 times. So Nore More Change"
+        seq_workers.delete( wrkr )
+      end
+    else              
+      puts "#!! adjust_Round Toggle LOGICAL ERROR "
+      puts "#!!   day: #{day}  worker #{wrkr} "
+      exit 1;
+    end
+  end # def do_Toggle_ETC
   
+#  days_Data =
+  #.....................
+  def get_DayOnOff(day)
+  #.....................
+    retstr=[]
+    (0...@num_workers).each {|w|
+      retstr << @wrkdays[w][day]
+    }
+    retstr
+  end #def get_DayOnOff(day)
+  
+  #-----------------
+  def adjust_Round(seq_workers=[0,1,2,3], reset=true)
+  #-----------------
+    #
+    seq_workers=seq_workers*3
+#    nextWorker = seq_workers.shift    # Next 
+    cnt_add = cnt_del = changed = cnt_ok = cnt_ok0 = cnt_offDays =  0
+    cnt_days=0
+    cnt_change_p_worker=Array.new(@num_workers, 0)
+    day_start = 4
+    doRedo = false
+    @theMonthRange.each do |day|
+      num = cnt_filled(day)
+      days_Data = get_DayOnOff(day)
+      puts "##----------Check #{day}   worker #{seq_workers[0]} filled num=#{num} #{days_Data}"
+      case num
+      when 1, 3    # 0, 4
+        # 1, 3 need one day  On Off
+        candiWorkers = []
+        days_Data.each_with_index{|s, i|
+          if isOffDay( s )
+            candiWorkers << i
+          end
+        }
+        case candiWorkers.size
+        when 0
+          puts "#=== Dame  over   3 changed Worker Exists ???!??"
+          puts "#==  change ocuur p Worker = #{cnt_change_p_worker}"
+          next;    # Dame !!
+        when 1   # Done target only one
+          worKer = candiWorkers[0]
+          do_Toggle_ETC( seq_workers[0], day, changed, cnt_add, cnt_del, cnt_change_p_worker, seq_workers)
+        when 2     # ( @num_workers - 1 )- 1   # last when num = 1 3   
+          seq_workers.each_with_index {|nextW,i|
+            candiWorkers.each {|cw|
+              if cw == nextW
+                candiWorkers.delete (cw)
+                do_Toggle_ETC(seq_workers[0], day, changed, cnt_add, cnt_del, cnt_change_p_worker, seq_workers)
+                break;
+              end
+            }
+          }
+        when 3
+        when 4
+          
+        end
+      when 0, 4     # need one day On/Off
+        # 0, 4 need two days On Off
+        p "## Day ",day
+        p "## seq_workers[0] ",  seq_workers[0]
+        p "## @wrkdays[ seq_workers[0]][day] ", @wrkdays[ seq_workers[0]][day] 
+        if isOffDay( @wrkdays[seq_workers[0]][day] ) #####
+          puts "##   seq_workers[0] #{seq_workers[0]}    ' ' -->X "
+          @wrkdays[seq_workers[0]][day] = 'X'
+          cnt_add += 1
+          changed += 1
+          cnt_change_p_worker[seq_workers[0]] += 1
+          seq_workers[0] = seq_workers.shift
+        else
+          puts "##   else seq_workers[0] #{seq_workers[0]}   "
+          avail = can_ToggleWorkers(seq_workers[0], day)
+          if avail.include?(@Koyano)  # Koyano
+            puts "##  Koyano "
+            @wrkdays[@Koyano][day] = 'X'
+            cnt_add += 1
+            changed += 1
+            cnt_change_p_worker[ @Koyano ] += 1
+          end
+        end
+      end # case num
+    end # @theMonthRange.each do |day|
+##    
+    puts "# << Adjust_Round done>> "
+#    puts "# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{seq_workers[0]}"
+    puts "# OK days  Before #{cnt_ok0}  ==> After #{cnt_ok} "
+    puts "#   Result + #{cnt_ok - cnt_ok0}"
+    puts "##  OffDay is #{cnt_offDays} days"
+#    
+    hor_show() # seq_workers[0])  # include exa.
+    (0...@num_workers).each {|w|
+      puts strStatus_Worker(w)
+     }
+    
+    puts strStatus_Place()
+    point = get_Score
+    if reset
+      load_Case
+    end
+    puts "# point #{point}"
+    point
+##    
+  end #  def adjust_RoundX()
 
   #....................
   def think(idxWorker) 
@@ -529,93 +662,10 @@ puts "# def pre_set_one( #{idx} )"
         puts " # ...> Tar Tar "
       end
     }
-  end
-
+  end #def think(idxWorker) 
+  
 end  # class
 #--- End of Class ---
 
+
 __END__
-def xx
-      #  
-  #
-    wrker = workers.shift    # Next 
-    day_start = 4
-    doRedo = false
-    @theMonthRange.each do |day|
-      num = cnt_filled(day)
-      puts "##----------Check #{day}   worker #{wrker}   filled  num=#{num}"
-  
-      case num
-      when 1, 3,    # 0, 4
-        # 1, 3 need one day  On Off
-        avails = can_ToggleWorkers(wrker, day)
-        case avails.size
-        when 0
-          next;    # Dame !!
-        when 1
-          worKer = avails[0]
-          if ! act_ToggleOneWorker(worKer, day)
-            puts "#!! adjust_Round Toggle LOGICAL ERROR "
-            puts "#!!   day: #{day}  worker #{worKer} "
-            exit 1;
-          end
-          changed += 1
-          if isOnDay( @wrkdays[worKer][day] )   # when after changed 
-            cnt_add += 1
-          else
-            cnt_del += 1
-          end
-          cnt_change_p_worker[worKer] += 1
-          # remove element of 'First worker' in seqence of workers
-          workers = set_WorkersSeq( workers, worKer )
-        when 2     # ( @num_workers - 1 )- 1   # last when num = 1 3   
-          # which select ?
-          get_ToggleWorkers( workers,  )
-          puts "Can't Select one in #{avails}"
-        #else
-        end
-      when 0, 4     # need one day On/Off
-        # 0, 4 need two days On Off
-
-
-
-
-        p "## Day ",day
-        p "## wrker ",  wrker
-        p "## @wrkdays[ wrker][day] ", @wrkdays[ wrker][day] 
-        if isOffDay( @wrkdays[wrker][day] ) #####
-          puts "##   wrker #{wrker}    ' ' -->X "
-          @wrkdays[wrker][day] = 'X'
-          cnt_add += 1
-          changed += 1
-          cnt_change_p_worker[wrker] += 1
-          wrker = workers.shift
-        else
-          puts "##   else wrker #{wrker}   "
-          avail = can_ToggleWorkers(wrker, day)
-          if avail.include?(@Koyano)  # Koyano
-            puts "##  Koyano "
-            @wrkdays[@Koyano][day] = 'X'
-            cnt_add += 1
-            changed += 1
-            cnt_change_p_worker[ @Koyano ] += 1
-          end
-        end
-      when 3
-        if isOnDay( @wrkdays[wrker][day] ) 
-          @wrkdays[wrker][day] = '*'
-          cnt_del += 1
-          changed += 1
-          cnt_change_p_worker[wrker] += 1
-          wrker = workers.shift
-        else
-          avail = can_ToggleWorkers(wrker, day)
-          print "## when 3 to off '",  avail, "'\n"
-          if avail.include?(@Koyano)
-            @wrkdays[@Koyano][day] = '*'
-            cnt_del += 1
-            changed += 1
-            cnt_change_p_worker[@Koyano] += 1
-          end
-        end
-

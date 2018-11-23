@@ -518,16 +518,16 @@ module ControlHelper
       print prompt
       res = gets
       case res
-      when /^[yY]/
+      when /^[yY]$/,  /^$/
         return true
-      when /^[nN]/, /^$/
+      when /^[nN]/
         return false
       end
     end	
   end
 
   #-----------------------
-  def act_ToggleOneWorker(worker, idx_day)
+  def do_ToggleDay(worker, idx_day)
   #-----------------------
     done = false
     if isOnDay( @wrkdays[ worker ][idx_day] )
@@ -538,8 +538,8 @@ module ControlHelper
         @wrkdays[ worker ][idx_day] = 'X'
         done = true
       else
-        puts "# !! act_ToggleOneWorker unchangable"
-        puts "# !!  code = '#{@wrkdays[worker][idx_day]}'"
+        puts "#!! do_ToggleDay UnChangable"
+        puts "#!! code '#{@wrkdays[worker][idx_day]}'  (#{worker}, #{idx_day})"
       end
     end
     done
