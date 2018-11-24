@@ -99,7 +99,7 @@ y.load_Case()
   maxPoint[:Case]=[]
 
   puts "\n\n#ADJUST \n"
-point =  y.adjust_Round( [0,1,2,3], reset=true)
+point =  y.adjust_Round( reset=true)
   
 p point
   #p maxPoint[:point]

@@ -59,7 +59,11 @@ module ControlHelper
     
     # === Data ====
     # check info & views
- 
+    
+    # from file if exists prev month 
+    @seq_workers=(0...@num_workers).map{|w| w}  #[0,1,2,3]
+    @seq_workers=@seq_workers * 5
+    
     ## status  for each worker
     @chk_workers={}
     @chk_workers[:OnDay]=Array.new( @num_workers )
@@ -559,25 +563,30 @@ module ControlHelper
         ret[0]=$1.to_i
         ret[1]=$2.to_i
         return ret
+      elsif l=~/Q/i
+        puts "Exit"
+        exit 0
       end
     end 
   end # def select_Tog..OneWorker
 
-  #.............................................
-  def set_WorkersSeq( seq_workers,  doneWorker )
-  #.............................................
-    puts "# def set_WorkersSeq( seq_workers,  doneWorker )"
+  #.............................
+  def set_WorkersSeq( doneWorker )
+  #.............................
+    puts "# def set_WorkersSeq( #{doneWorker} )"
+    puts "# seq=#{@seq_workers} "
     newData=[]
-    seq_workers.each_with_index { |wrk, i|
-      if doneWorker == wrk
-        newData  += seq_workers[i+1,99]
+    @seq_workers.each_with_index { |wrkr, i|
+      if doneWorker == wrkr
+        newData  += @seq_workers[i+1,99]
         break
       else
-        newData << wrk
+        newData << wrkr
       end
     }
-    newData
-  end  #def set_WorkersSeq( seq_workers,  doneWorker )
+    puts "# ret='#{newData}'"
+    @seq_workers = newData    
+  end  #def set_WorkersSeq(  doneWorker )
 
 
 =begin
