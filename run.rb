@@ -98,25 +98,34 @@ y.load_Case()
   maxPoint[:point]=0
   maxPoint[:Case]=[]
 
-  puts "\n\n#ADJUST \n"
-point =  y.adjust_Round( reset=true)
+  puts "\n\n#Adjust_Round\n"
+point =  y.adjust_Round( reset=true )
   
 p point
   #p maxPoint[:point]
   #p maxPoint[:Case]
 
-   w,d = y.sel_ToggleOneWorker("Toggle On/Off" )
-   if ! y.do_ToggleDay(w, d)
-     puts "#!!! Not Done do_ToggleDay(#{w}, #{d})"
-   else  
-     y.hor_show
-     (0..3).each{|w|
-       puts y.strStatus_Worker(w)
-     }
-     puts y.strStatus_Place
-     print "Point ", y.get_Score, "\n"
-#     y.examine
-   end
+while true
+  w,d,d2 = y.sel_ToggleOneWorker("Toggle On/Off" )
+  if d2 != nil
+    if ! y.do_Exchange(w, d, w, d2)
+      puts "#!!! Not Done do_ToggleDay(#{w}, #{d})"
+      #      next;
+    end
+  else
+    if ! y.do_ToggleDay(w, d)
+      puts "#!!! Not Done do_ToggleDay(#{w}, #{d})"
+      #      next;
+    end
+  end    
+  y.hor_show
+  (0..3).each{|w|
+    puts y.strStatus_Worker(w)
+  }
+  puts y.strStatus_Place
+  print "Point ", y.get_Score, "\n"
+  y.examine
+end
 
 exit 
 

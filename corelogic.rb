@@ -3,27 +3,13 @@
 
 require 'date'
 
-Teiin = 2
-
 #......
-# 2018-11-02(Fri) 17:35:00
-#
-# 2018-10-27(Sat) 11:09:36
-# 2018-10-27(Sat) 15:27:27
-# 10-29(Mon) 15:43
-# 10-30(Thu) 13:49
-# 2018-10-30(Tue) 18:57:15
-##
 # Bug: bug, to DO
 #-----------------
 #  bug
 #
 #-----------------
 #
-
-#  -- set last 4 days of prev month 
-#  def prepare(idx, prevdays=' '*4, nvotAvail={})
-# 
 
 class Yotei
 
@@ -53,6 +39,7 @@ include './View'
     @debug_= 2
 #    @debug_ = 3  # 0,1, 2
 
+# ---- Test DATE --------
     if fakeDate != nil
       d=fakeDate.split('-')
       d.map!(&:to_i)
@@ -70,7 +57,15 @@ include './View'
     init_fake()
   end
 
+  #[- Yet
+  def changeParam( param )  # changeParam( :template, : )
+    puts "def changeParam( param )"
+    # date
+    #  template
+    #  seq_workers : start 0, 1 ,2 3
+  end #def changeParam( param )
 
+  
   #------------------------
   #  preparation
   #................................
@@ -163,7 +158,7 @@ end
   #.....................
   def pre_set_one(idx)
   #...................
-puts "# def pre_set_one( #{idx} )"
+    puts "# def pre_set_one( #{idx} )"
 
       dat_work=@wrkdays[idx]
       startp=start_p(dat_work)
@@ -336,188 +331,17 @@ puts "# def pre_set_one( #{idx} )"
     if reset
       load_Case
     end
+    g349
     puts point    
     point
   end #def adjust(worker, reset=true)
 
-  #...........................
-  def adjust_RoundXX(workers=[0,1,2,3], reset=true)
-  #............................
-    #	adjust day by day
-    #	proper worker to fill not available day
-    
-    puts "\n\n"
-    puts "#  adjust_Round( #{workers} )"
-#    if workers.empty?
-#      puts "#!! "
-#    else
-#    end
-#      
-      
-    save_Case
-
-    p "## workers", workers
-    workers=workers*3
-    cnt_add = cnt_del = changed = cnt_ok = cnt_ok0 = cnt_offDays =  0
-    cnt_days=0
-    cnt_change_p_worker=Array.new(@num_workers, 0)
-#    wrker = workers[0]
-    wrker = workers.shift
-    day_start = 4
-    doRedo = false
-    @theMonthRange.each do |day|
-      num = cnt_filled(day)
-      puts "##----------Check #{day}   worker #{wrker}   filled  num=#{num}"
-      case num
-      when 2
-        cnt_ok0 += 1        
-      when 1,   0   # 0
-        p "## Day ",day
-        p "## wrker ",  wrker
-        p "## @wrkdays[ wrker][day] ", @wrkdays[ wrker][day] 
-        if isOffDay( @wrkdays[wrker][day] ) #####
-          puts "##   wrker #{wrker}    ' ' -->X "
-          @wrkdays[wrker][day] = 'X'
-          cnt_add += 1
-          changed += 1
-          cnt_change_p_worker[wrker] += 1
-          wrker = workers.shift
-        else
-          puts "##   else wrker #{wrker}   "
-          avails = can_ToggleWorkers(wrker, day)
-          if avails.include?(@Koyano)  # Koyano
-            puts "##  Koyano "
-            @wrkdays[@Koyano][day] = 'X'
-            cnt_add += 1
-            changed += 1
-            cnt_change_p_worker[ @Koyano ] += 1
-          end
-        end
-        if num ==0
-          if ! doRedo 
-            redo
-          else
-            doRedo = false
-          end
-        end
-      when 3,  4
-        p "## Day ",day
-        p "## wrker ",  wrker
-        p "## @wrkdays[ wrker][day] ", @wrkdays[ wrker][day] 
-        if isOnDay( @wrkdays[wrker][day] ) 
-          @wrkdays[wrker][day] = '*'
-          cnt_del += 1
-          changed += 1
-          cnt_change_p_worker[wrker] += 1
-          wrker = workers.shift
-        else
-          avails = can_ToggleWorkers(wrker, day)
-          print "## when 3 to off '",  avails, "'\n"
-          case avails.size
-          when 0                 # Oteage !!
-            next;
-          when 1
-            worKer= avails[0]
-            @wrkdays[worKer][day] = '*'
-            cnt_del += 1
-            changed += 1
-            cnt_change_p_worker[worKer] += 1
-          #    Next Jun !?!
-          # Next JUN  !?
-          # wrker = workers.shift
-          when 2   # avails.size
-            worKer = avails[0]
-            worKer1 = avails[1]
-            @wrkdays[worKer][day] = '*'
-            cnt_del += 1
-            changed += 1
-            cnt_change_p_worker[worKer] += 1
-            
-            # Next JUN  !?
-            # wrker = workers.shift
-            #
-            if num == 4
-              @wrkdays[worKer1][day] = '*'
-              cnt_del += 1
-              changed += 1
-              cnt_change_p_worker[worKer1] += 1
-              #
-              # Next JUN  !?
-              # wrker = workers.shift
-            end
-          when 3   # avails size
-            worKers =[]
-            # 01230123
-            #    3
-            #     0123
-            #------
-            #  1
-            # 0 230123
-            avails.each {|w|
-              if w >= wrker
-                worKers << w
-                break
-              end
-            }
-            
-            worKer = worKers[0]   # avails[0]
-            worKer1 = worKers[1]  # avails[1]
-            @wrkdays[worKer][day] = '*'
-            cnt_del += 1
-            changed += 1
-            cnt_change_p_worker[worKer] += 1
-            workers = set_WorkersSeq( workers,  worKer )
-            if num == 4
-              @wrkdays[worKer1][day] = '*'
-              cnt_del += 1
-              changed += 1
-              cnt_change_p_worker[worKer1] += 1
-              workers = set_WorkersSeq( workers,  worker1 )
-            end
-          end   # case avails.size
-        end  #  if isOnDay( @wrkdays[wrker][day] ) 
-
-=begin        
-      when 0, 4
-        puts "##  when 0, 4 --> redo"
-        
-        if ! doRedo 
-          redo
-        else
-          doRedo = false
-        end
-=end
-      end
-    end
-    #
-    puts "# RESULT Adjust_Round done"
-#    puts "# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{wrker}"
-    puts "# OK days  Before #{cnt_ok0}  ==> After #{cnt_ok} "
-    puts "#   Result + #{cnt_ok - cnt_ok0}"
-    puts "##  OffDay is #{cnt_offDays} days"
-#    
-    hor_show() # wrker)  # include exa.
-    (0...@num_workers).each {|w|
-      puts strStatus_Worker(w)
-     }
-    
-    puts strStatus_Place()
-    point = get_Score
-
-    if reset
-      load_Case
-    end
-    puts "# point #{point}"
-    point
-  end #def adjust_Round(workers=[0,1,2,3], reset=true)
-
-
   #.....................
   def do_Toggle_ETC( wrkr, day, changed, cnt_add, cnt_del, cnt_change_p_worker)
   #.....................
-    puts "#!! do_Tog..Etc  ( #{wrkr} , #{day} )"
-    puts "#!!    Now '#{@wrkdays[wrkr][day]}'"
-    puts "#!! seq_workers  '#{@seq_workers}'"
+#    puts "#!! do_Tog..Etc  ( #{wrkr} , #{day} )"
+#    puts "#!!    Now '#{@wrkdays[wrkr][day]}'"
+#    puts "#!! seq_workers  '#{@seq_workers}'"
     
     wasDayOff =  isOffDay( @wrkdays[wrkr][day] )
     if do_ToggleDay(wrkr , day)
@@ -530,77 +354,40 @@ puts "# def pre_set_one( #{idx} )"
       end
       #
       set_WorkersSeq(  wrkr )
-      puts "#!! seq_workers  '#{@seq_workers}'"
+#      puts "#!! seq_workers  '#{@seq_workers}'"
 
       cnt_change_p_worker[wrkr] += 1
-      if cnt_change_p_worker[wrkr] > 3
-        puts "#!! #{wrkr} changed 3 times. So Nore More Change"
+      if cnt_change_p_worker[wrkr] > @limit_change
+        puts "#!! #{wrkr} changed #{@limit_change} times. So Nore More Change"
         @seq_workers.delete( wrkr )
       end
     else              
-      puts "#!! adjust_Round Toggle LOGICAL ERROR "
+      puts "#!! adjust_Round Toggle LOGICAL ERROR (in do_Toggle_ETC"
       puts "#!!   day: #{day}  worker #{wrkr} "
       exit 1;
     end
    end # def do_Toggle_ETC
   
 #  days_Data =
-  #.....................
-  def get_DayOnOff(day)
-  #.....................
-    retstr=[]
-    (0...@num_workers).each {|w|
-      retstr << @wrkdays[w][day]
-    }
-    retstr
-  end #def get_DayOnOff(day)
-
-  def get_Canididate(day)
-    puts "# def get_Canididate(day)"
-    candi = []
-    cnt = cnt_filled(day)
-    doTimes = (2 - cnt)
-    (0...@num_workers).each_with_index  {|w, i|
-      if doTimes == 0
-        break
-      else
-        theDay = @wrkdays[w][day]
-        if doTimes > 0
-          if isOffDay( theDay )
-            candi << i
-#            doTimes -= 1
-          end
-        else # doTimes< 0
-          if isOnDay( theDay )
-            candi << i
-#            doTimes += 1
-          end
-        end
-      end
-    }
-    puts "num=#{cnt}   #{2 - cnt} times in cand #{candi}"
-    return [ candi, ( 2 -cnt ).abs ]
-  end #  def get_Canididate(day)
-
   
   #-----------------
   def adjust_Round( reset=true)
   #-----------------
     #
     cnt_add = cnt_del = changed = cnt_ok = cnt_ok0 = cnt_offDays =  0
-    cnt_days=0
     cnt_change_p_worker=Array.new(@num_workers, 0)
 
     @theMonthRange.each do |day|
       #     num = cnt_filled(day)
       puts "#=== #{day} ==="
       candiWorkers,cnt_Times =  get_Canididate(day)
-      puts "#--- #{cnt_Times} in cand #{candiWorkers}"
+      puts "#--- #{cnt_Times} in cand #{candiWorkers}" if cnt_Times > 0
  #     isBreak = false
       @seq_workers.each_with_index do |wrkr, seq_idx|
         #       break if isBreak
         break if seq_idx > @num_workers
         if candiWorkers.any?(wrkr)
+          
           do_Toggle_ETC( wrkr, day, changed, cnt_add, cnt_del, cnt_change_p_worker)
           candiWorkers.delete(wrkr)
           cnt_Times -= 1
@@ -631,7 +418,7 @@ puts "# def pre_set_one( #{idx} )"
     puts "# point #{point}"
     point
 ##    
-  end #  def adjust_RoundX()
+  end #  def adjust_Round()
 
   #....................
   def think(idxWorker) 
@@ -656,93 +443,3 @@ end  # class
 
 
 __END__
-      candiWorkers, doTimes = get_Candidates(day)
-      # candi widx 
-      #  [0]123 0:On needs 1 Off
-
-      #   0123012.. seq_Workers
-       seq_w ( 0 1 2 3 0 .)each nextW
-         if cnd(1 2 3).any?(nextW)
-            use nextW
-            cnd.delete(nextW)
-            set seq_w
-
-         else # 
-         end
-       }
-            nextW
-a         
-                
-each cw
-      #    seq_
-=end
-=begin
-      days_Data = get_DayOnOff(day)
-      puts "##..... Check #{day}  worker #{@seq_workers} filled num=#{num} #{days_Data}"
-      case num
-      when 1, 3    # 0, 4
-        # 1, 3 need one day  On Off
-        candiWorkers = []
-        days_Data.each_with_index{|s, i|
-          if num ==1
-            if isOnDay( s )
-              candiWorkers << i
-            end
-          else
-           if isOffDay( s )
-              candiWorkers << i
-            end
-          end            
-        }
-        puts "num=#{num} cand #{candiWorkers}"
-        case candiWorkers.size
-        when 0
-          puts "#=== Dame  over   3 changed Worker Exists ???!??"
-          puts "#==  change ocuur p Worker = #{cnt_change_p_worker}"
-          next;    # Dame !!
-        when 1   # unconditionally it
-          worKer = candiWorkers[0]
-          do_Toggle_ETC( worKer, day, changed, cnt_add, cnt_del, cnt_change_p_worker)
-        when 2     # ( @num_workers - 1 )- 1 # last when num = 1 3
-          num_ToDo = (2 - num).abs
-          @seq_workers.each_with_index {|nextW,i|
-            break if num_ToDo == 0
-              
-            candiWorkers.each {|cw|
-              if cw == nextW
-                candiWorkers.delete (cw)
-                do_Toggle_ETC(nextW, day, changed, cnt_add, cnt_del, cnt_change_p_worker)
-                num_ToDo -= 1
-                break;
-              end
-            }
-          }
-        when 3
-          
-        when 4
-          
-        end
-      when 0, 4     # need one day On/Off
-        # 0, 4 need two days On Off
-        p "## Day ",day
-        p "## @seq_workers[0] ",  @seq_workers[0]
-        p "## @wrkdays[ @seq_workers[0]][day] ", @wrkdays[ @seq_workers[0]][day] 
-        if isOffDay( @wrkdays[@seq_workers[0]][day] ) #####
-          puts "##   @seq_workers[0] #{@seq_workers[0]}    ' ' -->X "
-          @wrkdays[@seq_workers[0]][day] = 'X'
-          cnt_add += 1
-          changed += 1
-          cnt_change_p_worker[@seq_workers[0]] += 1
-          @seq_workers[0] = @seq_workers.shift
-        else
-          puts "##   else @seq_workers[0] #{@seq_workers[0]}   "
-          avail = can_ToggleWorkers(@seq_workers[0], day)
-          if avail.include?(@Koyano)  # Koyano
-            puts "##  Koyano "
-            @wrkdays[@Koyano][day] = 'X'
-            cnt_add += 1
-            changed += 1
-            cnt_change_p_worker[ @Koyano ] += 1
-          end
-        end
-      end # case num

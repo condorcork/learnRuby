@@ -17,13 +17,18 @@ module ControlHelper
   #-----------------------
     #--- Constant ----
     @num_workers = members
-    @num_workers_p_day = 2            # Teiin
+    @num_workers_p_day = 2    # Teiin
+    #-----   Patamater to Change CONDITION ----
+    # in adjust_Round  Max or Limit  change / workers
+    @limit_change = 2
     #
-    @template=('xxx  '*8).split('')
+    @template=('xxx  '*8).split('')     #
 #    @template=('xxxx  '*7).split('')
 #    @template=('xxx  xx '*5).split('')
-#    @template=('xxxxx  '*6).split('')
+    @template=('xxxxx  '*6).split('')
     ### !!! TO DO : changable  'xxxx  ', 'xxx  xx '
+    #-----  End Patamater to Change CONDITION ----
+    #
     @Koyano = @num_workers - 1
 
     #--- Date ---- 
@@ -43,7 +48,6 @@ module ControlHelper
       puts "#=* Range Error"
       exit 1
     end
-    @num_wokers_p_day = 2
     puts " This has #{@num_workers} members"
     puts " Taiin = #{@num_workers_p_day}"
     puts " #{@year_16}-#{@month_16} has #{@num_days16} days."
@@ -59,7 +63,8 @@ module ControlHelper
     
     # === Data ====
     # check info & views
-    
+
+    #--- Paramater ------
     # from file if exists prev month 
     @seq_workers=(0...@num_workers).map{|w| w}  #[0,1,2,3]
     @seq_workers=@seq_workers * 5
@@ -156,6 +161,47 @@ module ControlHelper
   end
 
 
+  #.....................
+  def get_theDayOnOff(day)     # status On or Off of All Workers at the Day
+  #.....................
+    retstr=[]
+    (0...@num_workers).each {|w|
+      retstr << @wrkdays[w][day]
+    }
+    retstr
+  end #def get_theDayOnOff(day)
+
+  #...........................
+  def get_Canididate(day)
+  #...........................
+    # when the Day is not Filled TEIIIN (under/over)
+    puts "# def get_Canididate(day)"
+    candi = []
+    cnt = cnt_filled(day)
+    doTimes = (@num_workers_p_day  - cnt)
+    (0...@num_workers).each_with_index  {|w, i|
+      if doTimes == 0   # filled OK
+        break
+      else
+        theDay = @wrkdays[w][day]   
+        if doTimes > 0
+        # Under --> find OFF days to ON
+          if isOffDay( theDay )
+            candi << i
+#            doTimes -= 1
+          end
+        else # doTimes< 0
+          # Over --> find ON days to OFF
+          if isOnDay( theDay )
+            candi << i
+#            doTimes += 1
+          end
+        end
+      end
+    }
+    puts "num=#{cnt}   #{@num_workers_p_day  - cnt} times in cand #{candi}"
+    return [ candi, ( @num_workers_p_day  - cnt ).abs ]
+  end #  def get_Canididate(day)
 
   # 
   #..............................
@@ -318,7 +364,7 @@ module ControlHelper
     print "wrker #{wrker} '#{ @wrkdays[wrker][day] }'   isOnDay? #{ isOnDay(@wrkdays[wrker][day]) }\n"
     workers_CAN=[]
     (0...@num_workers).each {|w|
-      print "  w (0.. #{@num_worker} #{w} "
+      print "  w (0.. #{@num_workers} #{w} "
 #      if w != wrker 
       print "    dayis='#{ @wrkdays[w][day] }'   isOnDay? #{ isOnDay(@wrkdays[wrker][day]) }\n"
       print "    isOff(@..[w][day]) =#{isOffDay(@wrkdays[w][day])}   isOn(@..[w][day]) =#{isOnDay(@wrkdays[w][day])}"
@@ -491,44 +537,6 @@ module ControlHelper
     }
     cnt
   end
-  
-  #--------
-  #  miscellaneous
-  #--------
-# yet   
-  #.............................
-  def getData(prompt=':Quit/ ')
-    #.............................
-    if prompt[-1] == "\n"
-      prompt.chop!
-    end
-    if prompt =~ /:([A-Z])/
-      rep=[]
-      n=1
-#      while "$#{n}"
-#        
-#      end
-      while true
-        res = gets
-        break
-      end
-    end
-  end
-
-  #.............................
-  def ok_YN?(prompt='continue ? [y|n]:')
-  #.............................
-    while true
-      print prompt
-      res = gets
-      case res
-      when /^[yY]$/,  /^$/
-        return true
-      when /^[nN]/
-        return false
-      end
-    end	
-  end
 
   #-----------------------
   def do_ToggleDay(worker, idx_day)
@@ -549,27 +557,33 @@ module ControlHelper
     done
   end  # def act_ToggleOneWorker
 
+  def do_Exchange(wrkr1, day1, wrkr2, day2)
+    puts "def do_Exchange(#{wrkr1},  #{day1}, #{wrkr2}, #{day2})"
+    isDone = false
+    msg="#!!=== do_Exchange ERROR\n"
+    # check range
+#    if ! (0...@num_workers).include?( wrkr1 )
+    #      msg += "#{wrkr1}
+    #
+    day_1 = day_2 = ''
+    copy_Data( @wrkdays[wrkr1][day1], day_1)
+    copy_Data( @wrkdays[wrkr2][day2], day_2)
+    #day_1 = @wrkdays[wrkr1][day]
+    #day_2 = @wrkdays[wrkr2][day2]
+    if day_1 == 'D' or day_2 == 'D'
+      msg += "==== UnChangable VALUE "
+    else
+      #  
+      puts "#==== Before day1 '#{day_1}'   day2 '#{day_2}'"
+      copy_Data( day_2, @wrkdays[wrkr1][day1])
+      copy_Data( day_1, @wrkdays[wrkr2][day2])
+      puts "#==== After  day1 '#{@wrkdays[wrkr1][day1]}'   day2 '#{@wrkdays[wrkr2][day2]}'"
+#      @wrkdays[wrkr1][day1] = day_2
+#      @wrkdays[wrkr2][day2] = day_1
+      isDone = true
+    end
+  end # def do_Exchange(wrkr1, day1, wrkr2, day2)
   
-  #.........................
-  def sel_ToggleOneWorker(msg=nil)
-  #.........................
-    puts msg if msg != nil
-    prompt="Enter 'workmanNo.(0~) date(4~)[]' (index)\n To Toggle On/Off\n eg. '1 10' :"
-    print prompt
-    ret=[]
-    while true
-      l=gets
-      if l=~/(\d)[ \t]+(\d+)/
-        ret[0]=$1.to_i
-        ret[1]=$2.to_i
-        return ret
-      elsif l=~/Q/i
-        puts "Exit"
-        exit 0
-      end
-    end 
-  end # def select_Tog..OneWorker
-
   #.............................
   def set_WorkersSeq( doneWorker )
   #.............................
@@ -588,6 +602,72 @@ module ControlHelper
     @seq_workers = newData    
   end  #def set_WorkersSeq(  doneWorker )
 
+  #--------
+  #  miscellaneous
+  #--------
+
+  #.............................
+  def ok_YN?(prompt='continue ? [y|n]:')
+  #.............................
+    while true
+      print prompt
+      res = gets
+      case res
+      when /^[yY]$/,  /^$/
+        return true
+      when /^[nN]/
+        return false
+      when /^Q/i
+        exit 0
+      end
+    end	
+  end
+
+  
+  #.........................
+  def sel_ToggleOneWorker(msg=nil)
+  #.........................
+    puts msg if msg != nil
+    prompt =  "Enter 'workmanNo.(0~) date(4~)[]' (index)\nTo Toggle On/Off\n eg. '1 10 [12]\n [day2]: exchange day1 with day2\n' :"
+#    promot += "To Toggle On/Off\n eg. '1 10 [12]'\n"
+#    prompt += " [day2] : exchange day1 with day2\n' :"
+    print prompt
+    ret=[]
+    while true
+      l=gets
+      if l=~/(\d)[ \t]+(\d+)([ \t]+(\d+))*/
+        ret[0]=$1.to_i
+        ret[1]=$2.to_i
+        if $4 != nil
+          ret[2]=$4.to_i
+        end
+        return ret
+      elsif l=~/Q/i
+        puts "Exit"
+        exit 0
+      end
+    end 
+  end # def select_Tog..OneWorker
+
+# yet   
+  #.............................
+  def getData(prompt=':Quit/ ')
+    #.............................
+    if prompt[-1] == "\n"
+      prompt.chop!
+    end
+    if prompt =~ /:([A-Z])/
+      rep=[]
+      n=1
+#      while "$#{n}"
+#        
+#      end
+      while true
+        res = gets
+        break
+      end
+    end
+  end
 
 =begin
   def change_IO(prompt=nil)
