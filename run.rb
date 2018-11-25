@@ -106,18 +106,19 @@ p point
   #p maxPoint[:Case]
 
 while true
-  w,d,d2 = y.sel_ToggleOneWorker("Toggle On/Off" )
-  if d2 != nil
-    if ! y.do_Exchange(w, d, w, d2)
-      puts "#!!! Not Done do_ToggleDay(#{w}, #{d})"
-      #      next;
+  w1,d1,w2,d2 = y.sel_ToggleOneWorker("Toggle On/Off" )
+  puts "#{w1} #{d1} #{w2} #{d2}"
+  if w2 != nil
+    if ! y.do_Exchange(w1, d1, w2, d2)
+      puts "#!!! Not Done do_ToggleDay(#{w1}, #{d1}   #(w2}, #{d2})"
+      next;
     end
   else
-    if ! y.do_ToggleDay(w, d)
-      puts "#!!! Not Done do_ToggleDay(#{w}, #{d})"
-      #      next;
+    if ! y.do_ToggleDay(w1, d1)
+      puts "#!!! Not Done do_ToggleDay(#{w1}, #{d1})"
+      next;
     end
-  end    
+  end
   y.hor_show
   (0..3).each{|w|
     puts y.strStatus_Worker(w)

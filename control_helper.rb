@@ -541,7 +541,9 @@ module ControlHelper
   #-----------------------
   def do_ToggleDay(worker, idx_day)
   #-----------------------
+  puts "def do_ToggleDay( #{worker}, #{idx_day} ) "
     done = false
+    
     if isOnDay( @wrkdays[ worker ][idx_day] )
       @wrkdays[ worker ][idx_day] = '*'
       done = true
@@ -641,17 +643,20 @@ module ControlHelper
   #.........................
     puts msg if msg != nil
     prompt =  "Enter 'workmanNo.(0~) date(4~)[]' (index)\nTo Toggle On/Off\n eg. '1 10 [12]\n [day2]: exchange day1 with day2\n' :"
-#    promot += "To Toggle On/Off\n eg. '1 10 [12]'\n"
+#    promot += "To Toggle On/Off\n eg. '1, 10 [2, 20]'\n"
 #    prompt += " [day2] : exchange day1 with day2\n' :"
     print prompt
     ret=[]
     while true
       l=gets
-      if l=~/(\d)[ \t]+(\d+)([ \t]+(\d+))*/
-        ret[0]=$1.to_i
-        ret[1]=$2.to_i
+#      if l=~/(\d)[ \t]+(\d+)([ \t]+(\d+))*/
+      if l=~/((\d), *(\d+))([ \t]+(\d),[ \t]*(\d+))*/
+#             1  2     3  14        5         6   4
+        ret[0]=$2.to_i
+        ret[1]=$3.to_i
         if $4 != nil
-          ret[2]=$4.to_i
+          ret[2]=$5.to_i
+          ret[3]=$6.to_i
         end
         return ret
       elsif l=~/Q/i
