@@ -562,25 +562,37 @@ module ControlHelper
     isDone = false
     msg="#!!=== do_Exchange ERROR\n"
     # check range
-#    if ! (0...@num_workers).include?( wrkr1 )
-    #      msg += "#{wrkr1}
-    #
-    day_1 = day_2 = ''
-    copy_Data( @wrkdays[wrkr1][day1], day_1)
-    copy_Data( @wrkdays[wrkr2][day2], day_2)
+    if !(0...@num_workers).include?( wrkr1 ) or
+       !(0...@num_workers).include?( wrkr2 )
+      msg+=" worker Error"
+    else
+      if !@theMonthRange.include?(day1) or
+         !@theMonthRange.include?(day2)
+        msg+=" DAY Error"
+      else
+        day_1 = @wrkdays[wrkr1][day1]
+        day_2 = @wrkdays[wrkr2][day2]
+
+#    copy_Data( @wrkdays[wrkr1][day1], day_1)
+#    copy_Data( @wrkdays[wrkr2][day2], day_2)
     #day_1 = @wrkdays[wrkr1][day]
     #day_2 = @wrkdays[wrkr2][day2]
-    if day_1 == 'D' or day_2 == 'D'
-      msg += "==== UnChangable VALUE "
-    else
+        if day_1 == 'D' or day_2 == 'D'
+          msg += "==== UnChangable VALUE "
+        else
       #  
-      puts "#==== Before day1 '#{day_1}'   day2 '#{day_2}'"
-      copy_Data( day_2, @wrkdays[wrkr1][day1])
-      copy_Data( day_1, @wrkdays[wrkr2][day2])
-      puts "#==== After  day1 '#{@wrkdays[wrkr1][day1]}'   day2 '#{@wrkdays[wrkr2][day2]}'"
+          puts "#==== Before day1 '#{day_1}'   day2 '#{day_2}'"
+#          copy_Data( day_2, @wrkdays[wrkr1][day1])
+          #     copy_Data( day_1, @wrkdays[wrkr2][day2])
+          @wrkdays[wrkr2][day2]= day_1
+          @wrkdays[wrkr1][day1]= day_2
+
+          puts "#==== After  day1 '#{@wrkdays[wrkr1][day1]}'   day2 '#{@wrkdays[wrkr2][day2]}'"
 #      @wrkdays[wrkr1][day1] = day_2
 #      @wrkdays[wrkr2][day2] = day_1
-      isDone = true
+          isDone = true
+        end
+      end
     end
   end # def do_Exchange(wrkr1, day1, wrkr2, day2)
   

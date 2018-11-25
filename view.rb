@@ -142,21 +142,31 @@ module View
         exit 1
       end
     end
-    (0..34).each do |nth_day|
-      if nth_day == 4
+    (0..34).each do |day|
+      if day == 4
         puts '  ==|=================='
       end
-      printf " %2d ", nth_day
+      printf " %2d ", day
       canv =[]
-      chk_members.each { |worker|
-        canv << @wrkdays[worker][nth_day]
+      chk_members.each { |wrkr|
+        #
+        dat= Marshal.load (Marshal.dump( @wrkdays[wrkr][day] ))
+        #   dat= @wrkdays[wrkr][day]
+        if dat =~ /[X\*]/
+          dat.sub!(/[X\*]/) {|s|
+            color_str(s,'REVERSE,GREEN')
+          }
+          @wrkdays[wrkr][day].sub!('*',' ')   
+          @wrkdays[wrkr][day].sub!('X','x')   
+        end
+        #
+        canv << @wrkdays[wrkr][day]
       }
-      canv= '|__' + canv.join("___")
-      + '___'
-      if checkview == true
-        cnt = cnt_filled( nth_day ) #  @num_workers)
+      canv= '|__' + canv.join("___")  + '___'
+#      if checkview == true
+        cnt = cnt_filled( day ) 
         canv = canv + "|  [" + str_Attr(cnt) +  "]"
-      end
+#      end
       
       puts "" + canv
     end
