@@ -20,13 +20,18 @@ module ControlHelper
     @num_workers_p_day = 2    # Teiin
     #-----   Patamater to Change CONDITION ----
     # in adjust_Round  Max or Limit  change / workers
-    @limit_change = 2
+    @limit_change = 4
     #
-    @template=('xxx  '*8).split('')     #
-#    @template=('xxxx  '*7).split('')
-#    @template=('xxx  xx '*5).split('')
-    @template=('xxxxx  '*6).split('')
-    ### !!! TO DO : changable  'xxxx  ', 'xxx  xx '
+    @templateSrc=[]
+    @templateSrc[0]=('xxx  '*8).split('')     #
+    @templateSrc[1]=('xxxx  '*7).split('')
+    @templateSrc[2]=('xxxxx '*5).split('')
+    #
+    @templateSrc[3]=('xxx  xx '*5).split('')
+    #
+    @template=@templateSrc.shift
+    
+
     #-----  End Patamater to Change CONDITION ----
     #
     @Koyano = @num_workers - 1
@@ -67,7 +72,7 @@ module ControlHelper
     #--- Paramater ------
     # from file if exists prev month 
     @seq_workers=(0...@num_workers).map{|w| w}  #[0,1,2,3]
-    @seq_workers=@seq_workers * 5
+    @seq_workers=@seq_workers * 10
     
     ## status  for each worker
     @chk_workers={}
@@ -175,7 +180,7 @@ module ControlHelper
   def get_Canididate(day)
   #...........................
     # when the Day is not Filled TEIIIN (under/over)
-    puts "# def get_Canididate(day)"
+  #  puts "# def get_Canididate(day)"
     candi = []
     cnt = cnt_filled(day)
     doTimes = (@num_workers_p_day  - cnt)
@@ -199,7 +204,7 @@ module ControlHelper
         end
       end
     }
-    puts "num=#{cnt}   #{@num_workers_p_day  - cnt} times in cand #{candi}"
+ #   puts "num=#{cnt}   #{@num_workers_p_day  - cnt} times in cand #{candi}" if cnt != 2
     return [ candi, ( @num_workers_p_day  - cnt ).abs ]
   end #  def get_Canididate(day)
 
@@ -313,7 +318,7 @@ module ControlHelper
       #    puts "## daysWithFullOff '#{daysWithFullOff}'"
     end
     #
-      puts "## daysWithFullOff '#{daysWithFullOff}' at get_WithFullOffDays"
+ #     puts "## daysWithFullOff '#{daysWithFullOff}' at get_WithFullOffDays"
     #
     daysWithFullOff
   end 
@@ -409,7 +414,7 @@ module ControlHelper
   #----------
   def get_Score()
   #----------
-  puts "# def get_Score()"
+#  puts "# def get_Score()"
     scr= sprintf( "%02d ", @chk_Place[:OK]*2)
     puts "## scr : Num of OK in the Month  #{scr} x 2"
     w_scr=0
@@ -638,20 +643,57 @@ module ControlHelper
   end
 
   
+  def sel_MainMenu()
+    puts "def sel_MainMenu"
+    prompt=<<-EOF
+ MAIN MENU
+  # Story 
+  #  prepare, set Yotei
+  #  adjustRound
+  0. Test Env
+  1. Init
+  2. After Koyano
+  3. Shift 
+  4. Display , # History
+  5. Manual Handling
+  9. Quit
+EOF
+    print prompt
+    print ' : '
+    while true
+      l=gets.chop
+      if l =~ /^\b*(\d)\b*$/
+        menu = l.to_i
+        case menu
+        when 9
+          return 9
+          
+        end # case menu
+      end
+    end
+    
+  end # def sel_MainMenu()
+    
+  
   #.........................
-  def sel_ToggleOneWorker(msg=nil)
+  def sel_ToggleExchange(msg=nil)
   #.........................
     puts msg if msg != nil
-    prompt =  "Enter 'workmanNo.(0~) date(4~)[]' (index)\nTo Toggle On/Off\n eg. '1 10 [12]\n [day2]: exchange day1 with day2\n' :"
-#    promot += "To Toggle On/Off\n eg. '1, 10 [2, 20]'\n"
-#    prompt += " [day2] : exchange day1 with day2\n' :"
+    prompt=<<-EOF
+Manual HANDLING
+ 'worker, day':     Toggle On/Off 
+ 'w1,day1 w2,day2': Exchange 
+                     day1 day2
+  'M' :    Upper Menu
+  'Q' :    Quit from This Menu  
+EOF
     print prompt
+    
     ret=[]
     while true
       l=gets
-#      if l=~/(\d)[ \t]+(\d+)([ \t]+(\d+))*/
+      l.chop!
       if l=~/((\d), *(\d+))([ \t]+(\d),[ \t]*(\d+))*/
-#             1  2     3  14        5         6   4
         ret[0]=$2.to_i
         ret[1]=$3.to_i
         if $4 != nil
@@ -659,32 +701,39 @@ module ControlHelper
           ret[3]=$6.to_i
         end
         return ret
-      elsif l=~/Q/i
+      elsif l =~/^[ \t]*Q/i
         puts "Exit"
-        exit 0
+        exit 0        
+        break
+      elsif l =~/^[ \t]*M/i
+        return 'M'
       end
-    end 
+        
+=begin      
+      case l
+      when =~/^[ ]*M/i
+        puts "Upper M"
+        # upper Menu
+      when =~/^[ ]*Q/i
+        puts "Exit"
+        exit 0        
+        break
+      when =~/((\d), *(\d+))([ \t]+(\d),[ \t]*(\d+))*/
+        ret[0]=$2.to_i
+        ret[1]=$3.to_i
+        if $4 != nil
+          ret[2]=$5.to_i
+          ret[3]=$6.to_i
+        end
+        puts ret
+        return ret
+      else
+        puts "Else #{l}"
+      end
+=end
+    end
   end # def select_Tog..OneWorker
 
-# yet   
-  #.............................
-  def getData(prompt=':Quit/ ')
-    #.............................
-    if prompt[-1] == "\n"
-      prompt.chop!
-    end
-    if prompt =~ /:([A-Z])/
-      rep=[]
-      n=1
-#      while "$#{n}"
-#        
-#      end
-      while true
-        res = gets
-        break
-      end
-    end
-  end
 
 =begin
   def change_IO(prompt=nil)

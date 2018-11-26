@@ -65,8 +65,8 @@ module View
 #
     # for Header & Guide
     #
-    hdrDay   = "      |"
-    hdrMonth = " Date |"
+    hdrDay   = "  |"
+    hdrMonth = "Dy|"
 
     footer='0 1 2 3 |'
     ff = '4 + 6 7 8 9<1>1 2 3 4 + 6 7 8 9<2>1 2 3 4 + 6 7 8 9<3>1 2 3 4'.slice(0,  @num_days16*2)
@@ -119,7 +119,7 @@ module View
         dat.gsub!('X','x')
       end
       kinmuM = kinmuM + '_|' + dat + filler
-      hdr = " No.#{idx} |"
+      hdr = "#{idx}.|"
       puts hdr + kinmuM
     end
     #  check  Row,  Last Line
@@ -128,10 +128,22 @@ module View
 
      dat = dat + @chk_Place[:dayView][4... 4+@num_days16].join(filler)
 
-     puts " <=>  |#{dat}"    # when PC
-     puts ' IDX  |' + footer
+     puts "<>|#{dat}"    # when PC
+     puts 'IX|' + footer
   end  
 
+  #...................
+  def show_Result()
+  #...................
+    (0...@num_workers).each {|w|
+      puts strStatus_Worker(w)
+     }
+    #[- to do, More simple 
+    puts strStatus_Place()
+    point = get_Score
+    puts "Point = #{point}"
+    point
+  end #  def show_Result()
   #.............................
   def ver_show(chk_members=[0,1,2,3],   checkview=true)
   #.............................

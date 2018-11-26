@@ -322,17 +322,18 @@ end
         @chk_workers[:WithFullOffDay ][worker]
       )
     )
-=end    
+=end
+    point show_Result
+=begin    
     puts strStatus_Worker(worker)
     
     puts strStatus_Place()
     point = get_Score
-
+=end
     if reset
       load_Case
     end
-    g349
-    puts point    
+#    puts point    
     point
   end #def adjust(worker, reset=true)
 
@@ -406,16 +407,11 @@ end
     puts "##  OffDay is #{cnt_offDays} days"
 #    
     hor_show() # @seq_workers[0])  # include exa.
-    (0...@num_workers).each {|w|
-      puts strStatus_Worker(w)
-     }
-    
-    puts strStatus_Place()
-    point = get_Score
+    #
+    point = show_Result()
     if reset
       load_Case
     end
-    puts "# point #{point}"
     point
 ##    
   end #  def adjust_Round()
