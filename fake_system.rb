@@ -17,7 +17,8 @@ require 'io/console/size'
     # 
     # 3). Clear
     # 
-    @savedCase = [] 
+    @savedCase = []
+    @savedSeq = []            # for seq_workers 
 #    @savedCase << {"ADDASDAD" => dump'}
 #    @savedCase << {"noname" => dump'}
 #    p @savedCase
@@ -61,11 +62,46 @@ require 'io/console/size'
   def save_Case( nameCase = 'noname' )
     #-----------------------------
     puts "#def save_Case  size #{@isInitState}"    
-    @prevCase = Marshal.dump( @wrkdays )
-    @savedCase << { nameCase => @prevCase}
+    prevCase = Marshal.dump( @wrkdays )
+    @savedCase << { nameCase => prevCase }
+    prevSeq = Marshal.dump( @seq_workers )
+    @savedSeq << prevSeq  # for seq_workers 
 #    p @prevCase
-#    p @savedCase
+#    p @savedCase  
   end
+
+  #-----------------------------
+  def load_Case(dumped_Marshal=nil)   # case (Marshal.dump)
+  #----------------------------
+    puts "#def  load_Case( case_Marshal )"
+    if dumped_Marshal == nil
+      # load Previous which was recently saved
+      prevCase = @savedCase[-1]
+      if prevCase == nil
+        puts "#!! load_Case DO Nothing!!  'dumped_Marshal==nil' )"
+        nil
+      else
+        prkey= @savedCase[-1].keys[0]
+        dump_Dat = @savedCase[-1][prkey]
+        saved = Marshal.load( dump_Dat )
+        #  seq
+      end
+=begin        
+=> [{"noname"=>"Noname 1"}, {"noname"=>"Noname 2"}, {"Init"=>"Init 1"}]
+irb(main):067:0> m[-1][mk]
+=> "Init 1"
+irb(main):068:0> 
+=> "Init"
+irb(main):069:0> m[-1][mk]
+=> "Init 1"
+=end
+#[-        @savedCase.pop  # when delete 
+#      end
+    else
+      saved = Marshal.load( dumped_Marshal )
+    end
+    saved
+  end # def load_Case(case_Marshal)   # case (Marshal.dump)
 
   #
   #-----------------------------
@@ -94,25 +130,9 @@ require 'io/console/size'
     end
   end  #def allSavedCase
   
-  #-----------------------------
-  def load_Case(dumped_Marshal=nil)   # case (Marshal.dump)
-  #----------------------------
-    puts "#def  load_Case( case_Marshal )"
-    if dumped_Marshal == nil
-      if @prevCase == nil
-        puts "#!! load_Case DO Nothing!!  'dumped_Marshal==nil' )"
-        nil
-      else
-        saved = Marshal.load( @prevCase )
-#[-        @savedCase.pop  # when delete 
-      end
-    else
-      saved = Marshal.load( dumped_Marshal )
-    end
-    saved
-  end # def load_Case(case_Marshal)   # case (Marshal.dump)
 
-#;- no test  
+
+  #;- no test  
   #----------------------------
   def copy_Data( src, target)
   #----------------------------
@@ -125,7 +145,7 @@ require 'io/console/size'
   def getchar()
   #..............
     while (key = STDIN.getch) != "\C-c"
-      puts "#{i += 1}: #{key.inspect} キーが押されました。"
+      puts "#{i += 1}: #{key.inspect}  Key Pressed 。"
     end
   end # def getchar()
 =end
