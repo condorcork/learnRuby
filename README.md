@@ -18,9 +18,12 @@
 #             x getchar  without Return key
 #              1.     just now  # done 2018-11-26(Mon) 15:43:29
 #  History    
-#     save/load
+#     save/load  a litte 
 #  show changed Days
-#  Menu
+#  Menu  ....
+#     X   ShokiKA
+#     X  Sel Action
+#     X  Display HYO
 #    Story
 #  Miscel
 # 2.  control display Msg for test
