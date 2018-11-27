@@ -6,7 +6,8 @@ require 'io/console/size'
 def read_key
   i=0
   while (key = STDIN.getch) != "\C-c"
-    puts "#{i += 1}: #{key.inspect} キーが押されました。"
+    puts " #{i += 1}: #{key.inspect} キーが押されました。"
+    puts " #{i}: #{key}"
   end
 #..........  
 #方向	エスケープシーケンス
@@ -38,7 +39,7 @@ def read_arrow_key()
 end # read_arrow_key
 
 #---- MAIN ----
-#read_key
+read_key
 #  read_arrow_key
 
 

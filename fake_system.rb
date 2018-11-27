@@ -2,6 +2,10 @@
 
 module FakeSystem
 
+require 'io/console'
+require 'io/console/size'
+  
+  
   #................
   def init_fake()
   #................
@@ -59,7 +63,31 @@ module FakeSystem
     puts "#def save_Case  size #{@isInitState}"    
     @prevCase = Marshal.dump( @wrkdays )
     @savedCase << { nameCase => @prevCase}
+#    p @prevCase
+#    p @savedCase
   end
+
+  #
+  #-----------------------------
+  def allSavedCase( caseName = nil )
+  #-----------------------------
+    # --> def sr_dumpCase( caseKey )
+    puts "#def allSavedCase"
+    retIdx = []
+    retAll = []
+    @savedCase.each_with_index { |e, i|
+      retAll << i
+      if caseName != nil
+        if e.keys.include?(caseName)
+          retIdx << i
+        end
+      end
+    }
+    puts "#!!! ALL @savedCase.keys "
+    retAll.each {|keyname| puts " :'#{keyname}'"  }
+    puts "#!!! Searched key '#{caseName}'"
+    retIdx.each {|keyname| puts " :'#{keyname}'"  }
+  end  #def allSavedCase
   
   #-----------------------------
   def load_Case(dumped_Marshal=nil)   # case (Marshal.dump)
@@ -85,5 +113,15 @@ module FakeSystem
     puts "# def copy_Data( src, target)"
     target = Marshal.load( Marshal.dump( src ) )
   end # def copy_Data( src, target)
+
+=begin  
+  #..............
+  def getchar()
+  #..............
+    while (key = STDIN.getch) != "\C-c"
+      puts "#{i += 1}: #{key.inspect} キーが押されました。"
+    end
+  end # def getchar()
+=end
   
-end
+end # module FakeSystem

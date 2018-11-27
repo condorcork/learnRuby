@@ -15,6 +15,12 @@ module ControlHelper
   #----- Initailze -------  
   def init_InitVarCon(members, date)
   #-----------------------
+#.....  debug Display .....
+@debug_do_Exchange = false
+@debug_seq_WorkersSeq  = false
+@debug_adjust_Round = false
+#........
+    
     #--- Constant ----
     @num_workers = members
     @num_workers_p_day = 2    # Teiin
@@ -73,6 +79,7 @@ module ControlHelper
     # from file if exists prev month 
     @seq_workers=(0...@num_workers).map{|w| w}  #[0,1,2,3]
     @seq_workers=@seq_workers * 10
+    @seq_workers.shift   ### 
     
     ## status  for each worker
     @chk_workers={}
@@ -93,8 +100,11 @@ module ControlHelper
     @prevCase=nil     # marshal.dump Default
 
 #    @serCase=[]
-    
-  end
+    @bestScore = {}   #  :point, :num?  :case :env
+    @bestScore[:num] = 0
+    @bestScore[:case] = []
+    @bestScore[:env] = []   # seq_workers etc
+  end #
   
   #
   #----- Date --------
@@ -129,7 +139,7 @@ module ControlHelper
   def define_OnOff_Day()
   #..................................
     # 'X", 'A', 'B'
-    @day_ON = 'XAB'
+    @day_ON = 'XABT'     # Toumu (24h)
     # ' ','*'                   
     @day_OFF = ' *'
     # 'X', 'A', 'B', and 'D'
@@ -251,8 +261,6 @@ module ControlHelper
     end
   end
 
-
-  ###
   #-----------------------
   def get_SeqOffDays( wkDays )
   #-----------------------  
@@ -263,9 +271,9 @@ module ControlHelper
     num_days = 0  #  Check form Last 4 days of Prev Month
     #  ' ':LastDayOfPrevMonth | ' ': FirstDay  ===> FullOffDay 
 #    (0..@num_days16+4).each{|nth_day|
-    (0...@num_days16+4).each{|nth_day|
-      if  isOffDay( wkDays[nth_day] )
-        days << nth_day
+    (0...@num_days16+4).each{|day|
+      if  isOffDay( wkDays[day] )
+        days << day
         num_days+=1
       else
         if num_days > 1
@@ -362,72 +370,22 @@ module ControlHelper
     ret
   end
 
-  #..............
-  def can_ToggleWorkers(wrker, day)
-  #..............
-    puts "def can_ToggleWorkers( #{wrker}, #{day} )"
-    print "wrker #{wrker} '#{ @wrkdays[wrker][day] }'   isOnDay? #{ isOnDay(@wrkdays[wrker][day]) }\n"
-    workers_CAN=[]
-    (0...@num_workers).each {|w|
-      print "  w (0.. #{@num_workers} #{w} "
-#      if w != wrker 
-      print "    dayis='#{ @wrkdays[w][day] }'   isOnDay? #{ isOnDay(@wrkdays[wrker][day]) }\n"
-      print "    isOff(@..[w][day]) =#{isOffDay(@wrkdays[w][day])}   isOn(@..[w][day]) =#{isOnDay(@wrkdays[w][day])}"
-
-      if isOnDay(@wrkdays[wrker][day])
-        if isOffDay(@wrkdays[w][day])
-          workers_CAN << w
-          puts "=== To toggle to On  #{w}"
-        end
-      else
-        if isOffDay(@wrkdays[wrker][day])
-          if isOnDay(@wrkdays[w][day])
-            puts "=== To toggle for Off  #{w}"
-            workers_CAN << w
-          end
-        end
-      end
-#      end
-    }
-    puts "#==== can_ToggleWorkers return #{workers_CAN}"
-    workers_CAN
-  end # def can_ToggleWorkers
-
-  #............
-  def get_CAN(candiWorkers, changed)
-  #............
-#    candiWorkers.
-    if candiWorkers.include?( @Koyano )    # KOYANO SPECIAL
-      @Koyano
-#    else
-#      changed.min
-      #
-    else
-      puts "#!! get_CAN(candiWorkers, changed)"
-      puts "#!! get_CAN( #{candiWorkers}, #{changed} )"
-      puts "#!! YET NOT MADE !! "
-      exit 1
-    end
-    
-  end # def get_CAN()
-  
   #----------
   def get_Score()
   #----------
 #  puts "# def get_Score()"
     scr= sprintf( "%02d ", @chk_Place[:OK]*2)
-    puts "## scr : Num of OK in the Month  #{scr} x 2"
+    #puts "## scr : Num of OK in the Month  #{scr} x 2"
     w_scr=0
    # scr=@chk_Place[:OK].to_s.
     (0...@num_workers).each {|w|
-      puts "#.#{w} KOKYU = #{ @chk_workers[:FullOffDays][w] }"
+    #  puts "#.#{w} KOKYU = #{ @chk_workers[:FullOffDays][w] }"
       w_scr += ( 9 - @chk_workers[:FullOffDays][w].size * 2).abs / 2
     }
-    puts "score (OK x 2) :#{scr}"
-    puts " w_scr ( 9 - kokyu x 2) / 2 ) = #{w_scr}"
-    puts " Total Score  ( score - wscr ) :#{ @chk_Place[:OK]*2 - w_scr}\n"
+    #puts "score (OK x 2) :#{scr}"
+    #puts " w_scr ( 9 - kokyu x 2) / 2 ) = #{w_scr}"
+    #puts " Total Score  ( score - wscr ) :#{ @chk_Place[:OK]*2 - w_scr}\n"
     @chk_Place[:OK]*2 - w_scr
-
   end #def get_Score()
   
   #
@@ -436,7 +394,7 @@ module ControlHelper
   #..............................
   def examine(workers=[0,1,2,3])
   #...........................
-      puts "# def examine( #{workers} )"
+#  puts "# def examine( #{workers} )"
     #
     #  set PLACE Check to @chk_Place
     # -------
@@ -461,7 +419,7 @@ module ControlHelper
       puts "##  @chk_Place[:OK] + @chk_Place[:Under] + @chk_Place[:Over] != @num_days16"
       puts "##  #{@chk_Place[:OK]} + #{@chk_Place[:Under]} + #{@chk_Place[:Over]} != #{@num_days16}"
       puts "############# << def examine(workers=[0,1,2,3]) >> ====="
-      puts "\a"      # BELLx
+      puts "\a"      # BELL
       exit 1
     end
 
@@ -483,11 +441,9 @@ module ControlHelper
       #      @chk_work0ers[:WithFullOffDays][w] = []   @wrkdays[w])
       @chk_workers[:WithFullOffDay][w] = get_WithFullOffDays( get_SeqOffDays( @wrkdays[w] ) )
       #     print "\n# in exam. No.#{w} '", @chk_workers[:WithFullOffDay][w], "'\n\n"
-      
     end
 
-#    puts "#---- exam Place ------"
-    puts strStatus_Place()
+    puts strStatus_Place()      #[- !!!???
     
     (0..3).each {|w|
 #      puts "#----- exam Worker -- #{w}"
@@ -495,9 +451,28 @@ module ControlHelper
       dat.flatten!
  #     puts  " Full Off Days = #{dat.size} days:    #{dat}"
     }
+    
+    #.... Save the Best Score
+#    chk_BestScore()
   end   # of examine
 
-  
+  def chk_BestScore( point )
+  # def save_BestScore
+  # def load_BestScore()
+  # def   
+    if point > @bestScore[:point]
+      @bestScore[:point] = point
+      @bestScore[:num] = 0
+      @bestScore[:case] = [ save_Case( "TieScore" ) ]
+      @bestScore[:env] = []   # seq_workers etc
+    elsif point == @bestScore[:point]
+      @bestScore[:num] += 1
+      @bestScore[:case] << save_Case( "TieScore" )
+    end
+
+  end #  chk_BestScore( point )
+
+   
   #----------------------------
   def strStatus_Worker(worker)
   #----------------------------
@@ -508,25 +483,17 @@ module ControlHelper
 
     @statusStr_Worker =  "# No.#{worker}     #{@num_days16}\n"
 
-=begin    
-    @statusStr_Worker += " Off: #{@chk_workers[:OffDay][worker]}  FullOff(公休): #{dat.length} [ #{dat} ] \n"
-    @statusStr_Worker += " On: #{@chk_workers[:OnDay][worker]} [ 'On' with Other Place ]: #{@chk_workers[:OnDayAll][worker]}"
-=end
-    
     dat = get_FullOffDays(worker)
-
     @statusStr_Worker = @statusStr_Worker + " Off: #{@chk_workers[:OffDay][worker]}  FullOff(休): #{dat.length}  #{dat}\n"
     @statusStr_Worker = @statusStr_Worker + " On: #{@chk_workers[:OnDay][worker]} ['On' with Other Place ]: #{@chk_workers[:OnDayAll][worker]}"
 
-    @statusStr_Worker    
-
+    @statusStr_Worker 
   end
   
-  #-----------------------
+  #---------------------
   def strStatus_Place()
-  #-----------------------
+  #---------------------
     @statusStr_Place = "#{@num_days16}  = OK: #{@chk_Place[:OK]} +  Under: #{@chk_Place[:Under]} + Over: #{@chk_Place[:Over]}"
-    
     @statusStr_Place
   end
   
@@ -546,7 +513,7 @@ module ControlHelper
   #-----------------------
   def do_ToggleDay(worker, idx_day)
   #-----------------------
-  puts "def do_ToggleDay( #{worker}, #{idx_day} ) "
+  #puts "def do_ToggleDay( #{worker}, #{idx_day} ) "
     done = false
     
     if isOnDay( @wrkdays[ worker ][idx_day] )
@@ -563,15 +530,18 @@ module ControlHelper
     end
     done
   end  # def act_ToggleOneWorker
-
+  
+  
+  #----------------------------------------
   def do_Exchange(wrkr1, day1, wrkr2, day2)
+  #----------------------------------------
     puts "def do_Exchange(#{wrkr1},  #{day1}, #{wrkr2}, #{day2})"
     isDone = false
     msg="#!!=== do_Exchange ERROR\n"
     # check range
     if !(0...@num_workers).include?( wrkr1 ) or
        !(0...@num_workers).include?( wrkr2 )
-      msg+=" worker Error"
+      msg+="## worker Error "
     else
       if !@theMonthRange.include?(day1) or
          !@theMonthRange.include?(day2)
@@ -587,14 +557,18 @@ module ControlHelper
         if day_1 == 'D' or day_2 == 'D'
           msg += "==== UnChangable VALUE "
         else
-      #  
-          puts "#==== Before day1 '#{day_1}'   day2 '#{day_2}'"
-#          copy_Data( day_2, @wrkdays[wrkr1][day1])
+          #
+          if @debug_do_Exchange
+            puts "#==== Before day1 '#{day_1}'   day2 '#{day_2}'"
+          end # can_ToggleWorkers(wrker, day)
+          #          copy_Data( day_2, @wrkdays[wrkr1][day1])
           #     copy_Data( day_1, @wrkdays[wrkr2][day2])
           @wrkdays[wrkr2][day2]= day_1
           @wrkdays[wrkr1][day1]= day_2
 
-          puts "#==== After  day1 '#{@wrkdays[wrkr1][day1]}'   day2 '#{@wrkdays[wrkr2][day2]}'"
+  if @debug_do_Exchange
+            puts "#==== After  day1 '#{@wrkdays[wrkr1][day1]}'   day2 '#{@wrkdays[wrkr2][day2]}'"
+  end #
 #      @wrkdays[wrkr1][day1] = day_2
 #      @wrkdays[wrkr2][day2] = day_1
           isDone = true
@@ -606,8 +580,10 @@ module ControlHelper
   #.............................
   def set_WorkersSeq( doneWorker )
   #.............................
-    puts "# def set_WorkersSeq( #{doneWorker} )"
-    puts "# seq=#{@seq_workers} "
+    if @debug_seq_WorkersSeq     
+             puts "# def set_WorkersSeq( #{doneWorker} )"
+             puts "# seq=#{@seq_workers} "
+    end # if debug_seq_WorkersSeq     
     newData=[]
     @seq_workers.each_with_index { |wrkr, i|
       if doneWorker == wrkr
@@ -617,42 +593,54 @@ module ControlHelper
         newData << wrkr
       end
     }
-    puts "# ret='#{newData}'"
+    if @debug_seq_WorkersSeq     
+             puts "# ret='#{newData}'"
+     end ## if debug_seq_WorkersSeq     
     @seq_workers = newData    
   end  #def set_WorkersSeq(  doneWorker )
+
 
   #--------
   #  miscellaneous
   #--------
 
   #.............................
-  def ok_YN?(prompt='continue ? [y|n]:')
+  def ok_YN?(prompt="continue \n  Yes: Y, y, Cr\n  No: N, n\n  Q[q] stop [Y|N|\\n|Q] ? :")
   #.............................
-    while true
-      print prompt
-      res = gets
-      case res
-      when /^[yY]$/,  /^$/
+    print prompt
+    while (key = STDIN.getch) != "\C-c"
+      case key  # .inspect
+      when /[yY]/
         return true
-      when /^[nN]/
+      when /[N]/i
+        puts "[N]o "
+#        Exit 1
         return false
-      when /^Q/i
+      when /Q/i
+        puts "EXIT 0"
         exit 0
+      when "\r"
+        return true
       end
-    end	
+      puts "'#{key}' '#{key.inspect}'"
+    end
+    puts "\C-c"
+    exit 1;
   end
 
   
+  #.........................
   def sel_MainMenu()
-    puts "def sel_MainMenu"
+  #.........................
     prompt=<<-EOF
- MAIN MENU
+
+[ MAIN MENU ]
   # Story 
   #  prepare, set Yotei
   #  adjustRound
   0. Test Env
-  1. Init
-  2. After Koyano
+  1. all saved # Init
+  2. sse saved case # After Koyano
   3. Shift 
   4. Display , # History
   5. Manual Handling
@@ -662,9 +650,18 @@ EOF
     print ' : '
     while true
       l=gets.chop
-      if l =~ /^\b*(\d)\b*$/
+      case l
+      when /^\b*(\d)\b*$/
         menu = l.to_i
         case menu
+        when 0
+        when 1
+          allSavedCase()
+        when 2
+          allSavedCase()
+        when 3
+        when 4
+        when 5
         when 9
           return 9
           
@@ -673,14 +670,14 @@ EOF
     end
     
   end # def sel_MainMenu()
-    
   
   #.........................
   def sel_ToggleExchange(msg=nil)
   #.........................
     puts msg if msg != nil
     prompt=<<-EOF
-Manual HANDLING
+
+[ Manual HANDLING ]
  'worker, day':     Toggle On/Off 
  'w1,day1 w2,day2': Exchange 
                      day1 day2
@@ -688,12 +685,13 @@ Manual HANDLING
   'Q' :    Quit from This Menu  
 EOF
     print prompt
-    
+    print ': '
     ret=[]
     while true
       l=gets
       l.chop!
-      if l=~/((\d), *(\d+))([ \t]+(\d),[ \t]*(\d+))*/
+      case l
+      when /((\d), *(\d+))([ \t]+(\d),[ \t]*(\d+))*/
         ret[0]=$2.to_i
         ret[1]=$3.to_i
         if $4 != nil
@@ -701,86 +699,14 @@ EOF
           ret[3]=$6.to_i
         end
         return ret
-      elsif l =~/^[ \t]*Q/i
+      when /^[ \t]*Q/i
         puts "Exit"
         exit 0        
-        break
-      elsif l =~/^[ \t]*M/i
+#        break
+      when /^[ \t]*M/i
         return 'M'
       end
-        
-=begin      
-      case l
-      when =~/^[ ]*M/i
-        puts "Upper M"
-        # upper Menu
-      when =~/^[ ]*Q/i
-        puts "Exit"
-        exit 0        
-        break
-      when =~/((\d), *(\d+))([ \t]+(\d),[ \t]*(\d+))*/
-        ret[0]=$2.to_i
-        ret[1]=$3.to_i
-        if $4 != nil
-          ret[2]=$5.to_i
-          ret[3]=$6.to_i
-        end
-        puts ret
-        return ret
-      else
-        puts "Else #{l}"
-      end
-=end
     end
-  end # def select_Tog..OneWorker
-
-
-=begin
-  def change_IO(prompt=nil)
-    if prompt == nil
-      prompt="Enter 'workmanNo.(0~) date(4~)[]' (index)\n To Toggle On/Off\n eg. '1 10' :"
-      a="Select MENU\n"
-      b=" 1:  Toggle On/Off a day "
-      c="Exchange On/Off day"
-      d=" 2: one Day with Another Day in ONE WORKER"
-      e=" 3: one On/Off Day with Off/On Day between 2  WORKERs"
-      prompt0=a+"\n"+b+"\n"+c+"\n"+d+"\n"+e
-    end
-    print prompt0    ret=[]
-    while true
-      l=gets
-      if l=~/(\d)[ \t]+(\d+)/
-        ret[0]=$1.to_i
-        ret[1]=$2.to_i
-        return ret
-      end
-    end 
-  end #def change_IO
-=end
-
-  @bestScore = {}
-  @bestScore[:scre] = 0
-  @bestScore[:check] = ' '
-  @bestScore[:data] = 'NIL'
-  
-=begin
-  def BestScore( score, 
-    if score > @bestScore[:score]
-      @bestScore[:score] = score
-      @bestScore[:check] = status_Str_Place #+ 
-      @bestScore[:data] = marshal.sump( @wrkdays )
-    elsif
-      if @bestScore[:check].to_a?(STring)
-        @bestScore[:check] = [ @bestScore[:check] ]
-        @bestScore[:check] << 
-         @bestScore[:data] = marshal.sump( @wrkdays )
-      se
-      
-  @bestScore[:data] = ' '
-
-          @bestScore[:scre] = 
-  @bestScore[:check] = ' '
-  @bestScore[:data] = ' '
-=end
+  end # def sel_ToggleExchange(msg=nil)
   
 end  # End of Module

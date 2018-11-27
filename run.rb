@@ -5,7 +5,7 @@
 #require './corelogic'
 require './CoreLogic' 
 
-def test_Reverse()
+ def test_Reverse()
   dat='_ _*_x_X_'
   dat2=dat
   dat2=dat.gsub(/[X\*]/){|s|
@@ -16,9 +16,9 @@ def test_Reverse()
   puts "  '#{dat2}'  <-- '#{dat}'"
   puts
   puts "  '#{dat3}'  <-- '#{dat2}'"
-end
+ end
 
-def preparePrevMonth(y)
+ def preparePrevMonth(y)
 #... Prepare for Prevmonth
   # 'xx  ''xxx'    --> 0(1)
   y.prepare(0, 'xx  ')
@@ -30,8 +30,8 @@ def preparePrevMonth(y)
   # ' DDx '' DDD'  special
   y.prepare( 3, 'DDx ')    # y.@Koyano
   #
-  y.hor_show(1)
-end
+  y.hor_show()  # false
+ end
 
 #----- MAIN ------
   $fulldayDebug = false
@@ -45,16 +45,16 @@ p b
 
  preparePrevMonth(y)
   #
-  y.hor_show()
+  y.hor_show( false ) 
   
   #
   puts '##Yotaku idx 3 古谷野 san'
   y.yoyaku( 3, '6012')   # y.@Koyano, '6012')
-  y.hor_show( 3 )  #   y.@Koyano)
+  y.hor_show(false)  #   no Examine # y.@Koyano)
 #  
   $fulldayDebug = true
   y.examine
-  if ! y.ok_YN?( "## Continue Y/N:")
+  if ! y.ok_YN?()
     exit 0
   end
   
@@ -68,28 +68,28 @@ y.save_Case("Initail")                # initail stat
   puts "#---- PRESET by Pattern---"
   y.pre_set([0,1,2])
   y.save_Case()     
-  y.ver_show()
+  y.ver_show(false)
 
 #####
   y.presetKoyano( 3 )   # y.@Koyano )  #, [0,1,2,6], [3,5])
 y.save_Case("Koyano")     
   y.ver_show()
   print "\n\n===============Saved after Koyano\n"
-  y.hor_show([0,1,2])
+  y.hor_show()
   puts "#---- Check ---"
   ###
 ##
   
 =begin  
   (0..4).each {|x|
-    y.hor_show(x)   ## [ x ])
+    y.hor_show()   ## [ x ])
 #    seq=y.sr_offdays_array( x )
 #x    print "\n#Full Off No.#{x}  '", seq, "'\n\n"
   }
 
 =end
   
-  if ! y.ok_YN?( "---FOR ADJUT #-----")
+  if ! y.ok_YN?( "--- Do ADJUST #--- Y/N/Q :")
     exit 0
   end
 puts "=========================="
@@ -98,38 +98,38 @@ y.load_Case()
   maxPoint[:point]=0
   maxPoint[:Case]=[]
 
-  puts "\n\n#Adjust_Round\n"
+#  puts "\n\n#Adjust_Round\n"
 point =  y.adjust_Round( reset=true )
   
 p point
   #p maxPoint[:point]
   #p maxPoint[:Case]
 
-while true
-  w1,d1,w2,d2 = y.sel_ToggleExchange()
-  puts "#{w1} #{d1} #{w2} #{d2}"
-  if w2 != nil
-    if ! y.do_Exchange(w1, d1, w2, d2)
-      puts "#!!! Not Done do_ToggleDay(#{w1}, #{d1}   #(w2}, #{d2})"
-      next;
-    end
-  elsif w1 == nil
-    next
-  elsif w1 == 'M'
-    y.sel_MainMenu()
-  else
-    if ! y.do_ToggleDay(w1, d1)
-      puts "#!!! Not Done do_ToggleDay(#{w1}, #{d1})"
-      next;
-    end
-  end
-  y.ver_show()
-  # y.hor_show
-  y.show_Result
-#  y.examine
-end
+ while true
+   w1,d1,w2,d2 = y.sel_ToggleExchange()
+   puts "#{w1} #{d1} #{w2} #{d2}"
+   if w2 != nil
+     if ! y.do_Exchange(w1, d1, w2, d2)
+       puts "#!!! Not Done do_ToggleDay(#{w1}, #{d1}   #(w2}, #{d2})"
+       next;
+     end
+   elsif w1 == nil
+     next
+   elsif w1 == 'M'
+     y.sel_MainMenu()
+   else
+     if ! y.do_ToggleDay(w1, d1)
+       puts "#!!! Not Done do_ToggleDay(#{w1}, #{d1})"
+       next;
+     end
+   end
+   y.ver_show()
+   # y.hor_show
+#   y.show_Result
+   #  y.examine
+ end
 
-exit 
+ exit 
 
 
   maxPoint={}
@@ -166,7 +166,7 @@ exit
    print "worker '", wrker,"'  day '", day,"'\n"
    
    if y.act_ToggleOneWorker(wrker, day)
-     y.hor_show(wrker)
+     y.hor_show()
    else
      puts "!!NOT AVAILABLE INPUT"
      if ! y.ok_YN?('continue? ')
@@ -235,17 +235,17 @@ puts "======="
 exit 
 ##
 #  Test do_ToggleDay 
-(4 .. 30).each do |d|
-  (3..3).each {|w|
-    if ! y.do_ToggleDay(w, d)
-      puts "#!==== Error do_ToggleDay( #{w}, "#{d} )"
-    end
-  }
-end  
-y.hor_show()
-(1...4).each {|w|
-  puts y.strStatus_Worker(w)
-}
-puts y.strStatus_Place
-puts "Score =", y.get_Score
-exit 0
+ (4 .. 30).each do |d|
+   (3..3).each {|w|
+     if ! y.do_ToggleDay(w, d)
+       puts "#!==== Error do_ToggleDay( #{w}, "#{d} )"
+     end
+   }
+ end  
+ y.hor_show()
+ (1...4).each {|w|
+   puts y.strStatus_Worker(w)
+ }
+ puts y.strStatus_Place
+ puts "Score =", y.get_Score
+ exit 0

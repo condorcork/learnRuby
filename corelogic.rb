@@ -59,7 +59,7 @@ include './View'
 
   #[- Yet
   def changeParam( param )  # changeParam( :template, : )
-    puts "def changeParam( param )"
+    puts "# def changeParam( param )"
     # date
     #  template
     #  seq_workers : start 0, 1 ,2 3
@@ -80,7 +80,7 @@ include './View'
     puts "\n#==  presetKoyano( #{idxWorker} )"
 
     pos_OffDays = get_SeqOffDays( @wrkdays[idxWorker])   
-    p "po_OffDayss",pos_OffDays
+ #   p "po_OffDayss",pos_OffDays
 
     cnt_add = 0
     pos_OffDays.each {|days|
@@ -100,10 +100,8 @@ include './View'
         @wrkdays[idxWorker][days[-1]] = 'x'
       end
     }
-    puts "#==== presetKoyano #{cnt_add} days Added"
-
+    puts "# presetKoyano #{cnt_add} days Added"
     examine()
-
   end
   
   #...............................
@@ -127,11 +125,11 @@ include './View'
     (startDay..startDay + 30).each {|x|
      yb =( @wday_16 + delta ) % 7
 =begin
-if @debug_ > 1      
+ if @debug_ > 1      
       puts  " Pos Index  i : #{i}"
       p " start day  #{x}"
      puts "Yoybi #{yb}  #{%w(Su Mo Tu We Th Fr Sa)[yb]}"
-end
+ end
 =end
       if psv.include?(yb)
         @wrkdays[id_worker][i] = 'D'
@@ -173,8 +171,8 @@ end
 
   #.............................
   def prepare(idx, prevdays=' '*4, nvotAvail={})
-    #.............................
-    puts "def prepare( #{idx}, #{prevdays}, #{ nvotAvail})"
+  #.............................
+#    puts "def prepare( #{idx}, #{prevdays}, #{ nvotAvail})"
 
    # notAvail
     unless idx < @num_workers
@@ -214,16 +212,16 @@ end
     puts "\n\n#==  def shift_to( #{idxWorker}, #{direction} )"    
     strDays = @wrkdays[idxWorker].join('')
     strDays = strDays.slice(4, @num_days16)
-    puts " Orignal 4, @num_days16  strDays  '#{strDays.length}'"
-    puts "'#{strDays}'"
+  #  puts " Orignal 4, @num_days16  strDays  '#{strDays.length}'"
+  #  puts "'#{strDays}'"
     puts "....+....0"*4
 
     distance = ( direction < 0 ? direction * -1 : direction )
-    puts "#--- distance  '#{distance}'"
+#    puts "#--- distance  '#{distance}'"
     filler = ' ' * distance    
-    puts "#--- filler "
-    puts "'....+....0"*4
-    puts "'#{filler}'"
+#    puts "#--- filler "
+#    puts "'....+....0"*4
+#    puts "'#{filler}'"
     if direction > 0
       strDays = filler + strDays
       strDays = strDays.slice(0, @num_days16)
@@ -268,8 +266,8 @@ end
   #...........................
   def adjust(worker, reset=true)
   #............................
-    puts "\n\n"
     puts "#def adjust( #{worker} )"
+    
     save_Case
     
     cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
@@ -278,13 +276,13 @@ end
       case num
       when 2
         cnt_ok0 += 1        
-      when 1, 0
+      when 1, 0         #[- when 0 More? 
         if isOffDay( @wrkdays[worker][day] )
           @wrkdays[worker][day] = 'X'
           cnt_add += 1
           changed += 1
         end
-      when 3, 4
+      when 3, 4         #[- when 4 More?
         if isOnDay( @wrkdays[worker][day] ) 
           @wrkdays[worker][day] = '*'
           cnt_del += 1
@@ -306,13 +304,13 @@ end
       end
     }
 
-    hor_show(worker)  # include exa.
+    hor_show() 
 
-    puts "# RESULT Adjusted"
-    puts "# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{worker}"
-    puts "    OK  Before #{cnt_ok0}  ==> After #{cnt_ok} days  "
-    puts "#   Result + #{cnt_ok - cnt_ok0}"
-    puts "##  OffDay is #{cnt_offDays} days"
+    puts "?# RESULT Adjusted"
+    puts "?# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{worker}"
+    puts "?    OK  Before #{cnt_ok0}  ==> After #{cnt_ok} days  "
+    puts "?#   Result + #{cnt_ok - cnt_ok0}"
+    puts "?##  OffDay is #{cnt_offDays} days"
 
 =begin
 # 恐ろしいことを    
@@ -323,13 +321,7 @@ end
       )
     )
 =end
-    point show_Result
-=begin    
-    puts strStatus_Worker(worker)
-    
-    puts strStatus_Place()
-    point = get_Score
-=end
+    point = show_Result
     if reset
       load_Case
     end
@@ -346,7 +338,7 @@ end
     
     wasDayOff =  isOffDay( @wrkdays[wrkr][day] )
     if do_ToggleDay(wrkr , day)
-      puts "#!!  done  '#{@wrkdays[wrkr][day]}'"
+#      puts "#!!  done  '#{@wrkdays[wrkr][day]}'"
       changed += 1
       if wasDayOff
         cnt_add += 1
@@ -359,12 +351,12 @@ end
 
       cnt_change_p_worker[wrkr] += 1
       if cnt_change_p_worker[wrkr] > @limit_change
-        puts "#!! #{wrkr} changed #{@limit_change} times. So Nore More Change"
+        puts "#=== #{wrkr} changed #{@limit_change} times. So Nore More Change"
         @seq_workers.delete( wrkr )
       end
     else              
-      puts "#!! adjust_Round Toggle LOGICAL ERROR (in do_Toggle_ETC"
-      puts "#!!   day: #{day}  worker #{wrkr} "
+      puts "#===!! adjust_Round Toggle LOGICAL ERROR (in do_Toggle_ETC"
+      puts "#===!!   day: #{day}  worker #{wrkr} "
       exit 1;
     end
    end # def do_Toggle_ETC
@@ -375,21 +367,54 @@ end
   def adjust_Round( reset=true)
   #-----------------
     #
-    cnt_add = cnt_del = changed = cnt_ok = cnt_ok0 = cnt_offDays =  0
+    cnt_add = cnt_del = changed = cnt_ok = cnt_ok0 =  0
     cnt_change_p_worker=Array.new(@num_workers, 0)
 
+    # Save Before num of OK 
+    @theMonthRange.each do |day|
+      if cnt_filled( day ) == @num_workers_p_day
+        cnt_ok0 += 1
+      end
+    end
+    
     @theMonthRange.each do |day|
       #     num = cnt_filled(day)
-      puts "#=== #{day} ==="
+ if @debug_adjust_Round       
+              puts "#=== #{day} ==="
+ end # debug_adjust_Round       
       candiWorkers,cnt_Times =  get_Canididate(day)
-      puts "#--- #{cnt_Times} in cand #{candiWorkers}" if cnt_Times > 0
- #     isBreak = false
+ if @debug_adjust_Round       
+              puts "#--- #{cnt_Times} in cand #{candiWorkers}" if cnt_Times > 0
+ end
+#     isBreak = false
       @seq_workers.each_with_index do |wrkr, seq_idx|
         #       break if isBreak
         break if seq_idx > @num_workers
         if candiWorkers.any?(wrkr)
-          
-          do_Toggle_ETC( wrkr, day, changed, cnt_add, cnt_del, cnt_change_p_worker)
+          #
+#          do_Toggle_ETC( wrkr, day, changed, cnt_add, cnt_del, cnt_change_p_worker)
+          wasDayOff =  isOffDay( @wrkdays[wrkr][day] )
+          if do_ToggleDay(wrkr , day)
+            #      puts "#!!  done  '#{@wrkdays[wrkr][day]}'"
+            changed += 1
+            if wasDayOff
+              cnt_add += 1
+            else
+              cnt_del += 1
+            end
+            #
+            set_WorkersSeq(  wrkr )
+            cnt_change_p_worker[wrkr] += 1
+            if cnt_change_p_worker[wrkr] > @limit_change
+              puts "#==!!!= #{wrkr} changed #{@limit_change} times. So Nore More Change"
+              @seq_workers.delete( wrkr )
+            end
+          else              
+            puts "#===!! adjust_Round Toggle LOGICAL ERROR (in do_Toggle_ETC"
+            puts "#===!!   day: #{day}  worker #{wrkr} "
+            exit 1;
+          end
+          #
           candiWorkers.delete(wrkr)
           cnt_Times -= 1
           if cnt_Times < 1
@@ -398,22 +423,27 @@ end
           end
         end
       end # @seq_workers.each_
+      if cnt_filled( day ) == @num_workers_p_day
+        cnt_ok += 1
+      end
     end # @theMonthRange.each do |day|
-##    
-    puts "# << Adjust_Round done>> "
-    puts "# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del} for Person  #{@seq_workers}"
-    puts "# OK days  Before #{cnt_ok0}  ==> After #{cnt_ok} "
-    puts "#   Result + #{cnt_ok - cnt_ok0}"
-    puts "##  OffDay is #{cnt_offDays} days"
+    ##
+    
 #    
     hor_show() # @seq_workers[0])  # include exa.
     #
-    point = show_Result()
+    puts "# << Adjust_Round done>> "
+    puts "# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del}"
+    puts "# Seq_worker  #{@seq_workers}"
+    puts "# OK days  Before #{cnt_ok0}  ==> After #{cnt_ok} "
+    puts "#   Result + #{cnt_ok - cnt_ok0}"
+    
+#    point = show_Result()
     if reset
       load_Case
     end
-    point
-##    
+    get_Score
+    ##
   end #  def adjust_Round()
 
   #....................

@@ -57,9 +57,9 @@ module View
   end
 
   #.............................
-  def hor_show(chk_Worker=[0,1,2,3] ) 
+  def hor_show( dispResult = true )    #[- Param show Result or Not
   #.............................
-    puts "# def hor_show( #{chk_Worker} )"
+  #  puts "# def hor_show( #{chk_Worker} )"
     #  Prepare Check Line
     examine()
 #
@@ -110,7 +110,6 @@ module View
       dat_=@wrkdays[idx][4... 4+@num_days16].dup
       dat = dat_.join(filler)
       
-#      if idx == chk_Worker
       if dat =~ /[X\*]/
         dat.gsub!(/[X\*]/) {|s|
           color_str(s,'REVERSE,GREEN')
@@ -130,6 +129,10 @@ module View
 
      puts "<>|#{dat}"    # when PC
      puts 'IX|' + footer
+
+     if dispResult
+       show_Result
+     end
   end  
 
   #...................
@@ -144,23 +147,18 @@ module View
     puts "Point = #{point}"
     point
   end #  def show_Result()
+  
   #.............................
-  def ver_show(chk_members=[0,1,2,3],   checkview=true)
+  def ver_show(  dispResult = true )
   #.............................
-    puts "# def ver_show( #{chk_members}, #{checkview} )"
-    chk_members.each do |worker|
-      if ! (0...@num_workers).include?( worker )
-        puts "Unkown worker index #{worker} : expected (0 .. #{@num_workers} )"
-        exit 1
-      end
-    end
+  #  puts "# def ver_show( "
     (0..34).each do |day|
       if day == 4
         puts '  ==|=================='
       end
       printf " %2d ", day
       canv =[]
-      chk_members.each { |wrkr|
+      (0...@num_workers).each { |wrkr|
         #
         dat= Marshal.load (Marshal.dump( @wrkdays[wrkr][day] ))
         #   dat= @wrkdays[wrkr][day]
@@ -182,7 +180,11 @@ module View
       
       puts "" + canv
     end
+
+    if dispResult
+      show_Result
+    end
   end
 
 #   
-end
+end # module View

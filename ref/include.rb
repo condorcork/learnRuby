@@ -2,7 +2,12 @@
 # coding: utf-8
 
 #fake include module
-
+#
+#------------------------------------
+# CAUTION
+#   bug 
+#  ^end ==> Module END
+# ...................................
 @cnt_begin = 0
 @cnt__END__ = 0
 
@@ -125,7 +130,11 @@ end
     end
     next
     end
-=end  
+=end
+ if line =~ /^if @debug_do_Exchange/
+   line = l
+ end
+
   if line =~ /^include[ \t]+\'\.\/([a-zA-Z_0-9]+)\'/
     # including
     md=$1
