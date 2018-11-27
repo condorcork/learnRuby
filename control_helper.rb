@@ -77,9 +77,10 @@ module ControlHelper
 
     #--- Paramater ------
     # from file if exists prev month 
-    @seq_workers=(0...@num_workers).map{|w| w}  #[0,1,2,3]
+    @seq_workersOrg=(0...@num_workers).map{|w| w}  #[0,1,2,3]
+    @seq_workers =  Marshal.load( Marshal.dump( @seq_workersOrg) )
     @seq_workers=@seq_workers * 10
-    @seq_workers.shift   ### 
+#    @seq_workers.shift   ### 
     
     ## status  for each worker
     @chk_workers={}
@@ -105,7 +106,16 @@ module ControlHelper
     @bestScore[:case] = []
     @bestScore[:env] = []   # seq_workers etc
   end #
-  
+
+  def set_nextSeq( wrker = nil )
+    @seq_workers =  Marshal.load( Marshal.dump( @seq_workersOrg) )
+    @seq_workers=@seq_workers * 10
+    @seq_workers.shift
+    p "set_nextSeq"
+    p @seq_workers
+    p @seq_workersOrg
+  end
+
   #
   #----- Date --------
   #.............................
@@ -639,34 +649,79 @@ module ControlHelper
   #  prepare, set Yotei
   #  adjustRound
   0. Test Env
-  1. all saved # Init
-  2. sse saved case # After Koyano
-  3. Shift 
-  4. Display , # History
-  5. Manual Handling
-  9. Quit
+  1. Initialied #   
+  2. after Koyano
+  3. change Priority (shift seq )  #
+  4. adjust_Round
+  5. Display  , # History
+  6. Manual Handling
+  9. Quit [END]
 EOF
     print prompt
     print ' : '
+    
+    casename = []
+
     while true
+      print ": "
       l=gets.chop
       case l
-      when /^\b*(\d)\b*$/
+      when /^(\b*(\d)\b*)|(HM)$/
         menu = l.to_i
         case menu
-        when 0
         when 1
-          allSavedCase()
+          puts "Menu 1"
+          casename = allSavedCase()
+          p " Now saved Case ", casename
         when 2
-          allSavedCase()
+          puts "Menu 2"
+          found = 0
+          dat = sr_dumpCase("Initial" )
+          dat.each {|k, v|
+            puts "KEY='#{k}'"
+              found += 1
+              @wrkdays = load_Case( v )
+              hor_show( false )
+          }
+          if found == 0
+            puts "# No Data for Initail "
+          end
         when 3
+          puts "3. change Priority SHIFT SEQ"
+          set_nextSeq
+#          hor_show()
+=begin          
+          p " Now saved Case ", casename
+          p casename
+          casename.each {|n|
+            puts "# load Name #{n} "
+            @savedCase.each { |k, v|
+              if k == n
+                puts "load_Case "
+                laod_Case ( v )
+              end
+              hor_show( false )
+            }
+          }
+=end
         when 4
+          adjust_Round()
+          hor_show
         when 5
+          hor_show
+        when 6
+          return 
         when 9
+          puts "EXIT "
+          exit 0;
           return 9
           
+        when /H(ELP)*/i  # help
+          print prompt
+          print ' : '
         end # case menu
       end
+      puts " "
     end
     
   end # def sel_MainMenu()

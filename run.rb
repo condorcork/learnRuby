@@ -61,7 +61,7 @@ p b
   #-----------------------
   # Start to Think
   #-----------------------
-y.save_Case("Initail")                # initail stat
+y.save_Case("Initial")                # initail stat
   puts '# ======== Saved end of Yotaku idx 3 古谷野 san'
 #
   #... PreSet  Fill days by Patern ....

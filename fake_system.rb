@@ -87,6 +87,11 @@ require 'io/console/size'
     retAll.each {|keyname| puts " :'#{keyname}'"  }
     puts "#!!! Searched key '#{caseName}'"
     retIdx.each {|keyname| puts " :'#{keyname}'"  }
+    if caseName != nil
+      retIdx
+    else
+      retAll
+    end
   end  #def allSavedCase
   
   #-----------------------------
@@ -98,12 +103,13 @@ require 'io/console/size'
         puts "#!! load_Case DO Nothing!!  'dumped_Marshal==nil' )"
         nil
       else
-        Marshal.load( @prevCase )
+        saved = Marshal.load( @prevCase )
 #[-        @savedCase.pop  # when delete 
       end
     else
-      Marshal.load( dumped_Marshal )
+      saved = Marshal.load( dumped_Marshal )
     end
+    saved
   end # def load_Case(case_Marshal)   # case (Marshal.dump)
 
 #;- no test  
