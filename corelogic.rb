@@ -16,13 +16,13 @@ class Yotei
 include './TestHelper'
 include './FakeSystem'
 include './ControlHelper'
+include './MenuIo'
 include './View'
   
   # date
   #  @month_16
   #  @year_16 
-  #  @num_days16
-  #  @wday_16
+  #  @num_days16  #  @wday_16
   #  @theMonthRange  #[- to refact
   # @num_workers
   # ...
@@ -376,6 +376,8 @@ include './View'
         cnt_ok0 += 1
       end
     end
+    notfilled = @num_days16 - cnt_ok0
+    @limit_change = notfilled / @num_workers
     
     @theMonthRange.each do |day|
       #     num = cnt_filled(day)

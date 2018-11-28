@@ -4,7 +4,8 @@
 
 #require './corelogic'
 require './CoreLogic' 
-
+  #
+ 
  def test_Reverse()
   dat='_ _*_x_X_'
   dat2=dat
@@ -18,6 +19,7 @@ require './CoreLogic'
   puts "  '#{dat3}'  <-- '#{dat2}'"
  end
 
+
  def preparePrevMonth(y)
 #... Prepare for Prevmonth
   # 'xx  ''xxx'    --> 0(1)
@@ -30,18 +32,14 @@ require './CoreLogic'
   # ' DDx '' DDD'  special
   y.prepare( 3, 'DDx ')    # y.@Koyano
   #
-  y.hor_show()  # false
+ # y.hor_show(false)
  end
 
 #----- MAIN ------
-  $fulldayDebug = false
-  members=4 
-  y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
-=begin
-a, b = y.change_IO()
-p a
-p b
-=end
+ $fulldayDebug = false
+ members=4
+   y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
+#  y=Yotei.new(members) 
 
  preparePrevMonth(y)
   #
@@ -67,19 +65,23 @@ y.save_Case("Initial")                # initail stat
   #... PreSet  Fill days by Patern ....
   puts "#---- PRESET by Pattern---"
   y.pre_set([0,1,2])
-  y.save_Case()     
+  y.save_Case("_Koyano")     
   y.ver_show(false)
 
-#####
-  y.presetKoyano( 3 )   # y.@Koyano )  #, [0,1,2,6], [3,5])
-y.save_Case("Koyano")     
-  y.ver_show()
-  print "\n\n===============Saved after Koyano\n"
-  y.hor_show()
+  #####
+  if y.ok_YN?("do Koyano Preset y/n")
+    
+    y.presetKoyano( 3 )   # y.@Koyano )  #, [0,1,2,6], [3,5])
+    y.save_Case("Koyano_")     
+    y.ver_show()
+    print "\n\n===============Saved after Koyano\n"
+    y.hor_show()
+  end
   puts "#---- Check ---"
   ###
 ##
-  
+#  y.test_load_saveCase
+#  exit
 =begin  
   (0..4).each {|x|
     y.hor_show()   ## [ x ])
@@ -113,7 +115,7 @@ p point
        puts "#!!! Not Done do_ToggleDay(#{w1}, #{d1}   #(w2}, #{d2})"
        next;
      end
-   elsif w1 == nil
+k   elsif w1 == nil
      next
    elsif w1 == 'M'
      y.sel_MainMenu()

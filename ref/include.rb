@@ -26,6 +26,8 @@ def fakename( fn )
     md = 'view'
   when "FakeSystem"
     md = "fake_system"
+  when "MenuIo"
+    md = "menu_io"
   else
     md = fn
   end

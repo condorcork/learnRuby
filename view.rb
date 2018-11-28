@@ -3,7 +3,15 @@ module View
 #  For Views
   #
 
-  #..........................
+  #..............
+  def init_View()
+  #..............
+    puts "# def init_View()"
+    @horixontal = true
+  end #def init_View()
+
+
+   #..........................
 #  def color_str(filled)      
 #  def set_AttrStr( num_filled )   | # for line check
   def str_Attr( num_filled )    # for line check
@@ -186,5 +194,15 @@ module View
     end
   end
 
+  #....................
+  def show_Hyo( isResult=true ) 
+  #....................
+  #  puts "#def show_Hyo( isResult=true )"
+    if @horizontal
+      hor_show(isResult)
+    else
+      hor_show(isResult)
+    end
+  end #def show_Hyo( isResult=true ) 
 #   
 end # module View
