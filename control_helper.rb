@@ -98,9 +98,9 @@ module ControlHelper
     #    for View ( show )
     @chk_Place[:dayView]=Array.new( 31+4, ' ' )
     #
-    @prevCase=nil     # marshal.dump Default
+   # @prevCase=nil     # marshal.dump Default
 
-#    @serCase=[]
+    #    @serCase=[]
     @bestScore = {}   #  :point, :num?  :case :env
     @bestScore[:num] = 0
     @bestScore[:case] = []
@@ -113,6 +113,7 @@ module ControlHelper
     @seq_workers.shift
     p "set_nextSeq"
     p @seq_workers
+
     last = @seq_workersOrg.shift
     @seq_workersOrg << last
     p @seq_workersOrg
@@ -318,7 +319,7 @@ module ControlHelper
           days_ << day
         end
       }
-      #    puts "## days in seq days_ ==> '#{days_}'"
+      #    puts "## days in seq days_ ==> '#{daqys_}'"
       #    puts "## days length ==> '#{days_.length}'"
       case days_.length
       when 1
@@ -611,159 +612,8 @@ module ControlHelper
     @seq_workers = newData    
   end  #def set_WorkersSeq(  doneWorker )
 
-
   #--------
   #  miscellaneous
   #--------
-
-  #.............................
-  def ok_YN?(prompt="continue \n  Yes: Y, y, Cr\n  No: N, n\n  Q[q] stop [Y|N|\\n|Q] ? :")
-  #.............................
-    print prompt
-    while (key = STDIN.getch) != "\C-c"
-      case key  # .inspect
-      when /[yY]/
-        return true
-      when /[N]/i
-        puts "[N]o "
-#        Exit 1
-        return false
-      when /Q/i
-        puts "EXIT 0"
-        exit 0
-      when "\r"
-        return true
-      end
-      puts "'#{key}' '#{key.inspect}'"
-    end
-    puts "\C-c"
-    exit 1;
-  end
-
-  
-  #.........................
-  def sel_MainMenu()
-  #.........................
-    prompt=<<-EOF
-
-[ MAIN MENU ]
-  # Story 
-  #  prepare, set Yotei
-  #  adjustRound
-  0. Test Env
-  1. Initialied #   
-  2. after Koyano
-  3. change Priority (shift seq )  #
-  4. adjust_Round
-  5. Display  , # History
-  6. Manual Handling
-  9. Quit [END]
-EOF
-    print prompt
-    print ' : '
-    
-    casename = []
-
-    while true
-      print ": "
-      l=gets.chop
-      case l
-      when /^(\b*(\d)\b*)|(HM)$/
-        menu = l.to_i
-        case menu
-        when 1
-          puts "Menu 1"
-          casename = allSavedCase()
-          p " Now saved Case ", casename
-        when 2
-          puts "Menu 2"
-          found = 0
-          dat = sr_dumpCase("Initial" )
-          dat.each {|k, v|
-            puts "KEY='#{k}'"
-              found += 1
-              @wrkdays = load_Case( v )
-              hor_show( false )
-          }
-          if found == 0
-            puts "# No Data for Initail "
-          end
-        when 3
-          puts "3. change Priority SHIFT SEQ"
-          set_nextSeq
-#          hor_show()
-=begin          
-          p " Now saved Case ", casename
-          p casename
-          casename.each {|n|
-            puts "# load Name #{n} "
-            @savedCase.each { |k, v|
-              if k == n
-                puts "load_Case "
-                laod_Case ( v )
-              end
-              hor_show( false )
-            }
-          }
-=end
-        when 4
-          adjust_Round()
-          hor_show
-        when 5
-          hor_show
-        when 6
-          return 
-        when 9
-          puts "EXIT "
-          exit 0;
-          return 9
-          
-        when /H(ELP)*/i  # help
-          print prompt
-          print ' : '
-        end # case menu
-      end
-      puts " "
-    end
-    
-  end # def sel_MainMenu()
-  
-  #.........................
-  def sel_ToggleExchange(msg=nil)
-  #.........................
-    puts msg if msg != nil
-    prompt=<<-EOF
-
-[ Manual HANDLING ]
- 'worker, day':     Toggle On/Off 
- 'w1,day1 w2,day2': Exchange 
-                     day1 day2
-  'M' :    Upper Menu
-  'Q' :    Quit from This Menu  
-EOF
-    print prompt
-    print ': '
-    ret=[]
-    while true
-      l=gets
-      l.chop!
-      case l
-      when /((\d), *(\d+))([ \t]+(\d),[ \t]*(\d+))*/
-        ret[0]=$2.to_i
-        ret[1]=$3.to_i
-        if $4 != nil
-          ret[2]=$5.to_i
-          ret[3]=$6.to_i
-        end
-        return ret
-      when /^[ \t]*Q/i
-        puts "Exit"
-        exit 0        
-#        break
-      when /^[ \t]*M/i
-        return 'M'
-      end
-    end
-  end # def sel_ToggleExchange(msg=nil)
-  
+  # menu io -->menu_io.rb
 end  # End of Module
