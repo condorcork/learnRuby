@@ -44,17 +44,18 @@ require 'io/console/size'
  20. change Priority (shift seq)
  21. inittialed & change Pattern
  30. SELECT Action
- 31.  do ShiftTo right/left & get Best
- 32.  do Simple Adust & get Best
- 33.  do Adjust_Round
+   31.  do ShiftTo right/left & get Best
+   32.  do Simple Adust & get Best
+   33.  do Adjust_Round
  40. SELECT   . get Best Score
  50. Change horizontal Mode
  51  display Hyo without Detail
  52. display Hyo with Detail
  55. display Best Score
- 60. Manual Handling
- 70. Quit To Top
- 9.  Quit [END]
+ 60.
+ 7[0], 8[0].     Manual Handling
+ 9[0], Q[uit].   Exit 
+ H(elp): show This Menu"
 EOF
     print prompt
     print ' : '
@@ -67,6 +68,7 @@ EOF
       case l
       when /^(\b*(\d+)\b*)$/
         menu = l.to_i
+        puts "Integer"
         case menu
         when 0
           do_test
@@ -124,19 +126,27 @@ EOF
         when 60
           puts "Manual Handling"
           return 60
-        when 70
+        when 7, 70
+          puts "Manual Handling"
           return 70
-        when 9
+        when 8, 80
+          puts "Manual Handling"
+          return 70
+        when 9, 90
           puts "Exit"
           exit 0
         end
-      when /^(\b*(H)elp\b*)$/
+      when /^(\b*(H)(elp)*\b*)$/i
+        puts "when /^(\b*(H)elp\b*)$/i"
         puts prompt
       when /^\b*Q(uit)*\b*/i
+        puts "when /^\b*Q(uit)*\b*/i"
         puts "Exit"
         exit 0
+      else
+        puts "else #{l}"
       end # case l
-      puts " "
+      puts " #{l} ;"
     end # while true
   end # def sel_MainMenu()
   

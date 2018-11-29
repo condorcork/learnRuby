@@ -9,7 +9,7 @@ module ControlHelper
 #     'D' : Dame (antherplace Kinmu)
 #     '*' : Off Day           # changable
 #     'A','B' :  OnDay ( Shift ) 
-#     'X' : Upper case fixed
+#     'T' : 当務
 # 
 #................
   #----- Initailze -------  
@@ -531,7 +531,7 @@ module ControlHelper
     if @bestScore[0][:num] > 1
       puts "#... Tiet Score #{point}"
     end
-#    @bestScore[0][:case] << save_Case
+    @bestScore[0][:case] << save_Case
 #    @bestScore[0][:env] << save_Case( "TieScore" )
   end #  chk_BestScore( point )
 

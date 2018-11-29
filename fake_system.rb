@@ -59,7 +59,7 @@ module FakeSystem
         load_NamedCase_Err(caseName,'seq_workers Data')
         return nil
       end
-      seq_workers = seq_   
+      @seq_workers = seq_   
     else
       # saisin
       cs=load_Case( @savedCase[ cases[-1]][ caseName ] )
@@ -68,7 +68,7 @@ module FakeSystem
         load_NamedCase_Err(caseName,'seq_workers Data')
         return nil
       end
-      seq_workers = seq_   
+      @seq_workers = seq_   
     end # case
     return cs
     
@@ -81,12 +81,11 @@ module FakeSystem
     prevCase = Marshal.dump( @wrkdays )
     @savedCase << { nameCase => prevCase}
     prevSeq = Marshal.dump( @seq_workers )
-     @savedSeqWrkr <<  prevSeq
+    @savedSeqWrkr <<  prevSeq
   end # def save_Case
   
-
   #-----------------------------
-  def load_Case(dumped_Marshal= nil)
+  def load_Case(dumped_Marshal= nil)   # *params
   #----------------------------
     puts "#def load_Case()"
     if dumped_Marshal == nil
@@ -103,7 +102,7 @@ module FakeSystem
         #[-        @savedCase.pop
       end
     else
-      # for Only load,  seq_workers 
+      # for Only load,  seq_workers is  unrelated
       saved = Marshal.load( dumped_Marshal )
     end
     saved
