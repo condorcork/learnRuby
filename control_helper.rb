@@ -79,8 +79,9 @@ module ControlHelper
     # from file if exists prev month 
     @seq_workersOrg=(0...@num_workers).map{|w| w}  #[0,1,2,3]
     @seq_workers =  Marshal.load( Marshal.dump( @seq_workersOrg) )
+    @seq_workersBegin =  Marshal.load( Marshal.dump( @seq_workersOrg) )
     @seq_workers=@seq_workers * 10
-#    @seq_workers.shift   ### 
+    #
     
     ## status  for each worker
     @chk_workers={}
@@ -99,15 +100,41 @@ module ControlHelper
     @chk_Place[:dayView]=Array.new( 31+4, ' ' )
     #
    # @prevCase=nil     # marshal.dump Default
-
+    @bestScore = []
+    @bestScore[0] = {}
+    @bestScore[0][:point] = 0
+    # forsecond, third if needed
+    @bestScore[1] = {}
+    @bestScore[1][:point] = 0
+    @bestScore[2] = {}
+    @bestScore[2][:point] = 0
+    
     #    @serCase=[]
-    @bestScore = {}   #  :point, :num?  :case :env
-    @bestScore[:num] = 0
-    @bestScore[:case] = []
-    @bestScore[:env] = []   # seq_workers etc
+    # bestScore = []
+    # bestScore[0] .... top
+    # bestScore[1] .... Next top
+    # bestScore[2] .... Next Next top
+    # bestScore[N]={score: point,
+    #    {num:1 [, # 2,3..n ]},
+    #    {dumpcase:
+    #        [ marshal.dump
+    #         ,marshal.dump2
+    #             :
+    #        ]}
+    #    
   end #
 
+  #................
+  def goBack_Start_seq()
+  #................
+  # initialize / go back BEGINNIG
+    @seq_workers = Marshal.load( Marshal.dump(@seq_workersBegin) )
+    @seq_workers=@seq_workers * 10
+  end #def goBack_Start_seq()
+
+  #................
   def set_nextSeq( wrker = nil )
+  #................
     @seq_workers =  Marshal.load( Marshal.dump( @seq_workersOrg) )
     @seq_workers=@seq_workers * 10
     @seq_workers.shift
@@ -117,7 +144,7 @@ module ControlHelper
     last = @seq_workersOrg.shift
     @seq_workersOrg << last
     p @seq_workersOrg
-  end
+  end #def set_nextSeq
 
   #
   #----- Date --------
@@ -466,23 +493,46 @@ module ControlHelper
     }
     
     #.... Save the Best Score
-#    chk_BestScore()
+    point = get_Score
+    chk_BestScore(point)
   end   # of examine
 
+  #...............  
+  def get_BestScore()
+  #...............  
+    puts "## Best Score #{@bestScore[0][:point]}"
+  end #  def get_BestScore
+      
+  #...................
   def chk_BestScore( point )
+  #...................
+    #        
   # def save_BestScore
   # def load_BestScore()
-  # def   
-    if point > @bestScore[:point]
-      @bestScore[:point] = point
-      @bestScore[:num] = 0
-      @bestScore[:case] = [ save_Case( "TieScore" ) ]
-      @bestScore[:env] = []   # seq_workers etc
-    elsif point == @bestScore[:point]
-      @bestScore[:num] += 1
-      @bestScore[:case] << save_Case( "TieScore" )
+    # def
+    puts "#def chk_BestScore"
+    puts " #{point} <> #{@bestScore[0][:point]}"
+
+    if point < @bestScore[0][:point]
+      #if get second
+      # comp  @bestScore[1][:point]
+      #end
+      return
+    end
+    if point > @bestScore[0][:point]
+      @bestScore[0][:point] = point
+      @bestScore[0][:num] = 0
+      @bestScore[0][:case] = []
+      @bestScore[0][:env] = []
+      puts "#... Best Score #{point}"
     end
 
+    @bestScore[0][:num] += 1
+    if @bestScore[0][:num] > 1
+      puts "#... Tiet Score #{point}"
+    end
+#    @bestScore[0][:case] << save_Case
+#    @bestScore[0][:env] << save_Case( "TieScore" )
   end #  chk_BestScore( point )
 
    
@@ -545,9 +595,9 @@ module ControlHelper
   end  # def act_ToggleOneWorker
   
   
-  #----------------------------------------
+  #----------------------------
   def do_Exchange(wrkr1, day1, wrkr2, day2)
-  #----------------------------------------
+  #-----------------------------
     puts "def do_Exchange(#{wrkr1},  #{day1}, #{wrkr2}, #{day2})"
     isDone = false
     msg="#!!=== do_Exchange ERROR\n"

@@ -51,6 +51,7 @@ require 'io/console/size'
  50. Change horizontal Mode
  51  display Hyo without Detail
  52. display Hyo with Detail
+ 55. display Best Score
  60. Manual Handling
  70. Quit To Top
  9.  Quit [END]
@@ -67,11 +68,13 @@ EOF
       when /^(\b*(\d+)\b*)$/
         menu = l.to_i
         case menu
+        when 0
+          do_test
         when 10..19
           puts "Menu #{menu}"
           if menu == 11
             csName='Initial'
-            init_seq
+            goBack_Start_seq()
           elsif menu == 12
             csName='_Koyano'
           else
@@ -98,9 +101,7 @@ EOF
             puts "Before Shift"
             show_Hyo
           }
-          
-        when 32
-          puts "do Simple Adust"
+                  puts "do Simple Adust"
           #adjust()
         when 33
           puts "do Adust_Round"
@@ -118,6 +119,8 @@ EOF
           show_Hyo(false)
         when 52
           show_Hyo()
+        when 55
+          get_BestScore
         when 60
           puts "Manual Handling"
           return 60

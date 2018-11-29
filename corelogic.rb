@@ -324,7 +324,7 @@ include './View'
 =end
     point = show_Result
     if reset
-      load_Case
+      @wrkdays = load_Case
     end
 #    puts point    
     point

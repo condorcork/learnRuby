@@ -23,5 +23,9 @@ module TestHelper
   def testMain()
     adjust(0)
   end
+
+  def do_test
+    
+  end
 end
 

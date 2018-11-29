@@ -21,9 +21,10 @@
 #              1.     just now  # done 2018-11-26(Mon) 15:43:29
 #  History    
 #     save/load  a litte
-#     pop/ shift clear
-#     Best Score
-#
+#     pop/ shift clear  11/28- almost
+
+#     Best Score  11/28 point only
+#                 yet restore
 #  show changed Days
 #  Menu  ....
 #     X   ShokiKA
@@ -45,3 +46,11 @@
 #........
 # option
 #  seq_workers REVETSE
+#
+# must 
+best Score point only(11/28-)
+   chk
+   sr
+
+
+

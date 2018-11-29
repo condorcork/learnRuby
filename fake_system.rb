@@ -22,7 +22,8 @@ module FakeSystem
   #...........................
   def sr_dumpCase( caseName )
   #...........................
-    puts "#def sr_dumpCase( caseName }"
+  #  index for load @seq_workers 
+   puts "#def sr_dumpCase( caseName }"
     retIdx = []
      @savedCase.each_with_index { |e, i|
       if e.keys.include?(caseName)
@@ -32,6 +33,15 @@ module FakeSystem
     retIdx 
   end #def sr_dumpCase( caseName }"
 
+  #...............
+  def load_NamedCase_Err(cadeName, msg)
+  #...............
+    puts "#!!-- Err load_NamedCase"
+    puts "#!!--case'#{caseName}' " + msg 
+    puts "#...keys ..."
+    @savedCase.each {|hsh| print "  '", hsh.keys,"'\n" }
+  end #  def load_SeqErr()
+
   
   #..........................
   def load_NamedCase( caseName )
@@ -40,19 +50,29 @@ module FakeSystem
     cases = sr_dumpCase( caseName )
     case cases.size
     when 0
-      puts "#!! --- Error  load_theCase"
-      puts "#!! --- case '#{caseName}' NOT SAVED)"
-      puts "#...keys ..."
-      @savedCase.each {|h| print "  '", h.keys,"'\n" }
+      load_NamedCase_Err(caseName, ' Not Saved')
       return nil
     when 1
       cs=load_Case( @savedCase[cases[0]][ caseName ] )
+      seq_ = Marshal.load( @savedSeqWrkr[ cases[0] ])
+      if seq_ == nil
+        load_NamedCase_Err(caseName,'seq_workers Data')
+        return nil
+      end
+      seq_workers = seq_   
     else
       # saisin
-      cs=load_Case( @savedCase[ cases[-1]][ caseName ] )      
+      cs=load_Case( @savedCase[ cases[-1]][ caseName ] )
+      seq_ = Marshal.load( @savedSeqWrkr[ cases[-1] ])
+      if seq_ == nil
+        load_NamedCase_Err(caseName,'seq_workers Data')
+        return nil
+      end
+      seq_workers = seq_   
     end # case
     return cs
-  end #def load_theCase"
+    
+  end #def load_NamedCase(caseName)
     
   #-----------------------------
   def save_Case(nameCase ='noname')
@@ -61,49 +81,33 @@ module FakeSystem
     prevCase = Marshal.dump( @wrkdays )
     @savedCase << { nameCase => prevCase}
     prevSeq = Marshal.dump( @seq_workers )
-    @savedSeqWrkr <<  prevSeq
+     @savedSeqWrkr <<  prevSeq
   end # def save_Case
   
-#=begin
-#<<<<<<< HEAD
 
   #-----------------------------
-  def load_Case(dumped_Marshal=nil)   # case (Marshal.dump)
+  def load_Case(dumped_Marshal= nil)
   #----------------------------
-    puts "#def  load_Case( case_Marshal )"
+    puts "#def load_Case()"
     if dumped_Marshal == nil
-      # load Previous which was recently saved
+    # load Previous which was recently saved
       prevCase = @savedCase[-1]
       if prevCase == nil
         puts "#!! load_Case DO Nothing!!  'dumped_Marshal==nil' )"
-        nil
+        saved = nil
       else
         prkey= @savedCase[-1].keys[0]
         dump_Dat = @savedCase[-1][prkey]
         saved = Marshal.load( dump_Dat )
-        #  seq
-        #[-        @savedCase.pop  # when delete     #      end
+        @seq_workers = Marshal.load(@savedSeqWrkr[-1])
+        #[-        @savedCase.pop
       end
-=begin
-irb> m
-=> [{"noname"=>"Noname 1"}, {"noname"=>"Noname 2"}, {"Init"=>"Init 1"}]
-irb(main):067:0> m[-1][mk]
-=> "Init 1"
-irb(main):068:0> 
-=> "Init"
-irb(main):069:0> m[-1][mk]
-=> "Init 1"
-=end
     else
+      # for Only load,  seq_workers 
       saved = Marshal.load( dumped_Marshal )
-      # seq
-      #
     end
     saved
-  end # def load_Case(case_Marshal)   # case (Marshal.dump)
-
-##=======
-##>>>>>>> 63b26af9c0cd68e1140d8bdc53fc5d51e08beca2
+  end # def load_Case(case_Marshal)
 
   #-----------------------------
   def allSavedCase( caseName = nil )
