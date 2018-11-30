@@ -103,11 +103,14 @@ module ControlHelper
     @bestScore = []
     @bestScore[0] = {}
     @bestScore[0][:point] = 0
+    @bestScore[0][:num]=0
     # forsecond, third if needed
     @bestScore[1] = {}
     @bestScore[1][:point] = 0
+    @bestScore[1][:num] = 0
     @bestScore[2] = {}
     @bestScore[2][:point] = 0
+    @bestScore[2][:num] = 0
     
     #    @serCase=[]
     # bestScore = []
@@ -438,6 +441,7 @@ module ControlHelper
     #
     #  set PLACE Check to @chk_Place
     # -------
+    @wrkdays
     (0...4+@num_days16 ).each{ |day|
       @chk_Place[:numDay][day] = cnt_filled( day )
       @chk_Place[:isOK][day] = ( cnt_filled( day ) == @num_workers_p_day )
@@ -507,9 +511,23 @@ module ControlHelper
   def load_BestScore()
   #-------------------
 #[- which when pulural
-    if @bestScore[0][:num] > 1
+    case @bestScore[0][:num]
+    when 0
+      puts '#!!  load_Best_Score Not Yet Gotten!!'
+      reurn
+    when 1
+      puts '#!! Load Best Score'
+      days = @bestScore[0][:case][0]
+      if days != nil
+        @wrkdays = days
+        @seq_workers = Marshal.load( @bestScore[0][:env] )
+      else
+        puts '#!! load_BestScore( @bestScore[0][:case][0] ) Err !!'
+        return nil
+      end
     else
-      #[- yet
+      puts '#!!  load_Best_Score not One !!'
+      # 'Not Yet Gotten!!'
     end   
   end #  def load_BestScore()
   
@@ -542,9 +560,7 @@ module ControlHelper
       puts "#... Tiet Score #{point}"
     end
     @bestScore[0][:case] << save_Case
-    @bestScore[0][:env] << s
-
-    save_Case( "TieScore" )
+    @bestScore[0][:env] << Marshal.dump(@seq_workers)
   end #  chk_BestScore( point )
 
    

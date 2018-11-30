@@ -79,7 +79,7 @@ module FakeSystem
     prevCase = Marshal.dump( @wrkdays )
     @savedCase << { nameCase => prevCase}
     prevSeq = Marshal.dump( @seq_workers )
-    @savedSeqWrkr <<  prevSeq
+    @savedSeqWrkr  <<  prevSeq
   end # def save_Case
   
   #-----------------------------
