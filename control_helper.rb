@@ -502,7 +502,17 @@ module ControlHelper
   #...............  
     puts "## Best Score #{@bestScore[0][:point]}"
   end #  def get_BestScore
-      
+
+  #-------------------
+  def load_BestScore()
+  #-------------------
+#[- which when pulural
+    if @bestScore[0][:num] > 1
+    else
+      #[- yet
+    end   
+  end #  def load_BestScore()
+  
   #...................
   def chk_BestScore( point )
   #...................
@@ -532,7 +542,9 @@ module ControlHelper
       puts "#... Tiet Score #{point}"
     end
     @bestScore[0][:case] << save_Case
-#    @bestScore[0][:env] << save_Case( "TieScore" )
+    @bestScore[0][:env] << s
+
+    save_Case( "TieScore" )
   end #  chk_BestScore( point )
 
    

@@ -43,8 +43,7 @@ require './CoreLogic'
 
  preparePrevMonth(y)
   #
-  y.hor_show( false ) 
-  
+  y.hor_show( false )   
   #
   puts '##Yotaku idx 3 古谷野 san'
   y.yoyaku( 3, '6012')   # y.@Koyano, '6012')
@@ -52,7 +51,8 @@ require './CoreLogic'
 #  
   $fulldayDebug = true
   y.examine
-  if ! y.ok_YN?()
+  if y.ok_YN?("Main Menu Y/N/Q:")
+    y.sel_MainMenu
     exit 0
   end
   

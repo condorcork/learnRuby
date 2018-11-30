@@ -28,34 +28,68 @@ require 'io/console/size'
     exit 1;
   end
 
-  
+  def get_PtnDat2( ptn, *matchN )
+    puts "Enter #{ptn}"
+    puts "#{ptn}"
+    cs=1
+    case matchN.size
+    when 2
+      case matchN[1]
+      when 2
+        cs=2
+      when 3
+        cs=3
+      when 4
+        cs=4
+      end
+    end
+    
+    while true
+      l=gets
+      if l =~ /#{ptn}/
+        x=$1
+        case cs
+        when 1
+          y=nil
+        when 2
+          y=$2
+        when 3
+          y=$3
+        when 4
+          y=$4
+        end
+        #x= $"#{matchN[0]}"
+        return x,y
+      elsif l =~ /^Q/i
+        return 'Q'
+      end
+    end
+  end # get_PtnDat2
+   
   #.........................
   def sel_MainMenu()
   #.........................
     prompt=<<-EOF
-
 [ MAIN MENU ]
-
- 0.  Test Env
- 10.  go back to Initialied #   
- 11.  go back before set Koyan
- 12.  go back Aftet set Koyano
- 13.  go back to Prev Status
- 20. change Priority (shift seq)
- 21. inittialed & change Pattern
- 30. SELECT Action
-   31.  do ShiftTo right/left & get Best
-   32.  do Simple Adust & get Best
-   33.  do Adjust_Round
- 40. SELECT   . get Best Score
- 50. Change horizontal Mode
- 51  display Hyo without Detail
- 52. display Hyo with Detail
- 55. display Best Score
- 60.
- 7[0], 8[0].     Manual Handling
+ 0.  Set Initial Env
+ 10..  Go back to DONE Status
+  11/12. Before /After set Koyan
+  13.  to Prev Status
+  19.  to Best Score
+ 2.. Change CONDTION 
+   21.Shift seq  22. Pattern etc.
+ 3. SELECT Action 
+   31.. Shift To right/left
+   32.. Simple Adjust
+   33.. Adjust_Round
+ 40.. INFO  get Best Score, show HYO
+ 50.. HYO :Change horizontal Mode
+  51/52. Hyo only/ Hyo with Detail
+ 60. ENDING (decide A.B) & Print
+ 70.
+ 8[0]. Manual Handling
+ H(elp)/M(enu): show This Menu"
  9[0], Q[uit].   Exit 
- H(elp): show This Menu"
 EOF
     print prompt
     print ' : '
@@ -68,66 +102,29 @@ EOF
       case l
       when /^(\b*(\d+)\b*)$/
         menu = l.to_i
-        puts "Integer"
         case menu
         when 0
           do_test
         when 10..19
-          puts "Menu #{menu}"
-          if menu == 11
-            csName='Initial'
-            goBack_Start_seq()
-          elsif menu == 12
-            csName='_Koyano'
-          else
-            csName='Koyano_'
-          end
-          cs = load_NamedCase( csName )
-          if cs != nil
-            @wrkdays = cs
-          end
-        when 20
-          set_nextSeq          
+          do_GoBack
+        when 2,20
         when 21
-          # change patern
-        when 30
-          puts ". SELECT Action"
-        when 31
-          puts "do ShiftTo right/left"
-          save_Case('Before Shift')
-          (0...@num_workers -1 ).each {|w|
-            shift_to(w, 1)
-            show_Hyo
-            cs = load_NamedCase('Before Shift')
-            @wrkday2 = cs
-            puts "Before Shift"
-            show_Hyo
-          }
-                  puts "do Simple Adust"
-          #adjust()
-        when 33
-          puts "do Adust_Round"
-          adjust_Round()
-          show_Hyo()
+          set_nextSeq          
+        when 22
+        #set_Pattern
+        when 3, 30..33
+          do_Action(menu)
         when 40
-          puts ". get Best Scend" 
-          show_Hyo()
-        when 50
-          if ok_YN?("change horizontal(#{@horizontal}) Mode : Y/N" )
-            @horizontal = !@horizontal
-            puts "\nHorizontal Mode #{@horizontal} changed"
-          end
-        when 51
-          show_Hyo(false)
-        when 52
-          show_Hyo()
+          puts ". get Best Scend"        when 50..54
+          do_HYO(menu)
         when 55
           get_BestScore
         when 60
-          puts "Manual Handling"
+          puts "do_Ending"
+          do_Ending
           return 60
         when 7, 70
-          puts "Manual Handling"
+          puts ""
           return 70
         when 8, 80
           puts "Manual Handling"
@@ -143,13 +140,77 @@ EOF
         puts "when /^\b*Q(uit)*\b*/i"
         puts "Exit"
         exit 0
-      else
-        puts "else #{l}"
       end # case l
-      puts " #{l} ;"
     end # while true
-  end # def sel_MainMenu()
+  end # sel_MainMenu()
+
+  def do_Ending(isContinue=true)
+    show_HYO
+    if !is_OK?
+      return
+    end
+    file=
+    Marshal.dump(@wrkways, file)
+      Marshal.dump
+  end
   
+  def do_Action(menu)
+    puts ". SELECT Action"
+    if menu == 3 or menu == 30
+      puts "31. ShiftTo right/left All Members"
+      puts " Usage: worker, +/-N"
+      puts "   +N(to Right) / -N(to Left) N days Shift"
+      wrkr, ndays= get_PtnDat2('(\d),((+|-)\d+))*', 1, 3)
+      
+      if ndays == nil
+        nday = +1
+        menu = 31
+      end 
+      return "Q" if wrkr == "Q"
+    end
+    #
+    case menu
+ 
+    when 31
+      shift_to(wrkr, ndays)
+      show_Hyo
+    when 33
+      puts "do Adust_Round"
+      adjust_Round()
+      show_Hyo()
+    when 32
+      puts "do ShiftTo right/left All Members"
+      save_Case('Before Shift')
+      (0...@num_workers-1).each do |w|
+        shift_to(w, 1)
+        show_Hyo
+        cs = load_NamedCase('Before Shift')
+        @wrkday2 = cs
+        puts "Before Shift"
+        show_Hyo(false)
+      end
+      puts "do Simple Adust"
+    #adjust()
+    end
+  end # do_Action
+
+  def do_HYO(menu)
+    case menu
+    when 50
+=begin
+      msg="change horizontal '#{@horizontal.inspect}' Mode : Y/N "
+      if ok_YN?(msg) == true
+        @horizontal= !@horizontal
+        puts "\nHorizontal Mode #{@horizontal} changed"
+end
+=end
+    when 51
+      show_Hyo(false)
+    when 52
+      show_Hyo()
+    end
+  end # do_HYO
+        
   #.........................
   def sel_ToggleExchange(msg=nil)
   #.........................

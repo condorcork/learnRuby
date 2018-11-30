@@ -10,15 +10,13 @@ module FakeSystem
     #
     # 1). Hisory 
     # 2). Specify
-    # 
     # 3). Clear
     # 
     @savedCase = []
     @savedSeqWrkr = [] # for seq_workers 
-#    @savedCase << {"noname" => dump'}
+    #    @savedCase << {"noname" => dump'}
   end #def init_fake()
 
-#;- no test  
   #...........................
   def sr_dumpCase( caseName )
   #...........................
@@ -34,7 +32,7 @@ module FakeSystem
   end #def sr_dumpCase( caseName }"
 
   #...............
-  def load_NamedCase_Err(cadeName, msg)
+  def load_NamedCase_Err(caseName, msg)
   #...............
     puts "#!!-- Err load_NamedCase"
     puts "#!!--case'#{caseName}' " + msg 
