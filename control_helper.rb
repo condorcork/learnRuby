@@ -136,7 +136,7 @@ module ControlHelper
   end #def goBack_Start_seq()
 
   #................
-  def set_nextSeq( wrker = nil )
+  def set_nextSeq( wrker = nil )  # [para?
   #................
     @seq_workers =  Marshal.load( Marshal.dump( @seq_workersOrg) )
     @seq_workers=@seq_workers * 10
@@ -695,3 +695,11 @@ module ControlHelper
   #--------
   # menu io -->menu_io.rb
 end  # End of Module
+
+#__END__
+
+#def set_prevMonth
+  #  if exists_prevMonth
+#  (0...4)
+#  @wrkdaysPrev
+#end

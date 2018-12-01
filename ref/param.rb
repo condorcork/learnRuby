@@ -1,4 +1,29 @@
 # coding: utf-8
+
+  def get_(ptn)
+    #
+    puts ptn
+    a=[]
+    while true
+      puts "----------"        
+      line=gets.chop!
+      if line=~ /#{ptn}/i
+        break if a[0]=='Q'        
+        a = $~[0]
+        (0..10).each{|x|
+          print ' #{x} "', $~[x], '"'
+        }
+        puts
+        puts 'p $~[0]'
+        p $~[0]
+        p 'a'
+        p a
+      puts "----------"        
+        return a
+      end
+    end
+  end #
+ 
   #-----------------------------
   def load_Case(*params)   # dumped_Marshal= nil)
   #----------------------------
@@ -53,10 +78,25 @@ Marshal.load(file)
 # => {:a=>1, :b=>2, :c=>3}
 =end
 
+  
+  r=[]
+  # 2, 1
+  r= get_('(\d|Q|A) *(, *(\d+))*')
+  p r 
+puts "\nnext"
+    r= get_('(\d|Q|A) *(, *(\d+))*')
+  p r 
+puts "\nnext"
+  r= get_('(\d|Q|A) *(, *(\d+))*')
+  p r 
 
+  puts "\New"
+  r= get_('(\d|Q|A) *(, *(\d+)),2')
+  p r 
 
   
-
+  exit
+#
   puts "c = load_Case()"
   c = load_Case()
   puts "ret='#{c}'\n\n"

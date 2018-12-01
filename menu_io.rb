@@ -74,23 +74,20 @@ require 'io/console/size'
   #.........................
     prompt=<<-EOF
 [ MAIN MENU ]
- 0.  Set Initial Env
- 10..  Go back to DONE Status
-  11/12. Before /After set Koyan
-  13.  to Prev Status
-  19.  to Best Score
- 2.. Change CONDTION 
-   21.Shift seq  22. Pattern etc.
- 3. SELECT Action 
-   31.. Shift To right/left
-   32.. Simple Adjust
-   33.. Adjust_Round
- 40.. INFO  get Best Score, show HYO
- 50.. HYO :Change horizontal Mode
+0.  Set Initial Env
+10..  Go back to DONE Status
+ 11/12. B/A Koyan  13. Prev 19. Best
+2[0].. Change CONDTION 
+ 21.Shift seq  22. Pattern etc.
+3[0].. SELECT Action 
+ 31.Shift 32.Adjust 33. Adjust_Round
+4[0].. INFO
+ 41.Best Score, show HYO
+50.. HYO :Change horizontal Mode
   51/52. Hyo only/ Hyo with Detail
- 60. ENDING (decide A.B) & Print
- 70.
- 8[0]. Manual Handling
+60. ENDING (decide A.B) & Print
+70.
+8[0]. Manual Handling
  H(elp)/M(enu): show This Menu"
  9[0], Q[uit].   Exit 
 EOF
@@ -107,28 +104,26 @@ EOF
         menu = l.to_i
         case menu
         when 0
+          puts ''
           do_test
         when 10..19
           do_GoBack(menu)
-        when 2,20
-        when 21
-          set_nextSeq          
-        when 22
-        #set_Pattern
+        when 2,20,21,22
+          do_ChangeCond(menu)
         when 3, 30..33
           do_Action(menu)
         when 40
-          puts ". get Best Scend"        when 50..54
+          puts ". get Best Scend"
           do_HYO(menu)
         when 55
           get_BestScore
         when 60
           puts "do_Ending"
           do_Ending
-          return 60
+    #      return 60
         when 7, 70
-          puts ""
-          return 70
+          puts "menu: 70"
+   #       return 70
         when 8, 80
           puts "Manual Handling"
           sel_ToggleExchange()
@@ -150,6 +145,33 @@ EOF
   #
   # Sub Menu / called Action
 
+  #.............
+  def do_ChangeCond(menu) # 20
+  #.............
+    puts '# do_ChangeCond'
+    if menu == 20 or menu == 2
+      puts '21 seq  22 pattern Q[uit] '
+      while true
+        l=gets.chop
+        if l =~ /Q/i
+          # no action
+          return
+        end
+        case l.to_i
+        when 31, 32
+          break
+        end
+      end
+    end
+        
+    case menu
+    when 31
+      set_nextSeq
+    when 32
+      puts '# change PATERN'
+    end # case menu
+  end #do_ChangeCond
+  
   #.............................
   def do_GoBack(menu)
   #.............................
@@ -164,7 +186,7 @@ EOF
   end
 
   #.............................
-  def do_get_BeastScore
+  def do_get_BestScore
   #.............................
     case @bestScore[0][:num]
     when 0
@@ -205,6 +227,12 @@ Marshal.load(file)
     @wrkdays = Marshal.load(file)
     show_Hyo
   end
+
+  def save_fileMarshal
+    file = File.open("./data/marshal_WrkDays", "w+")
+    Marshal.dump(@wrkdays, file)
+  end
+
   
   #.............................
   def do_Action(menu)
@@ -212,15 +240,14 @@ Marshal.load(file)
     puts ". SELECT Action"
     if menu == 3 or menu == 30
       puts "31. ShiftTo right/left All Members"
-      puts " Usage: worker, +/-N"
+      puts " Usage: worker, +/-N[, day1,day2]"
       puts "   +N(to Right) / -N(to Left) N days Shift"
-      wrkr, ndays= get_PtnDat2('(\d),((+|-)\d+))*', 1, 3)
-      
-      if ndays == nil
-        nday = +1
-        menu = 31
-      end 
-      return "Q" if wrkr == "Q"
+      puts "   option [ ,day1, day2] "
+      puts "    Shift(Slide) from day1 to day2  -N/N days Shift"
+      puts "32. Adjust A Member"
+      puts "33. Adjust RoundS"
+      print ' 31 32 33 :'
+      get_MenuDat
     end
     #
     case menu
@@ -242,7 +269,6 @@ Marshal.load(file)
         puts "Before Shift"
         show_Hyo(false)
       end
-      puts "do Simple Adust"
     #adjust()
     end
   end # do_Action
@@ -288,7 +314,7 @@ EOF
     print prompt
     print ': '
     ret=[]
-    while true
+     while true
       l=gets
       l.chop!
       case l
@@ -297,6 +323,7 @@ EOF
         ret[1]=$3.to_i
         if $4 != nil
           ret[2]=$5.to_i
+
           ret[3]=$6.to_i
         end
         return ret
@@ -309,4 +336,23 @@ EOF
       end
     end
   end # def sel_ToggleExchange(msg=nil)
+
+  def get_MenuDat(ptrn)
+    while true
+      menu=gets.chop!
+      case menu.to_i
+      when 31
+        wrkr, ndays= get_PtnDat2('(\d),((+|-)\d+)*', 1, 3)
+        if ndays == nil
+          nday = +1
+          menu = 31
+        end 
+        return "Q" if wrkr == "Q"
+      when 32, 33
+        break
+      end
+    end
+  end  #def get_MenuDat()
+
+
 end # MenuIo
