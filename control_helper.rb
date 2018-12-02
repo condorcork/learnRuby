@@ -441,7 +441,6 @@ module ControlHelper
     #
     #  set PLACE Check to @chk_Place
     # -------
-    @wrkdays
     (0...4+@num_days16 ).each{ |day|
       @chk_Place[:numDay][day] = cnt_filled( day )
       @chk_Place[:isOK][day] = ( cnt_filled( day ) == @num_workers_p_day )
@@ -528,7 +527,8 @@ module ControlHelper
     else
       puts '#!!  load_Best_Score not One !!'
       # 'Not Yet Gotten!!'
-    end   
+    end
+    days
   end #  def load_BestScore()
   
   #...................
@@ -562,7 +562,6 @@ module ControlHelper
     @bestScore[0][:case] << save_Case
     @bestScore[0][:env] << Marshal.dump(@seq_workers)
   end #  chk_BestScore( point )
-
    
   #----------------------------
   def strStatus_Worker(worker)

@@ -19,6 +19,7 @@
 #
 #             x getchar  without Return key
 #              1.     just now  # done 2018-11-26(Mon) 15:43:29
+#         replace with named_capture or more simple way in menu.io
 #  History    
 #     save/load  a litte
 #     pop/ shift clear  11/28- almost
@@ -37,8 +38,8 @@
 # 2.  control display Msg for test
 #
 # 3. month 12->1 New Year Mode
-#    member + 2
-#    num_workers
+#    t  member + 2  --> member 1 (other show when result )
+#    t  num_workers  --> same as above
 #..................................
 #  BUG : ref/include   
 #    ^end
@@ -48,7 +49,7 @@
 #  seq_workers REVETSE
 #
 # must 
-best Score point only(11/28-)
+#            x best Score point only(11/28-) 12/01 done 
    chk
    sr
 

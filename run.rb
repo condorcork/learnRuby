@@ -42,19 +42,41 @@ require './CoreLogic'
 #  y=Yotei.new(members) 
 
  preparePrevMonth(y)
-  #
   y.hor_show( false )   
   #
+  y.pre_set([0,1,2])
+  y.save_Case("_Init")     
+  y.ver_show(false)
+  #
+  y.yoyaku( 3, '6012')   # 
+  y.hor_show(false)      #   no Examine # y.@Koyano)
+  y.save_Case('_Koyano')
+  #
+  y.ok_YN?("do Koyano Preset y/n")
+  #
+#  puts "## Koyano Yayaku "
+#  if y.ok_YN?("do Koyano Preset y/n")
+#    y.presetKoyano( 3 )   # y.@Koyano )  #, [0,1,2,6], [3,5])
+#    y.save_Case("Koyano_")     
+#    y.ver_show()
+#    print "\n\n===============Saved after Koyano\n"
+#    y.hor_show()
+#  end
+#  puts "#---- Check ---"
+#exit  
+
+
+  
   puts '##Yotaku idx 3 古谷野 san'
   y.yoyaku( 3, '6012')   # y.@Koyano, '6012')
   y.hor_show(false)  #   no Examine # y.@Koyano)
 #  
   $fulldayDebug = true
-  y.examine
-  if y.ok_YN?("Main Menu Y/N/Q:")
-    y.sel_MainMenu
-    exit 0
-  end
+#  y.examine
+#  if y.ok_YN?("Main Menu Y/N/Q:")
+#    y.sel_MainMenu
+#    exit 0
+#  end
   
   #-----------------------
   # Start to Think
@@ -130,8 +152,6 @@ k   elsif w1 == nil
 #   y.show_Result
    #  y.examine
  end
-
- exit 
 
 
   maxPoint={}

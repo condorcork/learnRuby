@@ -83,21 +83,24 @@ module FakeSystem
   end # def save_Case
   
   #-----------------------------
-  def load_Case(dumped_Marshal= nil)   # *params
+  def load_Case(dumped_Marshal= nil, *param)   # *params Pop
   #----------------------------
     puts "#def load_Case()"
     if dumped_Marshal == nil
     # load Previous which was recently saved
       prevCase = @savedCase[-1]
       if prevCase == nil
-        puts "#!! load_Case DO Nothing!!  'dumped_Marshal==nil' )"
+        puts "#!! load_Case DO Nothing!!  'PrevCase==nil' )"
         saved = nil
       else
         prkey= @savedCase[-1].keys[0]
         dump_Dat = @savedCase[-1][prkey]
         saved = Marshal.load( dump_Dat )
         @seq_workers = Marshal.load(@savedSeqWrkr[-1])
-        #[-        @savedCase.pop
+        if param[0] != nil && param[0] == true
+          @savedCase.pop
+          @savedSeqWrkr.pop
+        end
       end
     else
       # for Only load,  seq_workers is  unrelated
@@ -106,6 +109,40 @@ module FakeSystem
     saved
   end # def load_Case(case_Marshal)
 
+  def CasePop(num)
+    num.times{ @saved_Case.pop }
+  end
+
+  def CaseShift(num)
+    num.times{ @saved_Case.shift }
+  end
+
+  
+  #-----------------------------
+  def load_PrevCase(isDel=true)
+  #-----------------------------
+    puts "#def load_PrevCase( #{isDel} )"
+    #  current to Prev 
+    @savedCase.pop
+    @savedSeqWrkr.pop
+    #
+    prevCase = @savedCase[-1]
+    if prevCase == nil
+      puts "#!! load_Case DO Nothing!!  'PrevCase==nil' )"
+      saved = nil
+    else
+      prkey= @savedCase[-1].keys[0]
+      dump_Dat = @savedCase[-1][prkey]
+      saved = Marshal.load( dump_Dat )
+      @seq_workers = Marshal.load(@savedSeqWrkr[-1])
+      if isDel
+        @savedCase.pop
+        @savedSeqWrkr.pop
+      end
+    end
+    saved
+  end # def load_PrevCase(isDel=true)
+  
   #-----------------------------
   def allSavedCase( caseName = nil )
   #-----------------------------

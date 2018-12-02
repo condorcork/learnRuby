@@ -29,6 +29,8 @@ require 'io/console/size'
     exit 1;
   end
 
+
+=begin  
   #.............................
   def get_PtnDat2( ptn, *matchN )
   #.............................
@@ -68,24 +70,26 @@ require 'io/console/size'
       end
     end
   end # get_PtnDat2
-   
+=end
+  
   #.........................
   def sel_MainMenu()
   #.........................
     prompt=<<-EOF
 [ MAIN MENU ]
 0.  Set Initial Env
-10..  Go back to DONE Status
- 11/12. B/A Koyan  13. Prev 19. Best
-2[0].. Change CONDTION 
+1[0]..[sMenu] 
+2[0]..[sMenu] Change CONDTION 
  21.Shift seq  22. Pattern etc.
-3[0].. SELECT Action 
- 31.Shift 32.Adjust 33. Adjust_Round
-4[0].. INFO
- 41.Best Score, show HYO
-50.. HYO :Change horizontal Mode
-  51/52. Hyo only/ Hyo with Detail
-60. ENDING (decide A.B) & Print
+30..[sMenu]  Go back to DONE Status
+ 31/32. B/A Koyan  33. Prev 39. Best
+4[0]..[sMenu] SELECT Action 
+ 41.Shift 42.Adjust 43. Adjust_Round
+5[0]..[sMenu] INFO
+ 51.Best Score, show HYO
+60..[sMenu] HYO :Change horizontal Mode
+  61/62. Hyo only/ Hyo with Detail
+70. ENDING (decide A.B) & Print
 70.
 8[0]. Manual Handling
  H(elp)/M(enu): show This Menu"
@@ -95,7 +99,7 @@ EOF
     print ' : '
     
     casename = []
-
+    
     while true
       print ": "
       l=gets.chop
@@ -103,20 +107,30 @@ EOF
       when /^(\b*(\d+)\b*)$/
         menu = l.to_i
         case menu
-        when 0
-          puts ''
-          do_test
-        when 10..19
+        #--  Condition 0,1[0], 2[0], 3[0]
+        when 0   # Initial set & Check
+          puts '# Initial Env'
+        #          do_test
+ #         do_initEnv
+        when 1, 10, 11..19    # 
+          # 11. xxxShift seq  12. Pattern etc.
+#          do_ChngActCond(menu) # 20
+        when 2, 20, 11..29    # Change CONDTION #
+          # 21. Shift seq  22. Pattern etc.
+          do_ChngActCond(menu) # 20
+        when 3, 30, 31..39    # 30..GoBack #
+          # 32/33. B/A Koyan  34. Prev  39. Best
           do_GoBack(menu)
-        when 2,20,21,22
-          do_ChangeCond(menu)
-        when 3, 30..33
+        #-- Action    
+        when 4, 40, 41..49 # SELECT Action 
+          # 41. Shift  42. Adjust  43. Adjust_Round
           do_Action(menu)
-        when 40
-          puts ". get Best Scend"
+#        when 40
+#          puts ". get Best Scend"
+#          do_HYO(menu)
+        when 50..59
           do_HYO(menu)
-        when 55
-          get_BestScore
+          #get_BestScore
         when 60
           puts "do_Ending"
           do_Ending
@@ -139,16 +153,14 @@ EOF
         puts "Exit"
         exit 0
       end # case l
+      puts "loop ENter Error #{l}"
     end # while true
   end # sel_MainMenu()
 
-  #
-  # Sub Menu / called Action
-
   #.............
-  def do_ChangeCond(menu) # 20
+  def do_ChngActCond(menu) # 20  
   #.............
-    puts '# do_ChangeCond'
+    puts '#20# do_ChngActCond'
     if menu == 20 or menu == 2
       puts '21 seq  22 pattern Q[uit] '
       while true
@@ -156,32 +168,65 @@ EOF
         if l =~ /Q/i
           # no action
           return
-        end
-        case l.to_i
-        when 31, 32
+        else
+          case l.to_i
+          when 21, 22
+            menu = l.to_i
           break
+          end
         end
-      end
-    end
-        
+      end # while true
+    end # if 
+    #
     case menu
-    when 31
+    when 21
       set_nextSeq
-    when 32
+    when 22
       puts '# change PATERN'
     end # case menu
   end #do_ChangeCond
-  
+
   #.............................
-  def do_GoBack(menu)
+  def do_GoBack(menu)   # 30 GoBack
   #.............................
+          # 32/33. B/A Koyan  34. Prev  39. Best
+    if menu == 3 or menu == 30
+      puts '32/33. B/A Koyan  34. Prev  39. Best  Q[uit] '
+      while true
+        l=gets.chop
+        if l =~ /Q/i
+          # no action
+          return
+        else
+          case l.to_i
+          when 32, 32, 34, 39
+            menu = l.to_i
+            break
+          end
+        end
+      end # while true
+    end
+    
     case menu
-    when 11
-      @wrkdays = load_NamedCase('_Koyano')
-    when 12
-      @wrkdays = load_NamedCase('Koyano_')
-    when 19
-      do_get_BeastScore
+    when 32
+      ret = load_NamedCase('_Koyano')
+      if !ret
+        show_Hyo(false)
+      else
+        @wrkdays = ret
+      end
+    when 33
+      ret = load_NamedCase('Koyano_')
+      if !ret
+        show_Hyo(false)
+      else
+        @wrkdays = ret
+      end
+    when 34    # PrevCase
+      load_PrevCase()
+      show_Hyo(false)
+    when 39
+
     end
   end
 
@@ -235,56 +280,112 @@ Marshal.load(file)
 
   
   #.............................
-  def do_Action(menu)
+  def do_Action(menu, *wrker_dir_ndays)    # 4. 40.
   #.............................
     puts ". SELECT Action"
-    if menu == 3 or menu == 30
-      puts "31. ShiftTo right/left All Members"
+    if menu == 4 or menu == 40
+      puts "\n31. ShiftTo right/left All Members"
       puts " Usage: worker, +/-N[, day1,day2]"
       puts "   +N(to Right) / -N(to Left) N days Shift"
-      puts "   option [ ,day1, day2] "
-      puts "    Shift(Slide) from day1 to day2  -N/N days Shift"
-      puts "32. Adjust A Member"
-      puts "33. Adjust RoundS"
-      print ' 31 32 33 :'
-      get_MenuDat
+#      puts "   option [ ,day1, day2]  .... 38"
+#      puts "    Shift(Slide) from day1 to day2  -N/N days Shift"
+      puts "42. Adjust a Member"
+      puts "43. Adjust RoundS"
+      print ' 41 42 43 :'
+      ret = get_MenuDat(/^\s*(\d|Q)\s*(,\s*(\-*\d+),\s*(\d+),*\s*(\d+)*)*\s*$/i, {:cmd_ => 1, :dire =>3, :day1 =>4, :day2=>5})
+      if ret[:cmd_] =~/Q/
+        return
+      end
+      wrkr = ret[:cmd_].to_i
+      dir   = ret[:dir].to_i
+      nday  = ret[:day1].to_i
+      #
+      # nday2  = ret[:day2].to_i
+      menu=41
+    elsif menu == 41
+      wrkr = wrker_ndays[0]
+      dir   = wrker_ndays[1]
+      ndays   = wrker_ndays[2]
+#      ndays2   = wrker_ndays[3]
     end
     #
     case menu
-     when 31
-      shift_to(wrkr, ndays)
+     when 41
+      puts "# ShiftTo right/left  for #{wrkr}"
+      shift_to(wrkr, dir )
       show_Hyo
-    when 33
+     when 42
+      puts "# ShiftTo All Members & get Best"
+      save_Case('Before Shift')
+      score=[]
+      idxbest = 0
+      # Koyano Can Not Shift 
+      (0...@num_workers - 1).each do |w|
+        cs= load_Case
+        @wrkday2 = cs
+
+        shift_to(w, 1)
+        show_Hyo
+        
+        score[w] = get_Score
+        if w = 0
+          idxbest = w
+        else
+          if score[w] > score[idxbest]
+            idxbest = w
+          end
+        end
+      end
+      #           0 1 2   w(orker)
+      #           2 1 0   before
+      #  idxbest
+      #  when 2 (3-1) - 2 = 0  current
+      #       1    2  - 1 = 1  before
+      #       0    2  - 0 = 2  before
+      ipos = ( @num_workers - 1 ) - idxbest 
+      CasePop(ipos)
+      cs = load_Case(nil, true)    # load & pop(del)
+      if cs != nil
+        @wrkday2 = cs
+      end
+      show_Hyo
+    when 43
       puts "do Adust_Round"
       adjust_Round()
       show_Hyo()
-    when 32
-      puts "do ShiftTo right/left All Members"
-      save_Case('Before Shift')
-      (0...@num_workers-1).each do |w|
-        shift_to(w, 1)
-        show_Hyo
-        cs = load_NamedCase('Before Shift')
-        @wrkdays = cs
-        puts "Before Shift"
-        show_Hyo(false)
-      end
-    #adjust()
+      #adjust()
     end
   end # do_Action
 
   #.............................
-  def do_HYO(menu)
+  def do_HYO(menu)     # 50..
   #.............................
+    puts "#50# .. HYO .."
+    if menu == 5 or menu == 50
+      puts "\n 51. HYO only"
+      puts " 52. HYO with DatailU"
+      puts " 59. Change Horizontal/ Vertival Mode"
+      print ' 51 52 59 Q :'
+      while true
+        ret = gets.chop
+        if ret =~/^\s*(\d\d|Q)\s*/i
+          if ret =~/Q/
+            return
+          end
+          print  "<> '#{ret}'  => '"
+          menu=ret.to_i
+          puts "'   '#{menu}'"
+          break
+        end
+        puts "loop #{ret}"
+      end
+    end
+    #  def do_Change
+    puts "sel Do ==> #{menu}"
     case menu
-    when 50
+    when 59
       if ok_YN?("change horizontal '#{@horizontal}' Mode : Y/N" )
-=begin        #
-        @horizontal = !@horizontal
-        puts "\nHorizontal Mode #{@horizontal} changed"
-        end                
-=end      
-        msg="change horizontal '#{@horizontal.inspect}' Mode : Y/N "
+        msg="\nchange horizontal '#{@horizontal.inspect}' Mode : Y/N "
         if ok_YN?( msg ) == true
           @horizontal = !@horizontal
           puts "\nHorizontal Mode #{@horizontal} changed"
@@ -337,22 +438,21 @@ EOF
     end
   end # def sel_ToggleExchange(msg=nil)
 
-  def get_MenuDat(ptrn)
+  #............................
+  def get_MenuDat(ptrn, param)
+  #...........................
+    puts ptrn
     while true
       menu=gets.chop!
-      case menu.to_i
-      when 31
-        wrkr, ndays= get_PtnDat2('(\d),((+|-)\d+)*', 1, 3)
-        if ndays == nil
-          nday = +1
-          menu = 31
-        end 
-        return "Q" if wrkr == "Q"
-      when 32, 33
-        break
-      end
+      ret = {}
+      if menu =~ /#{ptrn}/ 
+        param.each {|k, v|
+          ret[k] = $~[v]
+          p ret
+          return ret
+        }
+      end          
     end
-  end  #def get_MenuDat()
-
+  end # get_MenuDat
 
 end # MenuIo
