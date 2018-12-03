@@ -61,6 +61,7 @@ include './View'
   #[- Yet
   def changeParam( param )  # changeParam( :template, : )
     puts "# def changeParam( param )"
+    
     # date
     #  template
     #  seq_workers : start 0, 1 ,2 3
@@ -144,20 +145,20 @@ include './View'
   end
 
   #............................
-#  def pre_set(pass_idx)
-  def pre_set(idxs_workers=[0,1,2])
+  def set_Patterns(idxs_workers=[0,1,2])
   #..........................
-    puts "# def pre_set(#{idxs_workers})"
+    puts "# def set_Patterns( #{idxs_workers} )"
 
     idxs_workers.each do |n|
-      pre_set_one(n)
+      #pre_set_one(n)
+      set_Pattern(n)
     end
-  end
+    end
     
   #.....................
-  def pre_set_one(idx)
+  def set_Pattern(idx)
   #...................
-    puts "# def pre_set_one( #{idx} )"
+    puts "# def set_Pattern( #{idx} )"
 
       dat_work=@wrkdays[idx]
       startp=start_p(dat_work)

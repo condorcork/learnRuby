@@ -42,7 +42,7 @@ module FakeSystem
 
   
   #..........................
-  def load_NamedCase( caseName )
+  def load_NamedCase( caseName, toSave = true  )
   #..........................
     puts "#def load_NamedCase( #{caseName} )"
     cases = sr_dumpCase( caseName )
@@ -57,7 +57,10 @@ module FakeSystem
         load_NamedCase_Err(caseName,'seq_workers Data')
         return nil
       end
-      @seq_workers = seq_   
+      if toSave
+        @wrkdays = cs if cs
+        @seq_workers = seq_
+      end
     else
       # saisin
       cs=load_Case( @savedCase[ cases[-1]][ caseName ] )
@@ -66,7 +69,10 @@ module FakeSystem
         load_NamedCase_Err(caseName,'seq_workers Data')
         return nil
       end
-      @seq_workers = seq_   
+      if toSave
+        @wrkdays = cs if cs
+        @seq_workers = seq_
+      end
     end # case
     return cs
     
@@ -74,7 +80,8 @@ module FakeSystem
     
   #-----------------------------
   def save_Case(nameCase ='noname')
-  #-----------------------------
+
+    #-----------------------------
     puts "#def save_Case  size #{@isInitState}"    
     prevCase = Marshal.dump( @wrkdays )
     @savedCase << { nameCase => prevCase}
@@ -123,8 +130,8 @@ module FakeSystem
   #-----------------------------
     puts "#def load_PrevCase( #{isDel} )"
     #  current to Prev 
-    @savedCase.pop
-    @savedSeqWrkr.pop
+    cur_Case = @savedCase.pop
+    cur_Seq = @savedSeqWrkr.pop
     #
     prevCase = @savedCase[-1]
     if prevCase == nil
@@ -134,6 +141,7 @@ module FakeSystem
       prkey= @savedCase[-1].keys[0]
       dump_Dat = @savedCase[-1][prkey]
       saved = Marshal.load( dump_Dat )
+#      @wrkdays = saved if saved
       @seq_workers = Marshal.load(@savedSeqWrkr[-1])
       if isDel
         @savedCase.pop

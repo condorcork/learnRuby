@@ -40,36 +40,29 @@ require './CoreLogic'
  members=4
    y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
 #  y=Yotei.new(members) 
-
- preparePrevMonth(y)
+  y.save_Case('Blank')
+  preparePrevMonth(y)
+  y.save_Case('Blank_')
   y.hor_show( false )   
   #
-  y.pre_set([0,1,2])
-  y.save_Case("_Init")     
+  y.yoyaku( 3, '6012')   # 
+  y.hor_show(false)    
+  y.save_Case('K_Yoyaku')
+#
+# from Here Start to
+  y.set_Patterns()
+  y.save_Case('Pattern')     
   y.ver_show(false)
   #
-  y.yoyaku( 3, '6012')   # 
-  y.hor_show(false)      #   no Examine # y.@Koyano)
-  y.save_Case('_Koyano')
-  #
-  y.ok_YN?("do Koyano Preset y/n")
-  #
-#  puts "## Koyano Yayaku "
-#  if y.ok_YN?("do Koyano Preset y/n")
-#    y.presetKoyano( 3 )   # y.@Koyano )  #, [0,1,2,6], [3,5])
-#    y.save_Case("Koyano_")     
-#    y.ver_show()
-#    print "\n\n===============Saved after Koyano\n"
-#    y.hor_show()
-#  end
-#  puts "#---- Check ---"
-#exit  
-
-
+  if y.ok_YN?("do Koyano Preset y/n")
+    y.presetKoyano( 3 )   # y.@Koyano )  #, [0,1,2,6], [3,5])
+    y.save_Case("KoyanoPreSet")     
+    y.ver_show()
+    print "\n\n===============Saved after Koyano\n"
+    y.hor_show()
+  end
   
-  puts '##Yotaku idx 3 古谷野 san'
-  y.yoyaku( 3, '6012')   # y.@Koyano, '6012')
-  y.hor_show(false)  #   no Examine # y.@Koyano)
+  puts "#---- Check ---"
 #  
   $fulldayDebug = true
 #  y.examine
@@ -86,8 +79,8 @@ y.save_Case("Initial")                # initail stat
 #
   #... PreSet  Fill days by Patern ....
   puts "#---- PRESET by Pattern---"
-  y.pre_set([0,1,2])
-  y.save_Case("_Koyano")     
+  y.set_Patterns()
+  y.save_Case("Prepared")     
   y.ver_show(false)
 
   #####
@@ -103,16 +96,7 @@ y.save_Case("Initial")                # initail stat
   ###
 ##
 #  y.test_load_saveCase
-#  exit
-=begin  
-  (0..4).each {|x|
-    y.hor_show()   ## [ x ])
-#    seq=y.sr_offdays_array( x )
-#x    print "\n#Full Off No.#{x}  '", seq, "'\n\n"
-  }
-
-=end
-  
+#  exit  
   if ! y.ok_YN?( "--- Do ADJUST #--- Y/N/Q :")
     exit 0
   end
@@ -149,11 +133,15 @@ k   elsif w1 == nil
    end
    y.ver_show()
    # y.hor_show
-#   y.show_Result
+
+   #   y.show_Result
    #  y.examine
  end
 
+ y.sel_MainMenu
+ exit
 
+ #---------------
   maxPoint={}
   maxPoint[:point]=0
   maxPoint[:Case]=[]

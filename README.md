@@ -21,10 +21,10 @@
 #              1.     just now  # done 2018-11-26(Mon) 15:43:29
 #         replace with named_capture or more simple way in menu.io
 #  History    
-#     save/load  a litte
-#     pop/ shift clear  11/28- almost
+#     x save/load  a litte
+#     x pop/ shift clear  11/28- almost
 
-#     Best Score  11/28 point only
+#     x Best Score  11/28 point only
 #                 yet restore
 #  show changed Days
 #  Menu  ....
@@ -47,11 +47,8 @@
 #........
 # option
 #  seq_workers REVETSE
+#  Setting limitChangePWorker if short
 #
 # must 
 #            x best Score point only(11/28-) 12/01 done 
-   chk
-   sr
-
-
 

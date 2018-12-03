@@ -24,7 +24,7 @@ module ControlHelper
     #--- Constant ----
     @num_workers = members
     @num_workers_p_day = 2    # Teiin
-    #-----   Patamater to Change CONDITION ----
+    #-----   Paramater to Change CONDITION ----
     # in adjust_Round  Max or Limit  change / workers
     @limit_change = 4
     #
@@ -38,7 +38,7 @@ module ControlHelper
     @template=@templateSrc.shift
     
 
-    #-----  End Patamater to Change CONDITION ----
+    #-----  End Paramater to Change CONDITION ----
     #
     @Koyano = @num_workers - 1
 
@@ -513,7 +513,7 @@ module ControlHelper
     case @bestScore[0][:num]
     when 0
       puts '#!!  load_Best_Score Not Yet Gotten!!'
-      reurn
+      reurn nil
     when 1
       puts '#!! Load Best Score'
       days = @bestScore[0][:case][0]

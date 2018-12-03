@@ -71,7 +71,7 @@ require 'io/console/size'
     end
   end # get_PtnDat2
 =end
-  
+
   #.........................
   def sel_MainMenu()
   #.........................
@@ -82,7 +82,8 @@ require 'io/console/size'
 2[0]..[sMenu] Change CONDTION 
  21.Shift seq  22. Pattern etc.
 30..[sMenu]  Go back to DONE Status
- 31/32. B/A Koyan  33. Prev 39. Best
+ 31.Blank 32.Blank_ 33.Koyano
+ 34.Pattern 35.Prev 39.Best 
 4[0]..[sMenu] SELECT Action 
  41.Shift 42.Adjust 43. Adjust_Round
 5[0]..[sMenu] INFO
@@ -113,31 +114,29 @@ EOF
         #          do_test
  #         do_initEnv
         when 1, 10, 11..19    # 
-          # 11. xxxShift seq  12. Pattern etc.
-#          do_ChngActCond(menu) # 20
+          # 11. Shift seq  12. Pattern etc.
+          do_ChngActCond(menu) # 20
         when 2, 20, 11..29    # Change CONDTION #
           # 21. Shift seq  22. Pattern etc.
           do_ChngActCond(menu) # 20
-        when 3, 30, 31..39    # 30..GoBack #
-          # 32/33. B/A Koyan  34. Prev  39. Best
+        when 3, 30, 31..39 # 30..GoBack #
+    # 31.Blank  32.Blank_ 33.Koyano
+    #34.Pattern 35.Prev 39.Best 
           do_GoBack(menu)
         #-- Action    
-        when 4, 40, 41..49 # SELECT Action 
-          # 41. Shift  42. Adjust  43. Adjust_Round
+        when 4, 40, 41..49 # SELECT Action
+     # 41. Shift  42. Adjust  43. Adjust_Round
           do_Action(menu)
-#        when 40
+        when 50..59
 #          puts ". get Best Scend"
 #          do_HYO(menu)
-        when 50..59
+        when 60..69
           do_HYO(menu)
           #get_BestScore
-        when 60
+        when 70..79
           puts "do_Ending"
           do_Ending
     #      return 60
-        when 7, 70
-          puts "menu: 70"
-   #       return 70
         when 8, 80
           puts "Manual Handling"
           sel_ToggleExchange()
@@ -145,15 +144,15 @@ EOF
           puts "Exit"
           exit 0
         end
-      when /^(\b*(H)(elp)*\b*)$/i
-        puts "when /^(\b*(H)elp\b*)$/i"
+      when /^((\b*(H)(elp)*\b*)|Menu)$/i
+        puts 'when /^((\b*(H)(elp)*\b*)|Menu)$/'
         puts prompt
       when /^\b*Q(uit)*\b*/i
         puts "when /^\b*Q(uit)*\b*/i"
         puts "Exit"
         exit 0
       end # case l
-      puts "loop ENter Error #{l}"
+      puts "loop #{l} Entered"
     end # while true
   end # sel_MainMenu()
 
@@ -162,7 +161,8 @@ EOF
   #.............
     puts '#20# do_ChngActCond'
     if menu == 20 or menu == 2
-      puts '21 seq  22 pattern Q[uit] '
+      puts '21 Seq. of Priority'
+      puts '22 pattern   Q[uit] :'
       while true
         l=gets.chop
         if l =~ /Q/i
@@ -170,11 +170,12 @@ EOF
           return
         else
           case l.to_i
-          when 21, 22
+          when 21, 22..25
             menu = l.to_i
-          break
+            break
           end
         end
+
       end # while true
     end # if 
     #
@@ -182,51 +183,63 @@ EOF
     when 21
       set_nextSeq
     when 22
-      puts '# change PATERN'
+      puts '# change PATTERN'
+      mk_set_Pattern
+    when 23
+      set_NextPattern
     end # case menu
   end #do_ChangeCond
 
   #.............................
   def do_GoBack(menu)   # 30 GoBack
   #.............................
-          # 32/33. B/A Koyan  34. Prev  39. Best
+    puts "#do_GoBack( '#{menu}' )"
     if menu == 3 or menu == 30
-      puts '32/33. B/A Koyan  34. Prev  39. Best  Q[uit] '
+      puts ' 31.Blank  32.Blank_ 33.Koyano'
+      print ' 34.Pattern  35.Prev 39.Best Q.quit:'
       while true
         l=gets.chop
-        if l =~ /Q/i
+        if l =~ /\s*Q\s*/i
           # no action
           return
         else
           case l.to_i
-          when 32, 32, 34, 39
+          when 31..35,39
             menu = l.to_i
             break
           end
         end
       end # while true
     end
-    
+    puts "nenu GoBack '#{menu}'"
     case menu
+    #--- Prepare to 
+    when 31
+      caseName='Blank'
     when 32
-      ret = load_NamedCase('_Koyano')
-      if !ret
-        show_Hyo(false)
-      else
-        @wrkdays = ret
-      end
+      caseName='Blank_'
     when 33
-      ret = load_NamedCase('Koyano_')
-      if !ret
-        show_Hyo(false)
-      else
-        @wrkdays = ret
-      end
-    when 34    # PrevCase
-      load_PrevCase()
-      show_Hyo(false)
+      caseName='K_Yoyaku'
+   #--- After some Action
+    when 34
+      caseName='Pattern'
+    end
+    #
+    case menu
+    when 31..34
+      ret = load_NamedCase(caseName)
+      show_Hyo(false) if !ret
+    when 35
+      ret= load_PrevCase
+      show_Hyo(false) if ret
     when 39
-
+      load_BestScore
+      show_Hyo if ret
+    end
+    case menu
+    when 31..34
+      ret = load_NamedCase(caseName)
+      show_Hyo(false)  if !ret
     end
   end
 
@@ -292,7 +305,7 @@ Marshal.load(file)
       puts "42. Adjust a Member"
       puts "43. Adjust RoundS"
       print ' 41 42 43 :'
-      ret = get_MenuDat(/^\s*(\d|Q)\s*(,\s*(\-*\d+),\s*(\d+),*\s*(\d+)*)*\s*$/i, {:cmd_ => 1, :dire =>3, :day1 =>4, :day2=>5})
+      ret = get_MenuDat(/^\s*(\d\d*|Q)\s*(,\s*(\-*\d+),\s*(\d+),*\s*(\d+)*)*\s*$/i, {:cmd_ => 1, :dire =>3, :day1 =>4, :day2=>5})
       if ret[:cmd_] =~/Q/
         return
       end
@@ -328,7 +341,7 @@ Marshal.load(file)
         show_Hyo
         
         score[w] = get_Score
-        if w = 0
+        if w == 0
           idxbest = w
         else
           if score[w] > score[idxbest]
@@ -358,14 +371,14 @@ Marshal.load(file)
   end # do_Action
 
   #.............................
-  def do_HYO(menu)     # 50..
+  def do_HYO(menu)     # 60..
   #.............................
-    puts "#50# .. HYO .."
-    if menu == 5 or menu == 50
-      puts "\n 51. HYO only"
-      puts " 52. HYO with DatailU"
-      puts " 59. Change Horizontal/ Vertival Mode"
-      print ' 51 52 59 Q :'
+    puts "#60# .. HYO .."
+    if menu == 6 or menu == 50
+      puts "\n 61. HYO only"
+      puts " 62. HYO with DatailU"
+      puts " 69. Change Horizontal/ Vertival Mode"
+      print ' 61 62 69 Q :'
       while true
         ret = gets.chop
         if ret =~/^\s*(\d\d|Q)\s*/i
@@ -383,7 +396,7 @@ Marshal.load(file)
     #  def do_Change
     puts "sel Do ==> #{menu}"
     case menu
-    when 59
+    when 69
       if ok_YN?("change horizontal '#{@horizontal}' Mode : Y/N" )
         msg="\nchange horizontal '#{@horizontal.inspect}' Mode : Y/N "
         if ok_YN?( msg ) == true
@@ -391,9 +404,9 @@ Marshal.load(file)
           puts "\nHorizontal Mode #{@horizontal} changed"
         end
       end                
-    when 51
+    when 61
       show_Hyo(false)
-    when 52
+    when 62
       show_Hyo()
     end
   end # do_HYO
