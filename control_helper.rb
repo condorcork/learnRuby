@@ -27,7 +27,7 @@ module ControlHelper
     #-----   Paramater to Change CONDITION ----
     # in adjust_Round  Max or Limit  change / workers
     @limit_change = 4
-    #
+    #    
     @templateSrc=[]
     @templateSrc[0]=('xxx  '*8).split('')     #
     @templateSrc[1]=('xxxx  '*7).split('')
@@ -149,6 +149,13 @@ module ControlHelper
     p @seq_workersOrg
   end #def set_nextSeq
 
+  def set_NextPattern
+    @template=@templateSrc.shift
+    if @template == nil
+    end
+  end
+
+  
   #
   #----- Date --------
   #.............................

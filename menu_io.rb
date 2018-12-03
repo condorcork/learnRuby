@@ -30,48 +30,6 @@ require 'io/console/size'
   end
 
 
-=begin  
-  #.............................
-  def get_PtnDat2( ptn, *matchN )
-  #.............................
-    puts "Enter #{ptn}"
-    puts "#{ptn}"
-    cs=1
-    case matchN.size
-    when 2
-      case matchN[1]
-      when 2
-        cs=2
-      when 3
-        cs=3
-      when 4
-        cs=4
-      end
-    end
-    
-    while true
-      l=gets
-      if l =~ /#{ptn}/
-        x=$1
-        case cs
-        when 1
-          y=nil
-        when 2
-          y=$2
-        when 3
-          y=$3
-        when 4
-          y=$4
-        end
-        #x= $"#{matchN[0]}"
-        return x,y
-      elsif l =~ /^Q/i
-        return 'Q'
-      end
-    end
-  end # get_PtnDat2
-=end
-
   #.........................
   def sel_MainMenu()
   #.........................
@@ -116,7 +74,7 @@ EOF
         when 1, 10, 11..19    # 
           # 11. Shift seq  12. Pattern etc.
           do_ChngActCond(menu) # 20
-        when 2, 20, 11..29    # Change CONDTION #
+        when 2, 20, 22    # Change CONDTION #
           # 21. Shift seq  22. Pattern etc.
           do_ChngActCond(menu) # 20
         when 3, 30, 31..39 # 30..GoBack #
@@ -183,10 +141,10 @@ EOF
     when 21
       set_nextSeq
     when 22
+      set_NextPattern
+    when 23
       puts '# change PATTERN'
       mk_set_Pattern
-    when 23
-      set_NextPattern
     end # case menu
   end #do_ChangeCond
 
@@ -235,11 +193,6 @@ EOF
     when 39
       load_BestScore
       show_Hyo if ret
-    end
-    case menu
-    when 31..34
-      ret = load_NamedCase(caseName)
-      show_Hyo(false)  if !ret
     end
   end
 
@@ -296,8 +249,8 @@ Marshal.load(file)
   def do_Action(menu, *wrker_dir_ndays)    # 4. 40.
   #.............................
     puts ". SELECT Action"
-    if menu == 4 or menu == 40
-      puts "\n31. ShiftTo right/left All Members"
+    if menu == 4 or menu == 40 or menu == 41
+      puts "\n41. ShiftTo right/left All Members"
       puts " Usage: worker, +/-N[, day1,day2]"
       puts "   +N(to Right) / -N(to Left) N days Shift"
 #      puts "   option [ ,day1, day2]  .... 38"
@@ -316,9 +269,9 @@ Marshal.load(file)
       # nday2  = ret[:day2].to_i
       menu=41
     elsif menu == 41
-      wrkr = wrker_ndays[0]
-      dir   = wrker_ndays[1]
-      ndays   = wrker_ndays[2]
+      wrkr = wrker_dir_ndays[0] # wrker_ndays[0]
+      dir   = wrker_dir_ndays[1] # wrker_ndays[1]
+      ndays   = wrker_dir_ndays[2] # wrker_ndays[2]
 #      ndays2   = wrker_ndays[3]
     end
     #
@@ -437,9 +390,13 @@ EOF
         ret[1]=$3.to_i
         if $4 != nil
           ret[2]=$5.to_i
-
           ret[3]=$6.to_i
+          puts "exchange"
+          do_Exchange(ret[0], ret[1], ret[2], ret[3])
+        else
+          do_ToggleDay(ret[0], ret[1])
         end
+        
         return ret
       when /^[ \t]*Q/i
         puts "Exit"

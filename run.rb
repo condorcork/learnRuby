@@ -50,7 +50,7 @@ require './CoreLogic'
   y.save_Case('K_Yoyaku')
 #
 # from Here Start to
-  y.set_Patterns()
+  y.put_Patterns()
   y.save_Case('Pattern')     
   y.ver_show(false)
   #
@@ -79,7 +79,7 @@ y.save_Case("Initial")                # initail stat
 #
   #... PreSet  Fill days by Patern ....
   puts "#---- PRESET by Pattern---"
-  y.set_Patterns()
+  y.put_Patterns()
   y.save_Case("Prepared")     
   y.ver_show(false)
 

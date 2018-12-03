@@ -145,20 +145,19 @@ include './View'
   end
 
   #............................
-  def set_Patterns(idxs_workers=[0,1,2])
+  def put_Patterns(idxs_workers=[0,1,2])
   #..........................
-    puts "# def set_Patterns( #{idxs_workers} )"
+    puts "# def put_Patterns( #{idxs_workers} )"
 
     idxs_workers.each do |n|
-      #pre_set_one(n)
-      set_Pattern(n)
+      put_Pattern(n)
     end
-    end
+  end # puts_Patterns
     
   #.....................
-  def set_Pattern(idx)
+  def put_Pattern(idx)
   #...................
-    puts "# def set_Pattern( #{idx} )"
+    puts "# def put_Pattern( #{idx} )"
 
       dat_work=@wrkdays[idx]
       startp=start_p(dat_work)
@@ -169,7 +168,7 @@ include './View'
         i=i+1
       end
       @wrkdays[idx]= dat_work
-  end
+  end # put_Pattern
 
   #.............................
   def prepare(idx, prevdays=' '*4, nvotAvail={})
