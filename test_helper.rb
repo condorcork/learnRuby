@@ -18,6 +18,7 @@ module TestHelper
         end
       }
     }
+ 
     (0...@savedSeqWrkr.size).each {|idx|
       if @savedSeqWrkr[idx] == nil
         puts "Error !!Seq Saved #{idx} nil"
@@ -25,27 +26,34 @@ module TestHelper
         puts "No.#{idx} -> some seq dump"
       end
     }
+    
     puts 'Test Go Back'
-    (0...@savedCase.size).map(&:itself).reverse.each  {|idx|
-      @savedCase[idx].keys.each {|k|
-        print "   k='#{k}' -> '"
-        if @savedCase[idx][k] ==nil
-          puts "NIL' Error"
-        else
-          if load_Case( @savedCase[idx][k] ) != nil
-            if @savedSeqWrkr[idx] != nil
-              @seq_workers = Marshal.load( @savedSeqWrkr[idx] )
-
-              show_Hyo(false)
-              ok_YN?("loaded key ['#{idx}'] key='#{k}' Y:")
-
-            else
-              
-          end
+    (0...@savedCase.size).map(&:itself).reverse.each do |idx|
+      @savedCase[idx].keys.each do |k|
+        if ok_YN?( " '#{idx}'  key ='#{k}'   Y/N/Q" ) == 'N'
+          exit
         end
-      end
-    }
-
+        sc = load_Case( @savedCase[idx][k])
+        if sc ==nil
+          puts "#!! ERRor @savedCase['#{idx}']['#{k}'] ==nil"
+        else
+          print "loaded @wrkdays='", @wrkdays, "'\n"              
+          if @savedSeqWrkr[idx] != nil
+            sw =Marshal.load( @savedSeqWrkr[idx] )
+            if sw != nil
+              @seq_workers = Marshal.load( @savedSeqWrkr[idx] )
+              hor_show(false)
+            else
+              puts "#!! Error Load Err  Marshal.load(@savedSeqWrkr['#{idx}']) == nil"
+            end
+          else
+            puts "#!! Error @savedSeqWrkr['#{idx}'] == nil"
+          end
+        end 
+        ok_YN?("loaded key ['#{idx}'] key='#{k}' Y:")
+        puts ""
+      end # @savedCase[idx].keys.each 
+    end  #(0...@savedCase.size).map(&:itself).reverse.each
     
     exit
   end
