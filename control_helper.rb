@@ -513,6 +513,20 @@ module ControlHelper
     puts "## Best Score #{@bestScore[0][:point]}"
   end #  def get_BestScore
 
+  #--------------
+  def put_BestScore(idx)
+  #--------------   
+    days = @bestScore[0][:case][idx]
+    if days != nil
+      @wrkdays = days
+      @seq_workers = Marshal.load( @bestScore[0][:env][idx] )
+    else
+      puts "#!! load_BestScore( @bestScore[0][:case][#{idx}] ) Err !!"
+      return nil
+    end
+    days
+  end # put_BestScore
+  
   #-------------------
   def load_BestScore()
   #-------------------
@@ -523,17 +537,11 @@ module ControlHelper
       reurn nil
     when 1
       puts '#!! Load Best Score'
-      days = @bestScore[0][:case][0]
-      if days != nil
-        @wrkdays = days
-        @seq_workers = Marshal.load( @bestScore[0][:env] )
-      else
-        puts '#!! load_BestScore( @bestScore[0][:case][0] ) Err !!'
-        return nil
-      end
+      days = put_BestScore(0) 
     else
-      puts '#!!  load_Best_Score not One !!'
-      # 'Not Yet Gotten!!'
+      # ' mehr Gute !!'
+      puts '#!! load_Best_Score  Newest in plural!'
+      days = put_BestScore(-1)   # latest
     end
     days
   end #  def load_BestScore()
@@ -546,7 +554,7 @@ module ControlHelper
   # def load_BestScore()
     # def
     puts "#def chk_BestScore"
-    puts " #{point} <> #{@bestScore[0][:point]}"
+    puts "bestScore  #{point} <> #{@bestScore[0][:point]}"
 
     if point < @bestScore[0][:point]
       #if get second
@@ -564,7 +572,7 @@ module ControlHelper
 
     @bestScore[0][:num] += 1
     if @bestScore[0][:num] > 1
-      puts "#... Tiet Score #{point}"
+      puts "#... Tie Score #{point}"
     end
     @bestScore[0][:case] << save_Case
     @bestScore[0][:env] << Marshal.dump(@seq_workers)
@@ -673,7 +681,7 @@ module ControlHelper
       end
     end
   end # def do_Exchange(wrkr1, day1, wrkr2, day2)
-  
+
   #.............................
   def set_WorkersSeq( doneWorker )
   #.............................

@@ -49,10 +49,14 @@ require './CoreLogic'
   y.hor_show(false)    
   y.save_Case('K_Yoyaku')
 #
-# from Here Start to
+# from Here Star
+#  to Actual Handling
+#
   y.put_Patterns()
   y.save_Case('Pattern')     
   y.ver_show(false)
+  y.test_GoBack
+  exit
   #
   if y.ok_YN?("do Koyano Preset y/n")
     y.presetKoyano( 3 )   # y.@Koyano )  #, [0,1,2,6], [3,5])

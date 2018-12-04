@@ -1,6 +1,55 @@
 # coding: utf-8
 module TestHelper
 
+
+
+  def test_GoBack
+    puts '== Saved Case =='
+    puts "saved size    = #{@savedCase.size}"
+    puts "seqSaved size = #{@savedSeqWrkr.size}"
+    (0...@savedCase.size).each {|idx|
+      puts "No.#{idx}  key"
+      @savedCase[idx].keys.each {|k|
+        print "   k='#{k}' -> '"
+        if @savedCase[idx][k] ==nil
+          puts "NIL' Error"
+        else
+          puts ' some_Dump'
+        end
+      }
+    }
+    (0...@savedSeqWrkr.size).each {|idx|
+      if @savedSeqWrkr[idx] == nil
+        puts "Error !!Seq Saved #{idx} nil"
+      else
+        puts "No.#{idx} -> some seq dump"
+      end
+    }
+    puts 'Test Go Back'
+    (0...@savedCase.size).map(&:itself).reverse.each  {|idx|
+      @savedCase[idx].keys.each {|k|
+        print "   k='#{k}' -> '"
+        if @savedCase[idx][k] ==nil
+          puts "NIL' Error"
+        else
+          if load_Case( @savedCase[idx][k] ) != nil
+            if @savedSeqWrkr[idx] != nil
+              @seq_workers = Marshal.load( @savedSeqWrkr[idx] )
+
+              show_Hyo(false)
+              ok_YN?("loaded key ['#{idx}'] key='#{k}' Y:")
+
+            else
+              
+          end
+        end
+      end
+    }
+
+    
+    exit
+  end
+  
   def test_data()
     #xxx[0]="0123|4..................................."
     a = []

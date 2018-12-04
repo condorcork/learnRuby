@@ -80,8 +80,7 @@ module FakeSystem
     
   #-----------------------------
   def save_Case(nameCase ='noname')
-
-    #-----------------------------
+  #-----------------------------
     puts "#def save_Case  size #{@isInitState}"    
     prevCase = Marshal.dump( @wrkdays )
     @savedCase << { nameCase => prevCase}

@@ -7,7 +7,7 @@ module View
   def init_View()
   #..............
     puts "# def init_View()"
-    @horizontal = true
+    @horizontal = false
   end #def init_View()
 
 

@@ -55,7 +55,7 @@ require 'io/console/size'
  9[0], Q[uit].   Exit 
 EOF
     print prompt
-    print ' : '
+  print ' : '
     
     casename = []
     
@@ -69,6 +69,7 @@ EOF
         #--  Condition 0,1[0], 2[0], 3[0]
         when 0   # Initial set & Check
           puts '# Initial Env'
+          do_BaseTest()
         #          do_test
  #         do_initEnv
         when 1, 10, 11..19    # 
@@ -186,13 +187,14 @@ EOF
     case menu
     when 31..34
       ret = load_NamedCase(caseName)
-      show_Hyo(false) if !ret
+      show_Hyo(false) if ret
     when 35
       ret= load_PrevCase
       show_Hyo(false) if ret
     when 39
-      load_BestScore
-      show_Hyo if ret
+      if load_BestScore != nil
+        show_Hyo
+      end
     end
   end
 
