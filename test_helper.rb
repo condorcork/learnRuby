@@ -5,39 +5,24 @@ module TestHelper
 
   def test_GoBack
     puts '== Saved Case =='
-    puts "saved size    = #{@savedCase.size}"
-    puts "seqSaved size = #{@savedSeqWrkr.size}"
-    (0...@savedCase.size).each {|idx|
-      puts "No.#{idx}  key"
-      @savedCase[idx].keys.each {|k|
-        print "   k='#{k}' -> '"
-        if @savedCase[idx][k] ==nil
-          puts "NIL' Error"
-        else
-          puts ' some_Dump'
-        end
-      }
-    }
- 
-    (0...@savedSeqWrkr.size).each {|idx|
-      if @savedSeqWrkr[idx] == nil
-        puts "Error !!Seq Saved #{idx} nil"
-      else
-        puts "No.#{idx} -> some seq dump"
-      end
-    }
+    all_SavedCase
+
+    all_SavedSeq
     
-    puts 'Test Go Back'
+    puts '\nTest Go Back'
+
     (0...@savedCase.size).map(&:itself).reverse.each do |idx|
+#    (0...@savedCase.size).map(&:itself).each do |idx|
       @savedCase[idx].keys.each do |k|
-        if ok_YN?( " '#{idx}'  key ='#{k}'   Y/N/Q" ) == 'N'
-          exit
+        if ok_YN?( " '#{idx}'  key ='#{k}' Do?  Y/N/Q" ) == 'N'
+          return
         end
         sc = load_Case( @savedCase[idx][k])
         if sc ==nil
           puts "#!! ERRor @savedCase['#{idx}']['#{k}'] ==nil"
         else
-          print "loaded @wrkdays='", @wrkdays, "'\n"              
+          @wrkdays=sc
+          print "loaded @wrkdays='", @wrkdays, "'\n"
           if @savedSeqWrkr[idx] != nil
             sw =Marshal.load( @savedSeqWrkr[idx] )
             if sw != nil
@@ -50,12 +35,27 @@ module TestHelper
             puts "#!! Error @savedSeqWrkr['#{idx}'] == nil"
           end
         end 
-        ok_YN?("loaded key ['#{idx}'] key='#{k}' Y:")
+        ok_YN?("Done loaded key ['#{idx}'] key='#{k}'  NEXT Y:")
         puts ""
-      end # @savedCase[idx].keys.each 
-    end  #(0...@savedCase.size).map(&:itself).reverse.each
-    
-    exit
+      end # @saved..[idx].keys.each 
+    end  #(0...@sav..se.size).map(&:itself).reverse.each
+#    
+#---- GoBackTo origin (only Saved Case)
+#  
+    while true
+      if ok_YN?('PrevCase Y/N:')== false
+        puts ' .....'
+        break
+      end
+      sc=load_PrevCase
+      
+      break if sc ==nil
+      @wrkdays=sc
+      hor_show(false)
+    end 
+
+     test_load_saveCase()
+ #   exit
   end
   
   def test_data()

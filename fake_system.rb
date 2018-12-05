@@ -81,7 +81,7 @@ module FakeSystem
   #-----------------------------
   def save_Case(nameCase ='noname')
   #-----------------------------
-    puts "#def save_Case  size #{@isInitState}"    
+    puts "#def save_Case  #{@nameCase}"    
     prevCase = Marshal.dump( @wrkdays )
     @savedCase << { nameCase => prevCase}
     prevSeq = Marshal.dump( @seq_workers )
@@ -123,15 +123,47 @@ module FakeSystem
     num.times{ @saved_Case.shift }
   end
 
+  def all_SavedCase(isVerbose=true)
+    if isVerbose
+      puts "saved size  Case = #{@savedCase.size}  seqSaved = #{@savedSeqWrkr.size}"
+    end
+    
+    (0...@savedCase.size).each{|idx|
+      puts "No.#{idx}  key"
+      @savedCase[idx].keys.each {|k|
+        print "   k='#{k}' -> '"
+        if @savedCase[idx][k] ==nil
+          puts "NIL' Error"
+        else
+          puts ' some_Dump'
+        end
+      }
+    }
+  end # all_SavedCase
+
+  def all_SavedSeq(isVerbose=true)
+    if isVerbose
+      puts "saved size  Case = #{@savedCase.size}  seqSaved = #{@savedSeqWrkr.size}"
+    end
+    (0...@savedSeqWrkr.size).each {|idx|
+      if @savedSeqWrkr[idx] == nil
+        puts "Error !!Seq Saved #{idx} nil"
+      else
+        puts "No.#{idx} -> some seq dump"
+      end
+    }
+  end # all_SavedSeq
+
   
   #-----------------------------
   def load_PrevCase(isDel=true)
   #-----------------------------
     puts "#def load_PrevCase( #{isDel} )"
     #  current to Prev 
-    cur_Case = @savedCase.pop
-    cur_Seq = @savedSeqWrkr.pop
+ #   cur_Case = @savedCase.pop
+ #   cur_Seq = @savedSeqWrkr.pop
     #
+#    prevCase = @savedCase[0]
     prevCase = @savedCase[-1]
     if prevCase == nil
       puts "#!! load_Case DO Nothing!!  'PrevCase==nil' )"
@@ -139,13 +171,22 @@ module FakeSystem
     else
       prkey= @savedCase[-1].keys[0]
       dump_Dat = @savedCase[-1][prkey]
+#      prkey= @savedCase[0].keys[0]
+#      dump_Dat = @savedCase[0][prkey]
       saved = Marshal.load( dump_Dat )
 #      @wrkdays = saved if saved
       @seq_workers = Marshal.load(@savedSeqWrkr[-1])
       if isDel
+#        p @savedCase.shift
+#        p @savedSeqWrkr.shift
+#         @savedCase[-1,1]=[]
+#        @savedSeqWrkr[-1,1]=[]
         @savedCase.pop
         @savedSeqWrkr.pop
-      end
+        puts "$$ PrevCase pop"
+        all_SavedCase
+        all_SavedSeq
+     end
     end
     saved
   end # def load_PrevCase(isDel=true)
@@ -184,9 +225,10 @@ module FakeSystem
     target = Marshal.load( Marshal.dump( src ) )
   end # def copy_Data( src, target)
 
-
+  #......................
   def test_load_saveCase()
-  #
+  #.......................
+    puts '#def test_load_daveCase'
    puts "#### Go Back to beginning"
    cnt =  0
    caseS  = load_Case

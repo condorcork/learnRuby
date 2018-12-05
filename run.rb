@@ -56,7 +56,8 @@ require './CoreLogic'
   y.save_Case('Pattern')     
   y.ver_show(false)
   y.test_GoBack
-  exit
+  puts "returned  GoBack"
+  y.all_SavedCase
   #
   if y.ok_YN?("do Koyano Preset y/n")
     y.presetKoyano( 3 )   # y.@Koyano )  #, [0,1,2,6], [3,5])
@@ -125,7 +126,7 @@ p point
        puts "#!!! Not Done do_ToggleDay(#{w1}, #{d1}   #(w2}, #{d2})"
        next;
      end
-k   elsif w1 == nil
+   elsif w1 == nil
      next
    elsif w1 == 'M'
      y.sel_MainMenu()

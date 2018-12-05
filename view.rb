@@ -108,14 +108,14 @@ module View
     # Each Worker On/Off days
     #
     filler = '_'
-#print "@wrkdays['#{0}'] = '", @wrkdays[0] ,"'\n"
+print "@wrkdays['#{0}'] = '", @wrkdays[0] ,"'\n"
 #print "@wrkdays['#{1}'] = '", @wrkdays[1] ,"'\n"
 #print "@wrkdays['#{2}'] = '", @wrkdays[2] ,"'\n"
 #print "@wrkdays['#{3}'] = '", @wrkdays[3] ,"'\n"
     
     (0...@num_workers).each do |idx|
       # 4 days of prevMonth to Ref
-print "@wrkdays['#{idx}'] = '", @wrkdays[idx] ,"'\n"
+#print "@wrkdays['#{idx}'] = '", @wrkdays[idx] ,"'\n"
       kinmuM = @wrkdays[idx][0..3].join(filler)
       # this month
 #[-      dat = @wrkdays[idx][4... 4+@num_days16].join(filler)
