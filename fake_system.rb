@@ -236,7 +236,7 @@ puts "## Done laod_PreCase : check Shifted"
   #----------------------------
     puts "# def copy_Data( src, target)"
     target = Marshal.load( Marshal.dump( src ) )
-  end # def copy_Data( src, target)
+  end # def copy_Data( src )
   
   # 
   #......................

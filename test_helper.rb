@@ -3,9 +3,11 @@ module TestHelper
 
 
   def test_slide_Part
-    slide_Part(0, 2, 9,9)
+    #    slide_Part(0, 2, 2,9)
+    shift_to(0, 2, 6, 7)
     show_Hyo(false)
-    slide_Part(0, -2, 9,9)
+    shift_to(0, -2, 6, 7)
+    show_Hyo(false)
   end 
 
   def test_copy

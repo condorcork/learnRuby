@@ -207,10 +207,17 @@ include './View'
   #   Real Actual Operation 
   #
   #..............................
-  def shift_to(idxWorker, direction=+1)
+  def shift_to(idxWorker, direction=+1, *params)
   #..............................
     # shift right +N, left -N
-    puts "\n\n#==  def shift_to( #{idxWorker}, #{direction} )"    
+    puts "\n\n#==  def shift_to( #{idxWorker}, #{direction} )"
+    if params != nil
+      p params
+      if params.size == 2
+        ret = slide_Part(idxWorker, direction, *params) # idx_Start=4, idx_End)  #   , filler=' ')
+        return ret 
+      end
+    end
     strDays = @wrkdays[idxWorker].join('')
     strDays = strDays.slice(4, @num_days16)
   #  puts " Orignal 4, @num_days16  strDays  '#{strDays.length}'"
@@ -231,24 +238,38 @@ include './View'
     end
     strDays = @wrkdays[idxWorker].join('').slice(0,4) + strDays
     @wrkdays[idxWorker] = strDays.split('')
+    return true
   end
 
-#=begin 
-# yet perhaps Not So good  
   #..............................
 #  def shift_Part(idxWorker, direction=+1, idx_Start, idx_End, filler=' ')
   def slide_Part(idxWorker, direction=1, idx_Start=4, idx_End)  #   , filler=' ')
   #..............................
-  # shift or Slide  right +N, left -N from idx_Start to idx_End 
+    # shift or Slide  right +N, left -N from idx_Start to idx_End
+    #   filler = ' '
     puts "#  def shift_Part( #{idxWorker}, #{direction},  #{idx_Start}, #{idx_End} )"    
     #
-    strDays = @wrkdays[idxWorker].join('')
-    strDays = '0123456789|0123456789|'*2
-    strDays = strDays.slice(0... 4 + @num_days16 )
-    part2 = strDays.slice(idx_Start .. idx_End)
-    part1 = strDays.slice(0... idx_Start)
-    part3 =  strDays.slice(idx_End + 1 ... @num_days16 + 4)
+    if ! @theMonthRange.include?( idx_Start ) ||  ! @theMonthRange.include?( idx_End )
+      puts "#!! slide_Part : day from/to is out of Range"
+      puts "#!! #{idx_Start} #{idx_End} Not in #{@theMonthRange}"
+      return false
+    end
+
     
+    strDays = @wrkdays[idxWorker].join('')
+    wrkdaysOrg = copy_Data( @wrkdays[idxWorker] )
+#    strDays = '0123456789|0123456789|'*2
+
+    distance = ( direction < 0 ? direction * -1 : direction )
+    puts "#--- distance  '#{distance}'"
+    filler = ' ' * distance    
+
+    strDays = strDays.slice(0... 4 + @num_days16 )
+    part1 = strDays.slice(0... idx_Start)
+    part2 = strDays.slice(idx_Start .. idx_End)
+    part3 = strDays.slice(idx_End + 1  ... @num_days16 + 4)
+
+
     puts " Orignal "
     puts "'#{strDays}'"
     puts "'" +"....+....0"*4
@@ -256,23 +277,47 @@ include './View'
     puts "'" + ' '*(idx_Start -1 - 1) + "'#{part2}'"
     puts " " + ' '*( idx_End - 1 - 1 ) + "'#{part3}'"
     puts "'" +"012345678|"*4
-return    
-    distance = ( direction < 0 ? direction * -1 : direction )
-    puts "#--- distance  '#{distance}'"
-    filler = ' ' * distance    
+    
+    #
     puts "#--- filler "
     puts "'....+....0"*4
     puts "'#{filler}'"
-    if direction > 0
-      strDays = filler + strDays
-      strDays = strDays.slice(0, @num_days16)
-    else
+
+    if direction > 0           # to Right
+      #    ---1--- --2-- ----3---
+      #                  ZZZ 
+      #            XXX--2-- -3---
+      #            filler
+      part3 = part3.slice(distance..99)
+      strDays = part1 + filler + part2 + part3
+    else                      # to Left
+      #     ---1--- --2-- ---3---
+      #          ZZ 
+      #          ---2-- ---3---XX
+      #           
+      part1 = part1.slice(0... part1.size - distance ) 
+      strDays = part1 + part2 + part3
       strDays = strDays.slice(distance, 33)  + filler
     end
-    strDays = @wrkdays[idxWorker].join('').slice(0,4) + strDays
+    if strDays.length == wrkdaysOrg.length
+      puts "#!! logical Error"
+      puts "## #{strDays.length} != #{wrkdaysOrg.length}"
+      return false
+    end
+#    strDays = @wrkdays[idxWorker].join('').slice(0,4) + strDays
     @wrkdays[idxWorker] = strDays.split('')
-  end # shift_Part
-#=end
+    @theMonthRange.each {|d|
+      if @wrkdays[idxWorker][d] != wrkdaysOrg[d]
+        if isOnDay( @wrkdays[idxWorker][d] )
+          @wrkdays[idxWorker][d] = 'X'
+        elsif isOffDay( @wrkdays[idxWorker][d] )
+          @wrkdays[idxWorker][d] = '*'
+        end
+      end
+    }
+    hor_show()
+    return true
+  end # slide_Part
   
   #...........................
   def adjust(worker, reset=true)
