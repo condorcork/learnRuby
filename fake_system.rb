@@ -102,16 +102,23 @@ module FakeSystem
         prkey= @savedCase[-1].keys[0]
         dump_Dat = @savedCase[-1][prkey]
         saved = Marshal.load( dump_Dat )
+ #   print "*** in (load_Case). object-id='", @wrkdays.object_id, "'\n"
         @seq_workers = Marshal.load(@savedSeqWrkr[-1])
+ #   print "*** 2. in (load_Case). object-id='", @wrkdays.object_id, "'\n"
         if param[0] != nil && param[0] == true
-          @savedCase.pop
-          @savedSeqWrkr.pop
+          puts "# DONE load_Case"
+          my_Pop
+#   print "*** 2. in (load_Case). object-id='", @wrkdays.object_id, "'\n"
+          
+#          @savedCase.pop
+#          @savedSeqWrkr.pop
         end
       end
     else
       # for Only load,  seq_workers is  unrelated
       saved = Marshal.load( dumped_Marshal )
     end
+#  print "*** in (load_Case).  saved (return) object-id='", saved.object_id, "'\n"
     saved
   end # def load_Case(case_Marshal)
 
@@ -176,13 +183,16 @@ module FakeSystem
       saved = Marshal.load( dump_Dat )
 #      @wrkdays = saved if saved
       @seq_workers = Marshal.load(@savedSeqWrkr[-1])
+puts "## Done laod_PreCase : check Shifted"
       if isDel
+###        my_Shift
 #        p @savedCase.shift
 #        p @savedSeqWrkr.shift
 #         @savedCase[-1,1]=[]
 #        @savedSeqWrkr[-1,1]=[]
-        @savedCase.pop
-        @savedSeqWrkr.pop
+#        @savedCase.pop
+        #        @savedSeqWrkr.pop
+        my_Pop
         puts "$$ PrevCase pop"
         all_SavedCase
         all_SavedSeq
@@ -190,7 +200,8 @@ module FakeSystem
     end
     saved
   end # def load_PrevCase(isDel=true)
-  
+
+=begin  
   #-----------------------------
   def allSavedCase( caseName = nil )
   #-----------------------------
@@ -216,15 +227,18 @@ module FakeSystem
       retAll
     end
   end  #def allSavedCase
+=end
+  
 
   #;- no test  
   #----------------------------
-  def copy_Data( src, target)
+  def copy_Data( src )
   #----------------------------
     puts "# def copy_Data( src, target)"
     target = Marshal.load( Marshal.dump( src ) )
   end # def copy_Data( src, target)
-
+  
+  # 
   #......................
   def test_load_saveCase()
   #.......................
@@ -245,5 +259,38 @@ module FakeSystem
 #    puts "#### "
   end
  
-end # module FakeSystem
 
+  def my_Pop()
+    puts "## def my_pop"
+    all_SavedCase
+    saved=[]
+    if @savedCase.size > 0
+      last = @savedCase.size - 1
+      (0...@savedCase.size).each {|idx|
+        if idx < last
+          saved <<  @savedCase[idx]
+        end
+      }
+      @savedCase = saved
+    end
+    puts "#!! After my Pop"
+    all_SavedCase
+    #
+
+    puts "## my SEQ pop"
+    all_SavedSeq
+    saved_seq=[]
+    if @savedSeqWrkr.size > 0
+      last = @savedSeqWrkr.size - 1
+      (0...@savedSeqWrkr.size).each {|idx|
+        if idx < last
+          saved_seq << @savedSeqWrkr[idx] 
+        end
+      }
+      @savedSeqWrkr = saved_seq 
+    end
+    puts "#!! After my Pop"
+    all_SavedSeq
+  end # my_pop
+
+end # module FakeSystem

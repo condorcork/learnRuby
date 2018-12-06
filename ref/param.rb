@@ -3,23 +3,24 @@
   def get_(ptn)
     #
     puts ptn
-    a=[]
+    r=[]
     while true
       puts "----------"        
       line=gets.chop!
       if line=~ /#{ptn}/i
-        break if a[0]=='Q'        
         a = $~[0]
+        break if a[0]=='Q'        
         (0..10).each{|x|
-          print ' #{x} "', $~[x], '"'
+          print "No. #{x} '", $~[x], "'\n"
+          r << $~[x]
         }
         puts
         puts 'p $~[0]'
         p $~[0]
-        p 'a'
+        p 'all='
         p a
       puts "----------"        
-        return a
+        return r
       end
     end
   end #

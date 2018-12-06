@@ -44,6 +44,10 @@ require './CoreLogic'
   preparePrevMonth(y)
   y.save_Case('Blank_')
   y.hor_show( false )   
+
+
+##  y.test_SusMenu
+
   #
   y.yoyaku( 3, '6012')   # 
   y.hor_show(false)    
@@ -54,7 +58,13 @@ require './CoreLogic'
 #
   y.put_Patterns()
   y.save_Case('Pattern')     
-  y.ver_show(false)
+  y.hor_show(false)
+y.test_slide_Part
+exit
+
+
+
+  
   y.test_GoBack
   puts "returned  GoBack"
   y.all_SavedCase
@@ -102,9 +112,15 @@ y.save_Case("Initial")                # initail stat
 ##
 #  y.test_load_saveCase
 #  exit  
-  if ! y.ok_YN?( "--- Do ADJUST #--- Y/N/Q :")
-    exit 0
+  if  y.ok_YN?( "--- Do ADJUST Round #--- Y/N/Q :")
+    point =  y.adjust_Round( reset=true )
   end
+
+  y.sel_MainMenu
+  exit
+  
+
+  
 puts "=========================="
 y.load_Case()  
   maxPoint={}

@@ -2,26 +2,128 @@
 module TestHelper
 
 
+  def test_slide_Part
+    slide_Part(0, 2, 9,9)
+    show_Hyo(false)
+    slide_Part(0, -2, 9,9)
+  end 
+
+  def test_copy
+    puts "#@@@ TEST tmp= 'copy_Data'(@wrkdays, tempDays)"
+
+    tmp=  copy_Data(@wrkdays)
+
+    print "## @wrkdays '", @wrkdays, "'\n"
+    print "##      tmp '", tmp, "'\n"
+
+    if tmp ==  @wrkdays
+      puts "## tmp == @wrkdays "
+    else
+      puts "## tmp !=  @wrkdays "
+    end
+
+
+    tmp[0][0] = 'A'
+    print "## @wrkdays '", @wrkdays, "'\n"
+    print "##      tmp '", tmp, "'\n"
+
+    
+    puts "## tmp = @wrkdays "
+    tmp = @wrkdays
+    tmp[0][0] = 'A'
+    puts "## After tmp[0[0] = 'A'"
+    print "## @wrkdays '", @wrkdays, "'\n"
+    print "##      tmp '", tmp, "'\n"
+
+    org='B'
+    copied = org
+    puts " org='#{org}'  copied=' #{copied}'"
+    copied = 'C'
+    puts " After copied='C'"
+    puts "org='#{org}'  copied=' #{copied}'"
+    #
+    #
+    org=@wrkdays
+    copied = org
+    puts " org='#{org}'  copied=' #{copied}'"
+    copied[0][0] = 'XXX'
+    puts " After copied='C'"
+    puts "org='#{org}'  copied=' #{copied}'"
+##
+    exit;
+  end
+
+  def test_SusMenu
+    puts "Sub Menu Test"
+
+    ret = do_Action(45, 0, -2);    # Not sufficient　Params
+    puts "ret = #{ret}"
+    ret = do_Action(46,1); 
+    puts "ret = #{ret}"
+
+    ret = do_Action(40);     # Sub Menu SHow?
+    puts "ret = #{ret}"
+    ret = do_Action(41);     # got Diret 41
+    puts "ret = #{ret}"
+    ret = do_Action(42); 
+    puts "ret = #{ret}"
+    ret = do_Action(43); 
+    puts "ret = #{ret}"                                           
+    ret = do_Action(44); 
+    puts "ret = #{ret}"
+#
+    ret = do_Action(48);    # Yet
+    puts "ret = #{ret}"
+
+    ret = do_Action(49);    # Meanual go
+    puts "ret = #{ret}"
+
+#
+    ret = do_Action(45, 0, -2);    # Not sufficient　Params
+    puts "ret = #{ret}"
+    ret = do_Action(46,1); 
+    puts "ret = #{ret}"
+
+    ret = do_Action(47);    # Not sufficient　Params
+    puts "ret = #{ret}"
+    ret = do_Action(48);    # Yet
+    puts "ret = #{ret}"
+
+    ret = do_Action(49);    # Meanual go
+    puts "ret = #{ret}"
+
+    ret = do_Action(40);    # 'Q'
+    puts "ret = #{ret}"
+    exit
+    
+  end
 
   def test_GoBack
+    puts "#def test_GoBack"
     puts '== Saved Case =='
+    
     all_SavedCase
 
     all_SavedSeq
     
-    puts '\nTest Go Back'
+    puts "\nTest Go Back"
 
+#    # == (0...@savedCase.size).to_a.reverse
     (0...@savedCase.size).map(&:itself).reverse.each do |idx|
 #    (0...@savedCase.size).map(&:itself).each do |idx|
+    print "****** reverse 0            object-id='", @wrkdays.object_id, "'\n"
       @savedCase[idx].keys.each do |k|
         if ok_YN?( " '#{idx}'  key ='#{k}' Do?  Y/N/Q" ) == 'N'
           return
         end
+    print "****  reverse 1  Before    object-id='", @wrkdays.object_id, "'\n"
         sc = load_Case( @savedCase[idx][k])
+    print "*** reverse 2 (load_Case). object-id='", @wrkdays.object_id, "'\n"
         if sc ==nil
           puts "#!! ERRor @savedCase['#{idx}']['#{k}'] ==nil"
         else
           @wrkdays=sc
+    print "*** reverse 3 (assigned). object-id='", @wrkdays.object_id, "'\n"
           print "loaded @wrkdays='", @wrkdays, "'\n"
           if @savedSeqWrkr[idx] != nil
             sw =Marshal.load( @savedSeqWrkr[idx] )
@@ -50,7 +152,9 @@ module TestHelper
       sc=load_PrevCase
       
       break if sc ==nil
+    print "****** Prev 1. wrkdays object-id='", @wrkdays, "'\n"
       @wrkdays=sc
+    print "****** Prev 2. wrkdays object-id='", @wrkdays,  "'\n"
       hor_show(false)
     end 
 

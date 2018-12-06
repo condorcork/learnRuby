@@ -233,20 +233,30 @@ include './View'
     @wrkdays[idxWorker] = strDays.split('')
   end
 
-=begin 
+#=begin 
 # yet perhaps Not So good  
   #..............................
-  def shift_Part(idxWorker, direction=+1, idx_Start)
-    #..............................
-  # shift right +N, left -N
-    puts "#  def shift_Part( #{idxWorker}, #{direction} )"    
+#  def shift_Part(idxWorker, direction=+1, idx_Start, idx_End, filler=' ')
+  def slide_Part(idxWorker, direction=1, idx_Start=4, idx_End)  #   , filler=' ')
+  #..............................
+  # shift or Slide  right +N, left -N from idx_Start to idx_End 
+    puts "#  def shift_Part( #{idxWorker}, #{direction},  #{idx_Start}, #{idx_End} )"    
     #
     strDays = @wrkdays[idxWorker].join('')
-    strDays = strDays.slice(idx_Start, @num_days16)
-    puts " Orignal 4, @num_days16  strDays  '#{strDays.length}'"
+    strDays = '0123456789|0123456789|'*2
+    strDays = strDays.slice(0... 4 + @num_days16 )
+    part2 = strDays.slice(idx_Start .. idx_End)
+    part1 = strDays.slice(0... idx_Start)
+    part3 =  strDays.slice(idx_End + 1 ... @num_days16 + 4)
+    
+    puts " Orignal "
     puts "'#{strDays}'"
-    puts "....+....0"*4
-
+    puts "'" +"....+....0"*4
+    puts "'#{part1}'"
+    puts "'" + ' '*(idx_Start -1 - 1) + "'#{part2}'"
+    puts " " + ' '*( idx_End - 1 - 1 ) + "'#{part3}'"
+    puts "'" +"012345678|"*4
+return    
     distance = ( direction < 0 ? direction * -1 : direction )
     puts "#--- distance  '#{distance}'"
     filler = ' ' * distance    
@@ -262,15 +272,13 @@ include './View'
     strDays = @wrkdays[idxWorker].join('').slice(0,4) + strDays
     @wrkdays[idxWorker] = strDays.split('')
   end # shift_Part
-=end
+#=end
   
   #...........................
   def adjust(worker, reset=true)
   #............................
     puts "#def adjust( #{worker} )"
-    
-    save_Case
-    
+#    save_Case
     cnt_add=cnt_del=changed=cnt_ok = cnt_ok0 =cnt_offDays =  0
     @theMonthRange.each {|day|
       num = cnt_filled(day)
