@@ -47,10 +47,33 @@
 #........
 # option
 #  seq_workers REVETSE
+#  changed day spcial attr
+#   on : After action
+#   off : after show_Hyo
+#        ==> Before Next Action
+#         actually when
+# must
 #  Setting limitChangePWorker if short
+#  save switch Off/On for GoBack etc
+     # examine in show best score save
+     # sw
+       @isGoBackMode = false
+       True : GoBack
+       False  After func GoBack
+               show_Hyo --> examine 
+	       ??   False - >   save
+
+     Another Way
+       default     nosave
+       new change  save SPECIFY
+       
+       
+#  BestScore
+#  USE slide_Part returned Value
 #
 # must 
-#            x best Score point only(11/28-) 12/01 done 
+#            x best Score point only(11/28-)
+/01 done 
 
 ##
 bug      12/3

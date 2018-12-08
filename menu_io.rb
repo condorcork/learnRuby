@@ -41,7 +41,7 @@ require 'io/console/size'
  21.Shift seq  22. Pattern etc.
 30..[sMenu]  Go back to DONE Status
  31.Blank 32.Blank_ 33.Koyano
- 34.Pattern 35.Prev 39.Best 
+ 34.Pattern 35.Prev 38.Best <39> 
 4[0]..[sMenu] SELECT Action 
  41.Blank 44.Koyano(Prepared) 47. Adjust_Round
 5[0]..[sMenu] INFO
@@ -80,10 +80,10 @@ EOF
           do_ChngActCond(menu) # 20
         when 3, 30, 31..39 # 30..GoBack #
     # 31.Blank  32.Blank_ 33.Koyano
-    #34.Pattern 35.Prev 39.Best 
+    #34.Pattern 35.Prev 38.Best [39] 
           do_GoBack(menu)
         #-- Action    
-        when 4, 40, 41..49 # SELECT Action
+        when 4, 40, 41..49
      # 41. Shift  42. Adjust  43. Adjust_Round
           do_Action(menu)
         when 50..59
@@ -155,7 +155,7 @@ EOF
     puts "#do_GoBack( '#{menu}' )"
     if menu == 3 or menu == 30
       puts ' 31.Blank  32.Blank_ 33.Koyano'
-      print ' 34.Pattern  35.Prev 39.Best Q.quit:'
+      print ' 34.Pattern  35.Prev 38.Best [39] Q.quit:'
       while true
         l=gets.chop
         if l =~ /\s*Q\s*/i
@@ -163,7 +163,7 @@ EOF
           return
         else
           case l.to_i
-          when 31..35,39
+          when 31..35,38,39
             menu = l.to_i
             break
           end
@@ -171,6 +171,7 @@ EOF
       end # while true
     end
     puts "nenu GoBack '#{menu}'"
+    @isSaveMode = false
     case menu
     #--- Prepare to 
     when 31
@@ -184,6 +185,7 @@ EOF
       caseName='Pattern'
     end
     #
+    @isSaveMode = false
     case menu
     when 31..34
       ret = load_NamedCase(caseName)
@@ -191,10 +193,12 @@ EOF
     when 35
       ret= load_PrevCase
       show_Hyo(false) if ret
-    when 39
+    when 38
       if load_BestScore != nil
         show_Hyo
       end
+    when 39
+      all_SavedCase
     end
   end
 
@@ -309,7 +313,7 @@ Marshal.load(file)
  H(elp)/M(enu): show This Menu"
  Q[uit].   Exit Menu
 EOF
-
+    
     puts " '#{wrker_dir_ndays}''"
     wrkr = dir = nday = nday2 = nil
     
@@ -355,33 +359,41 @@ EOF
     end  # case menu   
     #
     puts "## Menu=#{menu}    wrkr '#{wrkr}'  dir '#{dir}'  ndays='#{nday}' ndays2='#{nday2}'"
-    
+
+    @isSaveMode = true
     case menu
     when 41
-puts "#      load_NamedCase('Blank')"
+puts "#      load_NamedCase('Blank_')"
       
     when 42
-puts "#      prepareKoyano(3)"
-    when 43
-puts "#      put_Pattern"
-    when 44
-puts "#      set_Koyano"
+      puts "#    do  K_Yoyaku"
+      yoyaku(3, '6012')
+p    when 43
+      puts "#      Pattern"
+      put_Patterns
+     when 44
+       puts "#      set_Koyano"
+       presetKoyano(@idx_Koyano, howTo=0)
     when 45
       puts "# ShiftTo right/left  for #{wrkr}"
       shift_to(wrkr, dir )
 #      show_Hyo
     when 46
-puts "#      adjust(wrkr)"
+      puts "#      adjust(wrkr)"
+      adjust(wrkr)
     when 47
-puts "#      adjust_Round"
+      puts "#      adjust_Round"
+      adjust_Round
     when 48
       puts "# do Exexctuing Karte (not yet)"
     when 49
       puts "# Manual Doing"
     else
+      @isSaveMode = false
       return
     end # case menu
-  end # do_Action
+    @isSaveMode = false
+   end # do_Action
 
                      #
   #.............................
@@ -497,6 +509,7 @@ puts "#      adjust_Round"
     end
     #  def do_Change
     puts "sel Do ==> #{menu}"
+    @isSaveMode = false
     case menu
     when 69
       if ok_YN?("change horizontal '#{@horizontal}' Mode : Y/N" )
@@ -545,7 +558,9 @@ EOF
         else
           do_ToggleDay(ret[0], ret[1])
         end
-        
+        @isSaveMode = true
+        examine
+        @isSaveMode = false
         return ret
       when /^[ \t]*Q/i
         puts "Exit"

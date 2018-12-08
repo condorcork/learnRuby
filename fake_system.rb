@@ -15,7 +15,8 @@ module FakeSystem
     @savedCase = []
     @savedSeqWrkr = [] # for seq_workers 
     #    @savedCase << {"noname" => dump'}
-  end #def init_fake()
+    @isSaveMode = false
+   end #def init_fake()
 
   #...........................
   def sr_dumpCase( caseName )
@@ -81,7 +82,14 @@ module FakeSystem
   #-----------------------------
   def save_Case(nameCase ='noname')
   #-----------------------------
-    puts "#def save_Case  #{@nameCase}"    
+    puts "#def save_Case(#{nameCase})"
+    puts "@isSaveMode  '#{@isSaveMode}'"
+    if nameCase == 'noname' &&
+       @isSaveMode == false then
+      return   # 
+    end
+
+    # New Action only
     prevCase = Marshal.dump( @wrkdays )
     @savedCase << { nameCase => prevCase}
     prevSeq = Marshal.dump( @seq_workers )
@@ -107,11 +115,11 @@ module FakeSystem
  #   print "*** 2. in (load_Case). object-id='", @wrkdays.object_id, "'\n"
         if param[0] != nil && param[0] == true
           puts "# DONE load_Case"
-          my_Pop
+#          my_Pop
 #   print "*** 2. in (load_Case). object-id='", @wrkdays.object_id, "'\n"
           
-#          @savedCase.pop
-#          @savedSeqWrkr.pop
+          @savedCase.pop
+          @savedSeqWrkr.pop
         end
       end
     else
@@ -123,11 +131,11 @@ module FakeSystem
   end # def load_Case(case_Marshal)
 
   def CasePop(num)
-    num.times{ @saved_Case.pop }
+    num.times{ @savedCase.pop }
   end
 
   def CaseShift(num)
-    num.times{ @saved_Case.shift }
+    num.times{ @savedCase.shift }
   end
 
   def all_SavedCase(isVerbose=true)
@@ -190,10 +198,10 @@ puts "## Done laod_PreCase : check Shifted"
 #        p @savedSeqWrkr.shift
 #         @savedCase[-1,1]=[]
 #        @savedSeqWrkr[-1,1]=[]
-#        @savedCase.pop
-        #        @savedSeqWrkr.pop
-        my_Pop
-        puts "$$ PrevCase pop"
+        @savedCase.pop
+        @savedSeqWrkr.pop
+#        my_Pop
+        puts "$$ PrevCase After pop"
         all_SavedCase
         all_SavedSeq
      end
@@ -202,6 +210,7 @@ puts "## Done laod_PreCase : check Shifted"
   end # def load_PrevCase(isDel=true)
 
 =begin  
+# not used --> all_SavrfCase
   #-----------------------------
   def allSavedCase( caseName = nil )
   #-----------------------------
@@ -229,12 +238,10 @@ puts "## Done laod_PreCase : check Shifted"
   end  #def allSavedCase
 =end
   
-
-  #;- no test  
   #----------------------------
   def copy_Data( src )
   #----------------------------
-    puts "# def copy_Data( src, target)"
+    puts "#def copy_Data(src) return OBJ"
     target = Marshal.load( Marshal.dump( src ) )
   end # def copy_Data( src )
   
@@ -242,7 +249,7 @@ puts "## Done laod_PreCase : check Shifted"
   #......................
   def test_load_saveCase()
   #.......................
-    puts '#def test_load_daveCase'
+    puts '#def test_load_saveCase'
    puts "#### Go Back to beginning"
    cnt =  0
    caseS  = load_Case

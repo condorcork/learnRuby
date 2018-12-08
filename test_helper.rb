@@ -3,11 +3,11 @@ module TestHelper
 
 
   def test_slide_Part
-    #    slide_Part(0, 2, 2,9)
-    shift_to(0, 2, 6, 7)
+     slide_Part(0, 2, 6,7)
+#    shift_to(0, 2, 6, 7)
     show_Hyo(false)
-    shift_to(0, -2, 6, 7)
-    show_Hyo(false)
+ #   shift_to(0, -2, 6, 7)
+#    show_Hyo(false)
   end 
 
   def test_copy
@@ -154,9 +154,9 @@ module TestHelper
       sc=load_PrevCase
       
       break if sc ==nil
-    print "****** Prev 1. wrkdays object-id='", @wrkdays, "'\n"
+#    print "****** Prev 1. wrkdays object-id='", @wrkdays, "'\n"
       @wrkdays=sc
-    print "****** Prev 2. wrkdays object-id='", @wrkdays,  "'\n"
+#    print "****** Prev 2. wrkdays object-id='", @wrkdays,  "'\n"
       hor_show(false)
     end 
 

@@ -81,6 +81,8 @@ include './View'
     
     puts "\n#==  presetKoyano( #{idxWorker} )"
 
+    @isSavedMode = true
+
     pos_OffDays = get_SeqOffDays( @wrkdays[idxWorker])   
  #   p "po_OffDayss",pos_OffDays
 
@@ -104,6 +106,7 @@ include './View'
     }
     puts "# presetKoyano #{cnt_add} days Added"
     examine()
+    @isSavedMode = false
   end
   
   #...............................
@@ -115,9 +118,11 @@ include './View'
       return false
     end
     #---
+    @isSavedMode = true
+    #
     psv=preserv.split('').sort
     all='0123456'.split('')
-#----    
+0#----    
     psv=preserv.split('').map(&:to_i)
     
     startDay = Date.new(@year_16, @month_16, 16).day
@@ -133,14 +138,14 @@ include './View'
      puts "Yoybi #{yb}  #{%w(Su Mo Tu We Th Fr Sa)[yb]}"
  end
 =end
-      if psv.include?(yb)
-        @wrkdays[id_worker][i] = 'D'
-        if @debug_ == -1
-          p @wrkdays[id_worker]
-        end
-      end
-      i+=1
-      delta+=1
+     if psv.include?(yb)
+       @wrkdays[id_worker][i] = 'D'
+       if @debug_ == -1
+         p @wrkdays[id_worker]
+       end
+     end
+     i+=1
+     delta+=1
     }
   end
 
@@ -158,7 +163,7 @@ include './View'
   def put_Pattern(idx)
   #...................
     puts "# def put_Pattern( #{idx} )"
-
+    @isSavedMode = true
       dat_work=@wrkdays[idx]
       startp=start_p(dat_work)
       i=4;
@@ -168,6 +173,7 @@ include './View'
         i=i+1
       end
       @wrkdays[idx]= dat_work
+      @isSavedMode = false
   end # put_Pattern
 
   #.............................
@@ -186,6 +192,7 @@ include './View'
       return false
     end
     #
+    @isSavedMode = true
     prv=prevdays.split('')
   if @debug_ > 10
     p prv
@@ -221,7 +228,10 @@ include './View'
     strDays = @wrkdays[idxWorker].join('')
     strDays = strDays.slice(4, @num_days16)
   #  puts " Orignal 4, @num_days16  strDays  '#{strDays.length}'"
-  #  puts "'#{strDays}'"
+    #  puts "'#{strDays}'"
+    #
+    @isSavedMode = true    
+    #
     puts "....+....0"*4
 
     distance = ( direction < 0 ? direction * -1 : direction )
@@ -247,7 +257,7 @@ include './View'
   #..............................
     # shift or Slide  right +N, left -N from idx_Start to idx_End
     #   filler = ' '
-    puts "#  def shift_Part( #{idxWorker}, #{direction},  #{idx_Start}, #{idx_End} )"    
+    puts "# def shift_Part( #{idxWorker}, #{direction},  #{idx_Start}, #{idx_End} )"    
     #
     if ! @theMonthRange.include?( idx_Start ) ||  ! @theMonthRange.include?( idx_End )
       puts "#!! slide_Part : day from/to is out of Range"
@@ -255,7 +265,9 @@ include './View'
       return false
     end
 
-    
+    #
+    @isSavedMode = true    
+    #  
     strDays = @wrkdays[idxWorker].join('')
     wrkdaysOrg = copy_Data( @wrkdays[idxWorker] )
 #    strDays = '0123456789|0123456789|'*2
@@ -485,7 +497,9 @@ include './View'
     end # @theMonthRange.each do |day|
     ##
     
-#    
+    #
+    @isSavedMode = true    
+    #
     hor_show() # @seq_workers[0])  # include exa.
     #
     puts "# << Adjust_Round done>> "

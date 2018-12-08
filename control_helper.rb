@@ -40,7 +40,7 @@ module ControlHelper
 
     #-----  End Paramater to Change CONDITION ----
     #
-    @Koyano = @num_workers - 1
+    @idx_Koyano = @num_workers - 1
 
     #--- Date ---- 
     if date.day < 7
@@ -69,8 +69,8 @@ module ControlHelper
     #
  
     # === Working Data ===    
-#    @wrkdays=Array.new( @num_workers + 1, Array.new(35, ' ') )
-    @wrkdays=Array.new( @num_workers, Array.new(35, ' ') )    # NO check Area 
+    #    @wrkdays=Array.new( @num_workers + 1, Array.new(35, ' ') )
+    mk_WrkDays  #  @wrkdays
     
     # === Data ====
     # check info & views
@@ -127,6 +127,10 @@ module ControlHelper
     #    
   end #
 
+  def mk_WrkDays
+    @wrkdays=Array.new( @num_workers, Array.new(35, ' ') )
+  end
+  
   #................
   def goBack_Start_seq()
   #................
@@ -441,8 +445,9 @@ module ControlHelper
   #
   #   check & Hyouka
   #
+  workers=
   #..............................
-  def examine(workers=[0,1,2,3])
+  def examine(workers=(0...@num_workes).to_a)  #[0,1,2,3])
   #...........................
 #  puts "# def examine( #{workers} )"
     #
@@ -554,6 +559,9 @@ module ControlHelper
   # def load_BestScore()
     # def
     puts "#def chk_BestScore"
+    #    
+    return if !@isSavedMode
+    #
     puts "bestScore  #{point} <> #{@bestScore[0][:point]}"
 
     if point < @bestScore[0][:point]
@@ -574,6 +582,7 @@ module ControlHelper
     if @bestScore[0][:num] > 1
       puts "#... Tie Score #{point}"
     end
+    #
     @bestScore[0][:case] << save_Case
     @bestScore[0][:env] << Marshal.dump(@seq_workers)
   end #  chk_BestScore( point )

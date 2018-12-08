@@ -68,7 +68,8 @@ module View
   #  puts "# def hor_show( #{chk_Worker} )"
     #  Prepare Check Line
     examine()
-#
+    #
+    svd = copy_Data( @wrkdays )
     # for Header & Guide
     #
     hdrDay   = "  |"
@@ -108,7 +109,7 @@ module View
     # Each Worker On/Off days
     #
     filler = '_'
-print "@wrkdays['#{0}'] = '", @wrkdays[0] ,"'\n"
+#print "@wrkdays['#{0}'] = '", @wrkdays[0] ,"'\n"
 #print "@wrkdays['#{1}'] = '", @wrkdays[1] ,"'\n"
 #print "@wrkdays['#{2}'] = '", @wrkdays[2] ,"'\n"
 #print "@wrkdays['#{3}'] = '", @wrkdays[3] ,"'\n"
@@ -142,6 +143,13 @@ print "@wrkdays['#{0}'] = '", @wrkdays[0] ,"'\n"
      puts "<>|#{dat}"    # when PC
      puts 'IX|' + footer
 
+     @wrkdays = []
+     svd.each_with_index{|w, i|
+       tmp = w.join('')
+       tmp.gsub!('*',' ')
+       tmp.gsub!('X','x')
+       @wrkdays << tmp.split('')
+     }
      if dispResult
        show_Result
      end
@@ -201,7 +209,7 @@ print "@wrkdays['#{0}'] = '", @wrkdays[0] ,"'\n"
   #....................
   def show_Hyo( isResult=true ) 
   #....................
-  #  puts "#def show_Hyo( isResult=true )"
+    #  puts "#def show_Hyo( isResult=true )"
     if @horizontal
       hor_show(isResult)
     else

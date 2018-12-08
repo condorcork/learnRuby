@@ -58,16 +58,18 @@ require './CoreLogic'
 #
   y.put_Patterns()
   y.save_Case('Pattern')     
-  y.hor_show(false)
-y.test_slide_Part
-exit
-
+  y.show_Hyo(false)
+#y.test_slide_Part
+#exit
+  y.sel_MainMenu
+  exit
 
 
   
-  y.test_GoBack
-  puts "returned  GoBack"
-  y.all_SavedCase
+#  y.test_GoBack
+#  puts "returned  GoBack"
+#  y.all_SavedCase
+#  exit
   #
   if y.ok_YN?("do Koyano Preset y/n")
     y.presetKoyano( 3 )   # y.@Koyano )  #, [0,1,2,6], [3,5])
@@ -79,11 +81,11 @@ exit
   
   puts "#---- Check ---"
 #  
-  $fulldayDebug = true
+#  $fulldayDebug = true
 #  y.examine
 #  if y.ok_YN?("Main Menu Y/N/Q:")
-#    y.sel_MainMenu
-#    exit 0
+    y.sel_MainMenu
+    exit 0
 #  end
   
   #-----------------------
