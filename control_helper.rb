@@ -445,9 +445,9 @@ module ControlHelper
   #
   #   check & Hyouka
   #
-  workers=
   #..............................
-  def examine(workers=(0...@num_workes).to_a)  #[0,1,2,3])
+#  def examine(workers=(0...@num_workes) ) # .to_a)  #[0,1,2,3])
+  def examine(workers=[0,1,2,3])
   #...........................
 #  puts "# def examine( #{workers} )"
     #

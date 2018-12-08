@@ -29,7 +29,6 @@ require 'io/console/size'
     exit 1;
   end
 
-
   #.........................
   def sel_MainMenu()
   #.........................
@@ -55,7 +54,7 @@ require 'io/console/size'
  9[0], Q[uit].   Exit 
 EOF
     print prompt
-  print ' : '
+  print ': '
     
     casename = []
     
@@ -537,7 +536,8 @@ p    when 43
  'worker, day':     Toggle On/Off 
  'w1,day1 w2,day2': Exchange 
                      day1 day2
-  'M' :    Upper Menu
+  'U','M' :    Upper (Main) Menu
+  'S' :    Show Hyo
   'Q' :    Quit from This Menu  
 EOF
     print prompt
@@ -562,18 +562,20 @@ EOF
         examine
         @isSaveMode = false
         return ret
-      when /^[ \t]*Q/i
-        puts "Exit"
-        exit 0        
+      when /^[ \t]*Q\s*/i
+        return
+#        puts "Exit"
+#        exit 0        
 #        break
-      when /^[ \t]*M/i
+      when /^[ \t]*S\s*/i
+        show_Hyo
+        print prompt
+      when /^[ \t]*(U|M)\s*/i
         return 'M'
       end
     end
   end # def sel_ToggleExchange(msg=nil)
 
-                     
- 
   #............................
   def get_MenuDat(ptrn, param)
   #...........................

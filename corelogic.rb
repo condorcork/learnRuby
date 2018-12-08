@@ -19,17 +19,6 @@ include './ControlHelper'
 include './MenuIo'
 include './View'
   
-  # date
-  #  @month_16
-  #  @year_16 
-  #  @num_days16  #  @wday_16
-  #  @theMonthRange  #[- to refact
-  # @num_workers
-  # ...
-  # check
-  #  @wrkdays
-  #  @cnt_hecks
-  
   #............................
   def initialize(members=4, fakeDate=nil )
   #...........................
