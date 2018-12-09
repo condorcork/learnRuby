@@ -23,23 +23,29 @@ require './CoreLogic'
  def preparePrevMonth(y)
 #... Prepare for Prevmonth
   # 'xx  ''xxx'    --> 0(1)
-  y.prepare(0, 'xx  ')
+  y.set_PrevMonth(0, 'xx  ')
   # 'x  x''xx__'   --> 1(2)
-  y.prepare(1, 'x  x')
+  y.set_PrevMonth(1, 'x  x')
 
   # ' xxx''__xx'   --> 3(4)
-  y.prepare(2, ' xxx')
+  y.set_PrevMonth(2, ' xxx')
   # ' DDx '' DDD'  special
-  y.prepare( 3, 'DDx ')    # y.@Koyano
+  y.set_PrevMonth( 3, 'DDx ')    # y.@Koyano
   #
  # y.hor_show(false)
  end
 
-#----- MAIN ------
+ #----- MAIN ------
+  
  $fulldayDebug = false
  members=4
    y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
-#  y=Yotei.new(members) 
+   #  y=Yotei.new(members)
+   
+ r =y.get_FromMenu_30("menu 30\nEnter worker :", 35)
+ p r
+  exit
+   
   y.save_Case('Blank')
   preparePrevMonth(y)
   y.save_Case('Blank_')
@@ -97,7 +103,7 @@ y.save_Case("Initial")                # initail stat
   #... PreSet  Fill days by Patern ....
   puts "#---- PRESET by Pattern---"
   y.put_Patterns()
-  y.save_Case("Prepared")     
+  y.save_Case("Set_PrevMonth")     
   y.ver_show(false)
 
   #####

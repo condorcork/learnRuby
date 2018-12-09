@@ -38,11 +38,12 @@ require 'io/console/size'
 1[0]..[sMenu] 
 2[0]..[sMenu] Change CONDTION 
  21.Shift seq  22. Pattern etc.
-30..[sMenu]  Go back to DONE Status
- 31.Blank 32.Blank_ 33.Koyano
- 34.Pattern 35.Prev 38.Best <39> 
-4[0]..[sMenu] SELECT Action 
- 41.Blank 44.Koyano(Prepared) 47. Adjust_Round
+3[0]..[sMenu] SELECT Action 
+ 31.Blank 34.Koyano(Prepared) 37. Adjust_Round
+40..[sMenu]  Go back to DONE Status
+ 41.Blank 42.Blank_ 43.Koyano
+ 44.Pattern 45.Prev 48.Best <49> 
+
 5[0]..[sMenu] INFO
  51.Best Score, show HYO
 60..[sMenu] HYO :Change horizontal Mode
@@ -77,12 +78,12 @@ EOF
         when 2, 20, 22    # Change CONDTION #
           # 21. Shift seq  22. Pattern etc.
           do_ChngActCond(menu) # 20
-        when 3, 30, 31..39 # 30..GoBack #
+        when 4, 40, 41..49 # 40..GoBack #
     # 31.Blank  32.Blank_ 33.Koyano
     #34.Pattern 35.Prev 38.Best [39] 
           do_GoBack(menu)
         #-- Action    
-        when 4, 40, 41..49
+        when 3, 30, 31..39
      # 41. Shift  42. Adjust  43. Adjust_Round
           do_Action(menu)
         when 50..59
@@ -149,7 +150,7 @@ EOF
   end #do_ChangeCond
 
   #.............................
-  def do_GoBack(menu)   # 30 GoBack
+  def do_GoBack(menu)   # 40 GoBack
   #.............................
     puts "#do_GoBack( '#{menu}' )"
     if menu == 3 or menu == 30
@@ -295,31 +296,35 @@ Marshal.load(file)
   end
   
   #.............................
-  def do_Action(menu, *wrker_dir_ndays)    # 4. 40.
-#  def do_Action(menu)    # 4. 40.
+  def do_Action(menu, *wrker_dir_ndays)    # 3. 30.
+#  def do_Action(menu)    # 3. 30.
   #.............................
     menuData=<<-EOF
 [ Action MENU ]
-41. Blank with  Prev Month data
-42. Koyano Yoyaku
-43. put Pattern
-44. set Koyano (before or after Holidays)
-45.. ShiftTo Right / Left
-46.. Adjust
-47. Adjust Round & Occurence No Limit
-48.. Continuous Do (Select Number )  
-49. Mnual Handling (inc  Adjust Holiddays)
+31. Blank with  Prev Month data
+32. Koyano Yoyaku
+33. put Pattern
+34. set Koyano (before or after Holidays)
+35.. ShiftTo Right / Left
+36.. Adjust
+37. Adjust Round & Occurence No Limit
+38.. Continuous Do (Select Number )  
+39. Mnual Handling (inc  Adjust Holiddays)
  H(elp)/M(enu): show This Menu"
  Q[uit].   Exit Menu
 EOF
     
     puts " '#{wrker_dir_ndays}''"
+    print menuData
     wrkr = dir = nday = nday2 = nil
     
     # check Complete?
     case menu
-    when 4, 40  #
+    when 3, 30 #
       isReady = false
+    when 31..34,37,39
+      isReady = true      
+=begin      
     else
       isReady = true
       if wrker_dir_ndays[0] != nil
@@ -336,56 +341,61 @@ EOF
       if wrker_dir_ndays[3] != nil
         nday2 = wrker_dir_ndays[3].to_i
       end
-      if menu == 45 or menu == 46
+      if menu == 35 or menu == 36
         if wrkr == nil
           isReady = false
           puts "#{menu} Param wrker Not Specified"
         end
-        if menu == 45
+        if menu == 35
           if dir == nil
             isReady = false
             puts "#{menu} Shift Direction Not Specified"
           end
         end
       end
-      
-      # sub menu or param
-      while !isReady
-        puts "goto get_FromMenu_40"
-        menu, wrkr, dir, ndays, ndays2 = get_FromMenu_40(menuData, menu) 
-        break
-      end # while !isReady
-    end  # case menu   
+=end
+    end # case menu
+    # sub menu or param
+    while !isReady
+      puts "goto get_FromMenu_40"
+      menu, wrkr, dir, ndays, ndays2 = get_FromMenu_30(menuData, menu) 
+      break
+    end # while !isReady
+
     #
     puts "## Menu=#{menu}    wrkr '#{wrkr}'  dir '#{dir}'  ndays='#{nday}' ndays2='#{nday2}'"
 
     @isSaveMode = true
     case menu
-    when 41
-puts "#      load_NamedCase('Blank_')"
-      
-    when 42
+    when 31
+      puts "#      load_NamedCase('Blank_')"
+      mk_WrkDays
+      set_PrevMonth(0, 'xx  ')
+      set_PrevMonth(1, 'x  x')
+      set_PrevMonth(2, ' xxx')
+      set_PrevMonth(3, 'DDx ')
+    when 32
       puts "#    do  K_Yoyaku"
       yoyaku(3, '6012')
-p    when 43
+    when 33
       puts "#      Pattern"
       put_Patterns
-     when 44
+     when 34
        puts "#      set_Koyano"
-       presetKoyano(@idx_Koyano, howTo=0)
-    when 45
+       presetKoyano(@idx_Koyano)
+    when 35
       puts "# ShiftTo right/left  for #{wrkr}"
       shift_to(wrkr, dir )
 #      show_Hyo
-    when 46
+    when 36
       puts "#      adjust(wrkr)"
       adjust(wrkr)
-    when 47
+    when 37
       puts "#      adjust_Round"
       adjust_Round
-    when 48
+    when 38
       puts "# do Exexctuing Karte (not yet)"
-    when 49
+    when 39
       puts "# Manual Doing"
     else
       @isSaveMode = false
@@ -396,48 +406,68 @@ p    when 43
 
                      #
   #.............................
-  def get_FromMenu_40(menuData, menu)
+  def get_FromMenu_30(menuData, menu)
     #.............................
-    puts "# def get_FromMenu_40( menu=#{menu} )"
+    puts "# def get_FromMenu_30( menu=#{menu} )"
+    # get detail param in menu 35 36
     quit_ = ''
-    #case menu
-    #when 4, 40
-      print menuData
-      menu, wrkr, dir, nday, nday2 = get_FromMenu_40_Sub
-      case  menu
-      when /Q/i
-        return 'Q'
-      when 41..44, 47, 49            # Ok 
-      when 99
-        return 99
-      else
-        if menu == 45  # when ShiftTo
-          print "Worker #.'#{wrkr}'  to #{dir}"
-          if nday != nil
-            puts "  from #### ndays  "
-            if nday2 != nil  
-              print " to #{nday2}"
-            end
-          end
-          puts ""
-          if ! rply=ok_YN?("OK Y/N/Q")
-            menu = 90
-          end
-#           'Q' ### Quit (Exit) in ok_YN?
-        elsif menu == 46  # Adjust
-          puts "Adjust  Worker #.'#{wrkr}'"
-          if ! rply=ok_YN?("OK Y/N/Q")
-            menu=90   # No
-          end
-        end
-      end
-    #end
-    return menu, wrkr, dir, nday, nday2
+    print menuData
+    #    menu, wrkr, dir, nday, nday2 = get_FromMenu_30_Sub
+    puts '35: shift(slide)'
+    puts '  wrker (-|+)*direction ( fromDay, toDay)'
 
-  end #  def get_fromMenu_40
+    puts '^\s*(\d)(\s+(-*\d+)(\s+(\d+)\s*,\s*(\d+))*)*\s*$'
+    while true
+      l=gets.chop
+      puts "'#{l}'"
+      l =~ /^\s*(\d)(\s+(-*\d+)(\s+(\d+)\s*,\s*(\d+))*)*\s*$/ 
+      case l
+      when /Q/i
+        return [ 'Q' ]
+      when /^\s*(\d)\s*$/
+        wrkr=$1
+        if menu == 36
+          return wrkr.to_i
+        else
+          puts "menu NOT 36"
+          next
+        end
+      when /^\s*(\d)(\s+(-*\d+)(\s+(\d+)\s*,\s*(\d+))*)*\s*$/
+     # wrkr
+     #( (dir) (, ((day1), (day2))* )*
+        wrkr= $1
+        dir=$3
+        day1 = $5
+        day2 = $6
+        puts "#{wrkr} #{dir} #{day1} #{day2}"
+puts "#{$1}'  '#{$2}' '#{$3}' '#{$4}' '#{$5}'  '#{$6}' '#{$7}'"        
+        if menu == 35  # when ShiftTo
+          print "Worker #.'#{wrkr}'  to #{dir}"
+          if day1 != nil
+            puts "  from #{day1}q"
+            if day2 != nil  
+              print " to #{day2}"
+            end
+            if ! rply=ok_YN?("OK Y/N/Q")
+              menu = 90
+            end
+#           'Q' ### Quit (Exit) in ok_YN?
+          elsif menu == 36  # Adjust
+            puts "Adjust  Worker #.'#{wrkr}'"
+            if ! rply=ok_YN?("OK Y/N/Q")
+              menu=90   # No
+            end
+          end # if day1
+        end # if menu
+      end #case l
+    end # while
+    #end
+    return wrkr, dir, day1, day2
+
+  end #  def get_fromMenu_30
 
   #.........................
-  def get_FromMenu_40_Sub
+  def get_FromMenu_30_Sub
   #.........................
    print ' Number or Q :'
    wrkr = dir = nday =  nday2 = nil
@@ -449,12 +479,12 @@ p    when 43
      elsif  l =~/^\s*(\d\d)\s*$/
        menu = $1.to_i
        case menu
-       when 41..44, 47, 49            # Ok 
+       when 31..34, 37, 39            # Ok 
          break;
-       when 46
+       when 36
          puts "\n #{menu}. Worker Not specified. ReEnter"
          next 
-       when 45, 48
+       when 35, 38
          puts "# Shift(Slide)   SELECT  worker, direction [ startDay [, EndDays ]]"
          next
        end

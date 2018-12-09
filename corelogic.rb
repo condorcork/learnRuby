@@ -166,7 +166,8 @@ include './View'
   end # put_Pattern
 
   #.............................
-  def prepare(idx, prevdays=' '*4, nvotAvail={})
+  def set_PrevMonth(idx, prevdays=' '*4, notAvail={})
+#  def prepare(idx, prevdays=' '*4, notAvail={})
   #.............................
 #    puts "def prepare( #{idx}, #{prevdays}, #{ nvotAvail})"
 
