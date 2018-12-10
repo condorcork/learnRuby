@@ -41,11 +41,7 @@ require './CoreLogic'
  members=4
    y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
    #  y=Yotei.new(members)
-   
- r =y.get_FromMenu_30("menu 30\nEnter worker :", 35)
- p r
-  exit
-   
+
   y.save_Case('Blank')
   preparePrevMonth(y)
   y.save_Case('Blank_')

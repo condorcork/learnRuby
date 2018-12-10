@@ -165,6 +165,30 @@ include './View'
       @isSavedMode = false
   end # put_Pattern
 
+  #[-
+  #...............
+  def get_PastMonthData(nen,tuki)
+  #...............
+    # 16-28,29,30,31 1..15
+    # month of 1..15
+    #...............
+    
+    #past_wrkdays=
+    #num_workers
+  end
+
+  #[-
+  def get_Last4days
+  #  wrk=get_PastMonthData
+    ret=[]
+    # test data
+    ret << 'xx  '
+    ret << 'x  x'
+    ret << ' xxx'
+    ret << 'DDx '
+    #
+  end
+  
   #.............................
   def set_PrevMonth(idx, prevdays=' '*4, notAvail={})
 #  def prepare(idx, prevdays=' '*4, notAvail={})
