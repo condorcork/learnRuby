@@ -40,33 +40,30 @@ require 'io/console/size'
  21.Shift seq  22. Pattern etc.
 3[0]..[sMenu] SELECT Action 
  31.Blank 34.Koyano(Prepared) 37. Adjust_Round
-40..[sMenu]  Go back to DONE Status
+40..[sMenu] Go back to DONE Stat.
  41.Blank 42.Blank_ 43.Koyano
  44.Pattern 45.Prev 48.Best <49> 
-
 5[0]..[sMenu] INFO
  51.Best Score, show HYO
-60..[sMenu] HYO :Change horizontal Mode
-  61/62. Hyo only/ Hyo with Detail
+60..[sMenu] HYO:Change hori/vert Mode
+ 61/62. Hyo only/ Hyo with Detail
 70. ENDING (decide A.B) & Print
 70.
 8[0]. Manual Handling
  H(elp)/M(enu): show This Menu"
  9[0], Q[uit].   Exit 
 EOF
-    print prompt
-  print ': '
-    
-    casename = []
+    puts prompt
+    casename = [] #[-?
     
     while true
       print ": "
       l=gets.chop
       case l
-      when /^(\b*(\d+)\b*)$/
+      when /^(\s*(\d+)\s*)$/
         menu = l.to_i
         case menu
-        #--  Condition 0,1[0], 2[0], 3[0]
+      #--  Condition 0,1[0], 2[0], 3[0]
         when 0   # Initial set & Check
           puts '# Initial Env'
           do_BaseTest()
@@ -75,23 +72,22 @@ EOF
         when 1, 10, 11..19    # 
           # 11. Shift seq  12. Pattern etc.
           do_ChngActCond(menu) # 20
-        when 2, 20, 22    # Change CONDTION #
-          # 21. Shift seq  22. Pattern etc.
-          do_ChngActCond(menu) # 20
-        when 4, 40, 41..49 # 40..GoBack #
-    # 31.Blank  32.Blank_ 33.Koyano
-    #34.Pattern 35.Prev 38.Best [39] 
-          do_GoBack(menu)
-        #-- Action    
+        when 2, 20, 22
+          # Change CONDTION #
+          do_ChngActCond(menu) 
         when 3, 30, 31..39
-     # 41. Shift  42. Adjust  43. Adjust_Round
+        #-- Action    
           do_Action(menu)
+        when 4, 40, 41..49
+        # 40..GoBack #
+          do_GoBack(menu)
         when 50..59
-#          puts ". get Best Scend"
-#          do_HYO(menu)
+#   5[0]..[sMenu] INFO          
+#   puts ". get Best Scend"
+        #         do_HYO(menu)
+          #get_BestScore
         when 60..69
           do_HYO(menu)
-          #get_BestScore
         when 70..79
           puts "do_Ending"
           do_Ending
@@ -103,6 +99,7 @@ EOF
           puts "Exit"
           exit 0
         end
+        
       when /^((\b*(H)(elp)*\b*)|Menu)$/i
         puts 'when /^((\b*(H)(elp)*\b*)|Menu)$/'
         puts prompt
@@ -116,12 +113,12 @@ EOF
   end # sel_MainMenu()
 
   #.............
-  def do_ChngActCond(menu) # 20  
+  def do_ChngActCond(menu) # 10  
   #.............
-    puts '#20# do_ChngActCond'
-    if menu == 20 or menu == 2
-      puts '21 Seq. of Priority'
-      puts '22 pattern   Q[uit] :'
+    puts '#10# do_ChngActCond'
+    if menu == 10 or menu == 1
+      puts '11 Seq. of Priority'
+      puts '12 pattern   Q[uit] :'
       while true
         l=gets.chop
         if l =~ /Q/i
@@ -129,7 +126,7 @@ EOF
           return
         else
           case l.to_i
-          when 21, 22..25
+          when 11, 12..15
             menu = l.to_i
             break
           end
@@ -139,11 +136,11 @@ EOF
     end # if 
     #
     case menu
-    when 21
+    when 11
       set_nextSeq
-    when 22
+    when 12
       set_NextPattern
-    when 23
+    when 13
       puts '# change PATTERN'
       mk_set_Pattern
     end # case menu
@@ -153,9 +150,9 @@ EOF
   def do_GoBack(menu)   # 40 GoBack
   #.............................
     puts "#do_GoBack( '#{menu}' )"
-    if menu == 3 or menu == 30
-      puts ' 31.Blank  32.Blank_ 33.Koyano'
-      print ' 34.Pattern  35.Prev 38.Best [39] Q.quit:'
+    if menu == 4 or menu == 40
+      puts ' 41.Blank  42.Blank_ 43.Koyano'
+      print ' 44.Pattern  45.Prev 48.Best [49] Q.quit:'
       while true
         l=gets.chop
         if l =~ /\s*Q\s*/i
@@ -163,7 +160,7 @@ EOF
           return
         else
           case l.to_i
-          when 31..35,38,39
+          when 41..45,48,49
             menu = l.to_i
             break
           end
@@ -174,30 +171,30 @@ EOF
     @isSaveMode = false
     case menu
     #--- Prepare to 
-    when 31
+    when 41
       caseName='Blank'
-    when 32
+    when 42
       caseName='Blank_'
-    when 33
+    when 43
       caseName='K_Yoyaku'
    #--- After some Action
-    when 34
+    when 44
       caseName='Pattern'
     end
     #
     @isSaveMode = false
     case menu
-    when 31..34
+    when 41..44
       ret = load_NamedCase(caseName)
       show_Hyo(false) if ret
-    when 35
+    when 45
       ret= load_PrevCase
       show_Hyo(false) if ret
-    when 38
+    when 48
       if load_BestScore != nil
         show_Hyo
       end
-    when 39
+    when 49
       all_SavedCase
     end
   end
@@ -323,7 +320,8 @@ EOF
     when 3, 30 #
       isReady = false
     when 31..34,37,39
-      isReady = true      
+      isReady = true
+      puts "## menu 31..34, 37,39 '#{menu}' Seled"
 =begin      
           puts "#{menu} Param wrker Not Specified"
             puts "#{menu} Shift Dpirection Not Specified"
@@ -332,15 +330,14 @@ EOF
     # sub menu or param
     menu, wrkr, dir, ndays, ndays2 = get_FromMenu_30(menuData, menu) if !isReady
 
-       puts "## Menu=#{menu}    wrkr '#{wrkr}'  dir '#{dir}'  ndays='#{nday}' ndays2='#{nday2}'"
+    puts "## Menu=#{menu}    wrkr '#{wrkr}'  dir '#{dir}'  ndays='#{nday}' ndays2='#{nday2}'"
 
     @isSaveMode = true
     case menu
     when 31
       puts "#      load_NamedCase('Blank_')"
       mk_WrkDays
-
-      lastdays=get_Dast4days
+      lastdays=get_Last4days
       (0...@num_workers).each{|w|
         set_PrevMonth(w, lastdays[w])
       }
@@ -368,11 +365,13 @@ EOF
     when 39
       puts "# Manual Doing"
     else
+      puts "menu else"
       @isSaveMode = false
       return
     end # case menu
+
     @isSaveMode = false
-   end # do_Action
+                     end # do_Action
 
                      #
   #.............................
@@ -381,12 +380,19 @@ EOF
     puts "# def get_FromMenu_30( menu=#{menu} )"
     print menuData    
     # get  menu num.
-    if menu==3 or menu==30
-      menu=get_MenuNum(menuData)
-      case menu
-      when 31..34,37,39
-        return [ menu  ]
-      end
+    case menu
+    when 3, 30
+      loop {
+        menu=get_MenuNum(menuData)
+        case menu
+        when 31..34,37,39
+          return [ menu  ]
+        when 35, 36, 38
+          break
+        when 'Q'
+          break
+        end
+      }
     end
       
     # get detail param in menu 35 36
@@ -479,7 +485,6 @@ EOF
   #.........................
     puts msg if msg != nil
     prompt=<<-EOF
-
 [ Manual HANDLING ]
  'worker, day':     Toggle On/Off 
  'w1,day1 w2,day2': Exchange 
@@ -526,13 +531,17 @@ EOF
 
 
   #-----------------------
-  def get_MenuNum(menuData)
+  def get_MenuNum(menuData, quitQ='Q')
   #-----------------------
     puts menuData
     loop {
+      print ': '
       l=gets.chop
-      if l=~/^\s*(\d\d*)\s*$/
+      case l
+      when /^\s*(\d\d*)\s*$/i
         return $1
+      when /^\s*#{quitQ}\s*$/i
+        return 'Q' if quitQ!=''
       end
     }
   end #  def get_MenuNum(menuData)
