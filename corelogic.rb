@@ -89,8 +89,12 @@ include './View'
           puts "  #{@wrkdays[idxWorker][days[-1]]}   day #{days[-1]} in #{days}"
           exit
         end
-          
-        @wrkdays[idxWorker][days[-1]] = 'x'
+
+        if howTo == 0
+          @wrkdays[idxWorker][days[0]] = 'x'    ### 
+        else
+          @wrkdays[idxWorker][days[-1]] = 'x'
+        end
       end
     }
     puts "# presetKoyano #{cnt_add} days Added"
@@ -231,7 +235,7 @@ include './View'
   def shift_to(idxWorker, direction=+1, *params)
   #..............................
     # shift right +N, left -N
-    puts "\n\n#==  def shift_to( #{idxWorker}, #{direction} )"
+    puts "\n\n#==  def shift_to( #{idxWorker}, #{direction}, #{params} )"
     if params != nil
       p params
       if params.size == 2
@@ -239,6 +243,17 @@ include './View'
         return ret 
       end
     end
+
+    puts " @wrkdays[idxWorker] "
+    p @wrkdays
+    p idxWorker
+    p idxWorker + 1
+    p  @wrkdays[ idxWorker]
+        
+    puts "@wrkdays[idxWorker] '#{@wrkdays[idxWorker].inspect}'"
+    puts "@wrkdays[idxWorker] "
+
+
     strDays = @wrkdays[idxWorker].join('')
     strDays = strDays.slice(4, @num_days16)
   #  puts " Orignal 4, @num_days16  strDays  '#{strDays.length}'"

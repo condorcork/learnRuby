@@ -54,7 +54,6 @@ require 'io/console/size'
  9[0], Q[uit].   Exit 
 EOF
     puts prompt
-    casename = [] #[-?
     
     while true
       print ": "
@@ -294,8 +293,7 @@ Marshal.load(file)
   
   #............................
   def do_Action(menu, *wrker_dir_ndays)    # 3. 30.
-#  def do_Action(menu)    # 3. 30.
-  #.............................
+    #.............................
     menuData=<<-EOF
 [ Action MENU ]
 31. Blank with  Prev Month data
@@ -310,8 +308,9 @@ Marshal.load(file)
  H(elp)/M(enu): show This Menu"
  Q[uit].   Exit Menu
 EOF
-    
-    puts " '#{wrker_dir_ndays}''"
+
+    puts " '#{wrker_dir_ndays}'"
+  
     print menuData
     wrkr = dir = nday = nday2 = nil
     
@@ -321,76 +320,79 @@ EOF
       isReady = false
     when 31..34,37,39
       isReady = true
-      puts "## menu 31..34, 37,39 '#{menu}' Seled"
-=begin      
-          puts "#{menu} Param wrker Not Specified"
-            puts "#{menu} Shift Dpirection Not Specified"
-=end
-    end # case menu
-    # sub menu or param
-    menu, wrkr, dir, ndays, ndays2 = get_FromMenu_30(menuData, menu) if !isReady
+      puts "    menu 31..34, 47,39"
+      puts menu
+    when 35, 36
+      
+    end
+                         # sub menu or param
+     menu, wrkr, dir, ndays, ndays2 = get_FromMenu_30(menuData, menu) if !isReady
 
-    puts "## Menu=#{menu}    wrkr '#{wrkr}'  dir '#{dir}'  ndays='#{nday}' ndays2='#{nday2}'"
+     puts "## Menu=#{menu}    wrkr '#{wrkr}'  dir '#{dir}'  ndays='#{nday}' ndays2='#{nday2}'"
 
-    @isSaveMode = true
-    case menu
-    when 31
-      puts "#      load_NamedCase('Blank_')"
-      mk_WrkDays
-      lastdays=get_Last4days
-      (0...@num_workers).each{|w|
-        set_PrevMonth(w, lastdays[w])
-      }
-    when 32
-      puts "#    do  K_Yoyaku"
-      yoyaku(3, '6012')
-    when 33
-      puts "#      Pattern"
-      put_Patterns
+     @isSaveMode = true
+     case menu
+     when 31
+       puts "#      load_NamedCase('Blank_')"
+       mk_WrkDays
+       lastdays=get_Last4days
+       (0...@num_workers).each{|w|
+         set_PrevMonth(w, lastdays[w])
+       }
+     when 32
+       puts "#    do  K_Yoyaku"
+       yoyaku(3, '6012')
+     when 33
+       puts "#      Pattern"
+       put_Patterns
      when 34
        puts "#      set_Koyano"
        presetKoyano(@idx_Koyano)
-    when 35
-      puts "#      adjust(wrkr)"
-      adjust(wrkr)
-    when 36
-      puts "# ShiftTo right/left  for #{wrkr}"
-      shift_to(wrkr, dir )
-#      show_Hyo      
-    when 37
-      puts "#      adjust_Round"
-      adjust_Round
-    when 38
-      puts "# do Exexctuing Karte (not yet)"
-    when 39
-      puts "# Manual Doing"
-    else
-      puts "menu else"
-      @isSaveMode = false
-      return
-    end # case menu
-
-    @isSaveMode = false
-                     end # do_Action
-
+     when 35
+       puts "#      adjust(wrkr)"
+       adjust(wrkr)
+     when 36
+       puts "# ShiftTo right/left  for #{wrkr}"
+       shift_to(wrkr, dir )
+     #      show_Hyo      
+     when 37
+       puts "#      adjust_Round"
+       adjust_Round
+     when 38
+       puts "# do Exexctuing Karte (not yet)"
+     when 39
+       puts "# Manual Doing"
+     else
+       puts "menu else"
+       @isSaveMode = false
+       return
+     end # case menu
+     #
+     @isSaveMode= false
+  end # do_Action
+                     
                      #
-  #.............................
+  #............................
   def get_FromMenu_30(menuData, menu)
-    #..........................
+  #.............................
     puts "# def get_FromMenu_30( menu=#{menu} )"
-    print menuData    
+##    print menuData    
     # get  menu num.
     case menu
     when 3, 30
       loop {
-        menu=get_MenuNum(menuData)
-        case menu
+        menu=get_MenuNum(menuData, '(H|Q)')
+        case menu.to_i
         when 31..34,37,39
           return [ menu  ]
         when 35, 36, 38
           break
-        when 'Q'
-          break
+        when 61
+          show_Hyo(false)
+        else
+          if menu == 'Q'
+            return 'Q'
+          end
         end
       }
     end
@@ -411,7 +413,8 @@ EOF
         return [ 'Q' ]
       when /^\s*(\d)(\s+(-*\d+)(\s+(\d+)\s*,\s*(\d+))*)*\s*$/
         ret = []
-        ret << $1
+        ret << menu
+        ret << $1.to_i 
         ret << $3.to_i if $3 != nil
         ret << $5.to_i if $5 != nil
         ret << $6.to_i if $6 != nil
@@ -424,17 +427,17 @@ EOF
             break
           end
         elsif menu == 35 # Adjust
-          puts "Adjust  Worker #.'#{ret[0]}'"
+          puts "Adjust  Worker #.'#{ret[1]}'"
           if ! rply=ok_YN?("OK Y/N/Q")
             menu=90   # No
-            ret=[]
+            ret=[ 90 ]
           else
-            return [menu, ret[0]]
+            return ret
           end    
         end # if mene
       end #case l
     end # while
-    return menu,ret
+    return ret
   end #  def get_fromMenu_30
   
   #.............................
@@ -539,7 +542,7 @@ EOF
       l=gets.chop
       case l
       when /^\s*(\d\d*)\s*$/i
-        return $1
+        return $1.to_i
       when /^\s*#{quitQ}\s*$/i
         return 'Q' if quitQ!=''
       end
