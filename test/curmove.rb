@@ -39,8 +39,9 @@ def read_arrow_key()
 end # read_arrow_key
 
 #---- MAIN ----
-read_key
-#  read_arrow_key
+#read_key
+  read_arrow_key
+p IO::console_size
 
 
 #画面を消去して、真ん中に移動しておく
@@ -56,17 +57,24 @@ while (key = STDIN.getch) != "\C-c"
 
   # 方向を判断
 
-
   direction = case key
-  when "A", "k", "w", "\u0010"; "A" #↑
-  when "B", "j", "s", "\u000E"; "B" #↓
-  when "C", "l", "d", "\u0006"; "C" #→
-  when "D", "h", "a", "\u0002"; "D" #←
-  else nil
-  end
+#              when "A", "k", "w", "\u0010"; "A" #↑
+              when "A","\u0010"; "A" #↑
+#  when "B", "j", "s", "\u000E"; "B" #↓
+              when "B", "\u000E"; "B" #↓
+  #when "C", "l", "d", "\u0006"; "C" #→
+              when "C", "\u0006"; "C" #→
+#  when "D", "h", "a", "\u0002"; "D" #←
+              when "D","\u0002"; "D" #←
+              else nil
+              end
 
   # カーソル移動
-  print "\e[#{direction}" if direction
+  if direction
+    print "\e[#{direction}"
+  else
+    print key
+  end
 end
 
 __END__

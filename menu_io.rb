@@ -185,10 +185,16 @@ EOF
     case menu
     when 41..44
       ret = load_NamedCase(caseName)
-      show_Hyo(false) if ret
-    when 45
+      if ret
+         @wrkdays = ret
+         show_Hyo(false)
+      end
+   when 45
       ret= load_PrevCase
-      show_Hyo(false) if ret
+      if ret
+        @wrkdays = ret
+        show_Hyo(false)
+      end
     when 48
       if load_BestScore != nil
         show_Hyo

@@ -533,6 +533,7 @@ include './View'
     #
     puts "# << Adjust_Round done>> "
     puts "# #{changed} days adjusted   On #{cnt_add}  Off #{cnt_del}"
+
     puts "# Seq_worker  #{@seq_workers}"
     puts "# OK days  Before #{cnt_ok0}  ==> After #{cnt_ok} "
     puts "#   Result + #{cnt_ok - cnt_ok0}"
