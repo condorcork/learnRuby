@@ -1,42 +1,7 @@
 # coding: utf-8
+
 require 'io/console'
 require 'io/console/size'
-
-
-def read_key
-  i=0
-  while (key = STDIN.getch) != "\C-c"
-    puts " #{i += 1}: #{key.inspect} キーが押されました。"
-    puts " #{i}: #{key}"
-  end
-#..........  
-#方向	エスケープシーケンス
-#上	"\e[A"
-#下	"\e[B"
-#右	"\e[C"
-#左	"\e[D"  
-#..........  
-end
-
-def read_arrow_key()
-  
-  arrows = {A: "↑", B: "↓", C: "→", D: "←"}
-
-  i = 0
-  while (key = STDIN.getch) != "\C-c"
-
-    if key == "\e"
-      second_key = STDIN.getch
-
-      if second_key == "["
-        key = STDIN.getch
-        key = arrows[key.intern] || "esc: [#{key}"
-      else
-        key = "esc: #{second_key}"
-      end
-    end
-  end
-end # read_arrow_key
 
 def getNum(endMark)
   key = STDIN.getch
@@ -60,6 +25,7 @@ end
 def clearScrn()
   print "\e[2J"
 end
+
 
 def scrn_Size()
   y,x= IO::console_size
@@ -98,7 +64,7 @@ end
 
 def goto_x_y(x, y)
   print "\e[%d;%dH" % [ y, x ]
-  print "\033[7 \033[0m"  #cursor
+#  print "\033[7 \033[0m"  #cursor
   @curX=x+1
   @curY=y
 end
@@ -111,10 +77,84 @@ def show_xy
   goto_x_y(xy[0], xy[1])
 end
 
+
+def Init_Dat()
+  @hdr=[]
+  @hdr[0] = '0 1 2 3|4 5 6 7 8 9 1 . . . . + . . . . 2 . . . . + . . . . 3 . . . . +'
+
+  @dat=[]
+  @dat[0]= 'x x x x|x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x'
+  @dat[1]= 'x_x____|x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x'
+  @dat[2]= ' _ _x_x|x_ _ _x_x_x_ _ _x_x_x_ _ _x_x_x_ _x_x_ _x_x_x_ _x_x_ _ _x_x_x_x'
+
+  @dat_pos=0
+  @num_days = 31
+end
+
+def show_Dat()
+
+  lin=@hdr[@dat_pos * 2, @maxX]
+  x_y_print(1, 0, lin)
+  
+  (0..2).each{|i|
+    lin=@dat[i][@dat_pos * 2, @dat_pos * 2 + @maxX]
+    x_y_print(1, i+2, lin)
+  }    
+end
+
+def ddd
+         
+  line1=hdr1[4*2, @maxX]
+  x_y_print(2, 2, line1)
+
+
+  line1=dat1[4*2, @maxX]
+  x_y_print(2, 3, line1)
+   
+  line1=dat2[4*2, @maxX]
+  x_y_print(2, 4, line1)
+
+  line1=dat3[4*2, @maxX]
+  x_y_print(2, 4, line1)
+end
+
+def slide_Dat(dirc)
+  @dat_pos += dirc
+  if @dat_pos < 0
+    @dat_pos = 0
+  end
+
+  n = @num_days - @dat_pos
+  if n * 2 > @maxX
+    (0..4).each {|y|
+      x_y_print(1, y, " " * @maxX)
+    }
+  end
+  show_Dat
+end
+
+def xxx  
+#  if 
+#  @hdr= 
+  
+#  @hdr1= '0 1 2 3|4 5 6 7 8 9 1 . . . . + . . . . 2 . . . . + . . . . 3 . . . . +'
+#  line1=@hdr1[4*2, @maxX]
+#  x_y_print(2, 2, line1)
+  
+#  @dat1= 'x x x x|x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x'
+#  @dat2= 'x_x____|x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x'
+#  @dat3= ' _ _x_x|x_ _ _x_x_x_ _ _x_x_x_ _ _x_x_x_ _x_x_ _x_x_x_ _x_x_ _ _x_x_x_x'
+end
+
+
+
+
 #---- MAIN ----
 #read_key
 #  read_arrow_key
 init_Scrn()
+Init_Dat()
+
 
 #y,x= IO::console_size
 #p x, y
@@ -124,17 +164,19 @@ init_Scrn()
   x_y_print(@maxX, 1, '\\')
   x_y_print(1, @maxY, '\\')
   x_y_print(@maxX, @maxY, '/')
-   
 #
-  (2...@maxY.each{|y|
+  (2...@maxY).each{|y|
     x_y_print(1, y, "%3d" % y)
   }
+  
+# x_y_print(2, 2, '234567890....+....2....+....3....+....4' +
+#                  '....+....5....+....6....+....7'+
+#                  '....+....8....+....9....+....0' +
+#           '....+....1....+....2....+....2....+....3....+....4')
 
- x_y_print(2, 2, '234567890....+....2....+....3....+....4' +
-                  '....+....5....+....6....+....7'+
-                  '....+....8....+....9....+....0' +
-           '....+....1....+....2....+....2....+....3....+....4')
+  show_Dat
 
+ 
 #画面を消去して、真ん中に移動しておく
 #print "\e[2J"
 ##show
@@ -148,7 +190,6 @@ while (key = STDIN.getch) != "\C-c"
   end
 
   # 方向を判断
-
   direction = case key
 #              when "A", "k", "w", "\u0010"; "A" #↑
               when "A","\u0010"; "A" #↑
@@ -179,7 +220,12 @@ while (key = STDIN.getch) != "\C-c"
       goto_x_y(xy[0]-1, xy[1])
     when '>'
       xy=cur_x_y()
-      goto_x_y(xy[0], xy[1]+1)
+      if xy[0] >= @maxX
+        slide_Dat(8)
+        goto_x_y(xy[0]-8, xy[1])
+      else
+        goto_x_y(xy[0]+1, xy[1])
+      end
     when "\r"
       xy=cur_x_y()
       goto_x_y(0, xy[1])
@@ -216,21 +262,6 @@ zakuro ishikuro
 
 
 © 2011-2018 Increments Inc.
-利用規約
-ガイドライン
-プライバシー
-ヘルプ
-Qiita とは
-ユーザー
-タグ
-記事
-ブログ
-API
-Qiita:Team
-Qiita:Zine
-広告掲載
-ご意見
-#
 # coding: utf-8
 require 'io/console'
 require 'io/console/size'
