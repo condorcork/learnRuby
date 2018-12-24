@@ -21,6 +21,15 @@ require './CoreLogic'
 
 
  def preparePrevMonth(y)
+  y.set_PrevMonth(0, 'x  x')
+  y.set_PrevMonth(1, 'xxx ')
+  y.set_PrevMonth(2, ' xxx')
+  y.set_PrevMonth(3, 'DDDD')
+  return
+
+
+
+   
 #... Prepare for Prevmonth
   # 'xx  ''xxx'    --> 0(1)
   y.set_PrevMonth(0, 'xx  ')
@@ -39,7 +48,7 @@ require './CoreLogic'
   
  $fulldayDebug = false
  members=4
-   y=Yotei.new(members, '2018-11-01')    #  # 11, 2)
+   y=Yotei.new(members, '2019-01-01')    #  # 11, 2)
    #  y=Yotei.new(members)
 
   y.save_Case('Blank')

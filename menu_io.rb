@@ -360,14 +360,17 @@ EOF
      when 36
        puts "# ShiftTo right/left  for #{wrkr}"
        shift_to(wrkr, dir )
-     #      show_Hyo      
+       pp
+a1     #      show_Hyo      
      when 37
        puts "#      adjust_Round"
        adjust_Round
+       adjust_Kyu
      when 38
        puts "# do Exexctuing Karte (not yet)"
      when 39
        puts "# Manual Doing"
+       sel_ToggleExchange()
      else
        puts "menu else"
        @isSaveMode = false

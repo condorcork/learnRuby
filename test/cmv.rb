@@ -19,6 +19,7 @@ end
 def init_Scrn()
   @maxX, @maxY = scrn_Size()
   clearScrn
+  @dat_pos = 0
   goto_x_y(1,1)
 end
 
@@ -30,13 +31,6 @@ end
 def scrn_Size()
   y,x= IO::console_size
   return x,y
-end
-
-def show()
-  hdr='0 1 2 3|4 5 6 7 8 9 0 '
-  hdr << '1 2 3 4 5 6 7 8 9 0 '*2
-  hdr << '1 2 3 4 5 '
-  x_y_print(0, 0, hdr)
 end
 
 def cur_x_y()
@@ -69,14 +63,63 @@ def goto_x_y(x, y)
   @curY=y
 end
 
-#
-def show_xy
+def goto_Right()
+  xy=cur_x_y()
+  if xy[0] >= @maxX
+    show_data( @dat_pos)
+    wait
+    @dat_pos += 2
+    show_data( @dat_pos)
+    wait
+    if @dat_pos >= @limit_pos
+      @dat_pos = @limit_pos
+    end
+    show_data( @dat_pos)
+    wait
+    show_Dat
+    goto_x_y(xy[0], xy[1])
+  else
+    goto_x_y(xy[0]+1, xy[1])
+  end
+end
+
+def goto_Left()
+  xy=cur_x_y()
+  if xy[0] == 0
+    show_data(@dat_pos)
+    if @dat_pos > 0
+      @dat_pos -= 2
+      if @dat_pos < 0
+        @dat_pos = 0
+      end
+      
+      show_Dat
+      goto_x_y(xy[0],xy[1])
+    end
+  else
+    goto_x_y(xy[0]-1, xy[1])
+  end
+end
+
+def show_xy()
   xy=cur_x_y()
   posStr=" pos=(%2d, %2d) " % xy
   x_y_print(12, @maxY, posStr)
   goto_x_y(xy[0], xy[1])
 end
 
+def wait()
+  STDIN.getch
+end
+
+def show_data(dat)
+  xy=cur_x_y()
+  x=@maxX - " '#{dat}' ".length 
+  x /= 2
+  x_y_print(1, @maxY, ' '* @maxX)
+  x_y_print(x, @maxY, " '#{dat}' ")
+  goto_x_y(xy[0], xy[1])
+end  
 
 def Init_Dat()
   @hdr=[]
@@ -89,65 +132,59 @@ def Init_Dat()
 
   @dat_pos=0
   @num_days = 31
+  # limit to Right
+  @limit_pos = (@num_days + 4)*2 - @maxX - 1
+
+  
 end
 
 def show_Dat()
 
-  lin=@hdr[@dat_pos * 2, @maxX]
-  x_y_print(1, 0, lin)
+  lin=@hdr[0][@dat_pos * 2, @dat_pos*2 + @maxX]
+#  if lin.length < @maxX
+#    lin += ' '*(@maxX - lin.length)
+#  end
+  x_y_print(1, 1, lin)
   
   (0..2).each{|i|
     lin=@dat[i][@dat_pos * 2, @dat_pos * 2 + @maxX]
+#    if lin.length < @maxX    
+#      lin += ' '*(@maxX - lin.length).
+#    end
     x_y_print(1, i+2, lin)
   }    
 end
 
-def ddd
-         
-  line1=hdr1[4*2, @maxX]
-  x_y_print(2, 2, line1)
-
-
-  line1=dat1[4*2, @maxX]
-  x_y_print(2, 3, line1)
-   
-  line1=dat2[4*2, @maxX]
-  x_y_print(2, 4, line1)
-
-  line1=dat3[4*2, @maxX]
-  x_y_print(2, 4, line1)
-end
-
-def slide_Dat(dirc)
-  @dat_pos += dirc
-  if @dat_pos < 0
-    @dat_pos = 0
-  end
-
-  n = @num_days - @dat_pos
-  if n * 2 > @maxX
-    (0..4).each {|y|
-      x_y_print(1, y, " " * @maxX)
-    }
+def set_Dat(row, column, key)
+  # for Debug
+  msg="def set_Dat(#{row}, #{column}, #{key})" % [ row, column, key]
+  xy=cur_x_y()  
+  x_y_print(12, @maxY, msg) 
+  goto_x_y(xy[0], xy[1])
+  # 
+  x=column + @dat_pos - 1
+  case row
+  when 1
+    @hdr[0][x]=key
+  when 2..4
+    @dat[row-2][x]=key
+  else
+    puts "Err #{row} not 1..4"
+    exit 1
   end
   show_Dat
 end
 
-def xxx  
-#  if 
-#  @hdr= 
-  
-#  @hdr1= '0 1 2 3|4 5 6 7 8 9 1 . . . . + . . . . 2 . . . . + . . . . 3 . . . . +'
-#  line1=@hdr1[4*2, @maxX]
-#  x_y_print(2, 2, line1)
-  
-#  @dat1= 'x x x x|x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x'
-#  @dat2= 'x_x____|x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x'
-#  @dat3= ' _ _x_x|x_ _ _x_x_x_ _ _x_x_x_ _ _x_x_x_ _x_x_ _x_x_x_ _x_x_ _ _x_x_x_x'
+def get_direction(key)
+   direction = case key
+               when "A", "k", "w", "\u0010"; "A" #↑
+               when "B", "j", "s", "\u000E"; "B" #↓
+                when "C", "l", "d", "\u0006"; "C" #→
+                when "D", "h", "a", "\u0002"; "D" #←
+                else nil
+               end
+   return direction
 end
-
-
-
 
 #---- MAIN ----
 #read_key
@@ -160,51 +197,73 @@ Init_Dat()
 #p x, y
 
 # frame corner of window
-  x_y_print(1, 1, '/')
-  x_y_print(@maxX, 1, '\\')
-  x_y_print(1, @maxY, '\\')
-  x_y_print(@maxX, @maxY, '/')
+  x_y_print(1, 1, '+')
+  x_y_print(@maxX, 1, '+')
+  x_y_print(1, @maxY, '+')
+  x_y_print(@maxX, @maxY, '+')
 #
   (2...@maxY).each{|y|
     x_y_print(1, y, "%3d" % y)
   }
   
-# x_y_print(2, 2, '234567890....+....2....+....3....+....4' +
-#                  '....+....5....+....6....+....7'+
-#                  '....+....8....+....9....+....0' +
-#           '....+....1....+....2....+....2....+....3....+....4')
-
   show_Dat
-
- 
-#画面を消去して、真ん中に移動しておく
-#print "\e[2J"
-##show
-#print "\e[%d;%dH" % IO::console_size.map{|size| size / 2 }
-#print "\033[32mSTART\033[0m :"
-
+  goto_x_y(3,10)
+  loop do
+    key=STDIN.getch
+    case key
+    when "\C-c";   break
+    when "\e"
+      if ( nkey=STDIN.getch ) == "["
+        key=STDIN.getch
+        direct=get_direction(key)
+        if direct
+          print "\e[#{direct}"
+        else
+          print key;
+        end
+      else
+        print key
+      end
+    when "\r"
+      print key
+    when "\C-e"
+      print "#{key}"
+    else
+      print key
+    end 
+  end
+  exit
+  
+escpLP=false
 while (key = STDIN.getch) != "\C-c"
   # 方向キー以外は不要なので、エスケープ文字を得る処理は簡略化した
   if key == "\e" && STDIN.getch == "["
+    escpLP=true
     key = STDIN.getch
   end
 
   # 方向を判断
-  direction = case key
-#              when "A", "k", "w", "\u0010"; "A" #↑
-              when "A","\u0010"; "A" #↑
-#  when "B", "j", "s", "\u000E"; "B" #↓
-              when "B", "\u000E"; "B" #↓
-  #when "C", "l", "d", "\u0006"; "C" #→
-              when "C", "\u0006"; "C" #→
-#  when "D", "h", "a", "\u0002"; "D" #←
-              when "D","\u0002"; "D" #←
-              else nil
-              end
+ direction = case key
+                #              when "A", "k", "w", "\u0010"; "A" #↑
+                when "A","\u0010"; "A" #↑
+                #  when "B", "j", "s", "\u000E"; "B" #↓
+                when "B", "\u000E"; "B" #↓
+                when "C", "l", "d", "\u0006"; "C" #→
+                #              when "C", "\u0006"; "C" #→
+                #  when "D", "h", "a", "\u0002"; "D" #←
+                when "D","\u0002"; "D" #←
+                else nil
+                end
 
-  # カーソル移動
-  if direction
-    print "\e[#{direction}"
+    # カーソル移動
+    if direction
+      if direction=='C'
+        goto_Right
+      elsif direction=='D'
+        goto_Left
+      else
+        print "\e[#{direction}"
+      end
   else
     case key
     when '?'
@@ -216,22 +275,16 @@ while (key = STDIN.getch) != "\C-c"
       xy=cur_x_y()
       goto_x_y(xy[0], xy[1]-1)
     when '<'
-      xy=cur_x_y()
-      goto_x_y(xy[0]-1, xy[1])
+      goto_Left()
     when '>'
-      xy=cur_x_y()
-      if xy[0] >= @maxX
-        slide_Dat(8)
-        goto_x_y(xy[0]-8, xy[1])
-      else
-        goto_x_y(xy[0]+1, xy[1])
-      end
+      goto_Right
     when "\r"
       xy=cur_x_y()
       goto_x_y(0, xy[1])
     else
       xy=cur_x_y()
       print key
+      set_Dat(xy[1], xy[0], key)
       goto_x_y(xy[0]+2, xy[1])
     end # case key
   end

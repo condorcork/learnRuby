@@ -465,6 +465,7 @@ include './View'
     cnt_add = cnt_del = changed = cnt_ok = cnt_ok0 =  0
     cnt_change_p_worker=Array.new(@num_workers, 0)
 
+    save_Case('beforeAdjustRound')
     # Save Before num of OK 
     @theMonthRange.each do |day|
       if cnt_filled( day ) == @num_workers_p_day
@@ -473,6 +474,9 @@ include './View'
     end
     notfilled = @num_days16 - cnt_ok0
     @limit_change = notfilled / @num_workers
+    if @limit_change < 4
+      @limit_change = 4
+    end
     
     @theMonthRange.each do |day|
       #     num = cnt_filled(day)
@@ -503,7 +507,7 @@ include './View'
             set_WorkersSeq(  wrkr )
             cnt_change_p_worker[wrkr] += 1
             if cnt_change_p_worker[wrkr] > @limit_change
-              puts "#==!!!= #{wrkr} changed #{@limit_change} times. So Nore More Change"
+              puts "#==!!!= #{wrkr} changed #{@limit_change} times. So No More Change"
               @seq_workers.delete( wrkr )
             end
           else              
@@ -546,6 +550,12 @@ include './View'
     ##
   end #  def adjust_Round()
 
+  def adjust_Kyu()
+    puts "#adjust_Kyu"
+    (0...@num_workers).each{|w|
+      p @chk_workers[:WithFullOffDay][w]
+    }
+  end # adjust_Kyu
   #....................
   def think(idxWorker) 
   #..........................

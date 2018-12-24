@@ -434,7 +434,7 @@ module ControlHelper
    # scr=@chk_Place[:OK].to_s.
     (0...@num_workers).each {|w|
     #  puts "#.#{w} KOKYU = #{ @chk_workers[:FullOffDays][w] }"
-      w_scr += ( 9 - @chk_workers[:FullOffDays][w].size * 2).abs / 2
+      w_scr += ( 9 - @chk_workers[:FullOffDays][w].size * 2).abs ##[- / 2
     }
     #puts "score (OK x 2) :#{scr}"
     #puts " w_scr ( 9 - kokyu x 2) / 2 ) = #{w_scr}"
